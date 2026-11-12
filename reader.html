@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>阅读 · 集藏本体论</title>
+<link rel="icon" href="favicon.svg">
+<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f5ead2;--paper2:#faf2dd;--ink:#2a241c;--ink2:#5a4a32;
+  --red:#a52a1b;--gold:#b08d46;--line:#c9b484;
+}
+html,body{margin:0;padding:0;background:var(--paper2);color:var(--ink);font-family:"Noto Serif SC","Songti SC","STSong",serif;}
+.topbar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(245,234,210,.98),rgba(250,242,221,.96));border-bottom:2px solid var(--red);box-shadow:0 2px 12px rgba(165,42,27,.1);backdrop-filter:blur(6px);}
+.topbar-inner{max-width:1400px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.brand{font-family:"Noto Serif SC",serif;font-size:20px;font-weight:900;color:var(--red);letter-spacing:3px;text-decoration:none;white-space:nowrap;}
+.brand:hover{color:var(--gold);}
+.book-meta{flex:1;min-width:200px;}
+.book-title{font-size:18px;font-weight:700;color:var(--ink);}
+.book-sub{font-size:13px;color:var(--ink2);margin-top:2px;}
+.tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.tool-btn{background:transparent;border:1px solid var(--line);color:var(--ink2);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;}
+.tool-btn:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.tool-btn.active{background:var(--red);color:#fff;border-color:var(--red);}
+.layout{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:260px 1fr;gap:0;min-height:calc(100vh - 60px);}
+.toc{background:var(--paper);border-right:1px solid var(--line);padding:16px 0;position:sticky;top:60px;align-self:start;max-height:calc(100vh - 60px);overflow-y:auto;}
+.toc-title{font-size:13px;font-weight:700;color:var(--red);padding:4px 20px 10px;border-bottom:1px solid var(--line);margin-bottom:8px;letter-spacing:2px;}
+.toc-list{list-style:none;padding:0;margin:0;}
+.toc-list li{}
+.toc-list a{display:block;padding:6px 20px;font-size:13px;color:var(--ink2);text-decoration:none;border-left:3px solid transparent;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.toc-list a:hover{background:rgba(165,42,27,.08);color:var(--red);}
+.toc-list a.active{background:rgba(165,42,27,.12);color:var(--red);border-left-color:var(--red);font-weight:600;}
+.reader{padding:40px 60px 80px;max-width:860px;margin:0 auto;}
+.reader h1.book-h{font-size:28px;font-weight:900;color:var(--ink);text-align:center;border-bottom:2px double var(--red);padding-bottom:16px;margin:0 0 24px;letter-spacing:4px;}
+.reader h2{font-size:20px;font-weight:700;color:var(--red);margin:40px 0 16px;padding-top:24px;border-top:1px dashed var(--line);text-align:center;letter-spacing:2px;}
+.reader h3{font-size:17px;font-weight:700;color:var(--ink);margin:24px 0 12px;padding-left:12px;border-left:4px solid var(--red);}
+.reader p{font-size:var(--fs,18px);line-height:2;margin:0 0 8px;text-indent:2em;color:var(--ink);text-align:justify;}
+/* 诗文不缩进 */
+.reader p.poem,.reader p.verse{text-indent:0;text-align:center;line-height:1.9;}
+.reader p.note{color:var(--ink2);font-size:calc(var(--fs,18px) - 2px);}
+.loading{text-align:center;padding:80px 20px;color:var(--ink2);font-size:16px;}
+.loading .spin{display:inline-block;width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{text-align:center;padding:60px 20px;color:var(--red);}
+.error a{color:var(--red);text-decoration:underline;}
+/* 字号档位 */
+body.fs-s{--fs:16px;}
+body.fs-m{--fs:18px;}
+body.fs-l{--fs:22px;}
+body.fs-xl{--fs:26px;}
+/* 竖排模式 */
+body.vertical{writing-mode:vertical-rl;-webkit-writing-mode:vertical-rl;}
+body.vertical .layout{display:block;}
+body.vertical .toc{display:none;}
+body.vertical .reader{max-width:none;padding:40px;}
+body.vertical .reader h2{border-top:none;border-right:2px solid var(--red);padding-right:12px;padding-top:0;margin:0 24px;}
+body.vertical .reader p{text-indent:0;margin:0 2px;}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .toc{position:static;max-height:200px;border-right:none;border-bottom:1px solid var(--line);}
+  .reader{padding:20px 16px 60px;}
+}
+</style>
+</head>
+<body class="fs-m">
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">◈ 集藏</a>
+    <div class="book-meta">
+      <div class="book-title" id="topTitle">加载中…</div>
+      <div class="book-sub" id="topSub"></div>
+    </div>
+    <div class="tools">
+      <button class="tool-btn" id="btnToc" title="目录">☰ 目录</button>
+      <span style="color:var(--ink2);font-size:12px;">字号</span>
+      <button class="tool-btn fs-btn" data-fs="s">小</button>
+      <button class="tool-btn fs-btn active" data-fs="m">中</button>
+      <button class="tool-btn fs-btn" data-fs="l">大</button>
+      <button class="tool-btn fs-btn" data-fs="xl">特大</button>
+      <button class="tool-btn" id="btnV" title="竖排">竖排</button>
+      <a class="tool-btn" href="books.html">← 返回典籍</a>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="toc" id="tocPanel">
+    <div class="toc-title">卷次目录</div>
+    <ul class="toc-list" id="tocList"></ul>
+  </aside>
+  <main class="reader" id="reader">
+    <div class="loading"><div class="spin"></div><div>正在加载典籍…</div></div>
+  </main>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const bookId = params.get('id');
+const cat = params.get('cat') || '';
+
+// 字号按钮
+document.querySelectorAll('.fs-btn').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.fs-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.body.className = document.body.className.replace(/fs-\w+/g,'') + ' fs-' + b.dataset.fs;
+    localStorage.setItem('jicang_fs', b.dataset.fs);
+  };
+});
+const savedFs = localStorage.getItem('jicang_fs')||'m';
+document.body.className = document.body.className.replace(/fs-\w+/g,'') + ' fs-' + savedFs;
+document.querySelectorAll('.fs-btn').forEach(b=>{if(b.dataset.fs===savedFs){document.querySelectorAll('.fs-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');}});
+
+// 竖排
+document.getElementById('btnV').onclick=()=>{
+  document.body.classList.toggle('vertical');
+};
+
+// 目录切换
+document.getElementById('btnToc').onclick=()=>{
+  document.getElementById('tocPanel').style.display = document.getElementById('tocPanel').style.display==='none'?'block':'';
+};
+
+// 渲染章节列表
+function renderToc(chapters){
+  const ul = document.getElementById('tocList');
+  if(!chapters||!chapters.length){ ul.innerHTML='<li style="padding:6px 20px;color:var(--ink2);font-size:12px;">（未识别卷次）</li>'; return;}
+  ul.innerHTML = chapters.map(c=>`<li><a href="#${c.id}" data-id="${c.id}">${c.title}</a></li>`).join('');
+  ul.querySelectorAll('a').forEach(a=>{
+    a.onclick=(e)=>{
+      e.preventDefault();
+      const el = document.getElementById(a.dataset.id);
+      if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    };
+  });
+}
+
+// 滚动时高亮当前章节
+window.addEventListener('scroll',()=>{
+  const hs = document.querySelectorAll('.reader h2');
+  let cur=null;
+  hs.forEach(h=>{if(h.getBoundingClientRect().top<120)cur=h;});
+  document.querySelectorAll('.toc-list a').forEach(a=>{
+    a.classList.toggle('active', cur && a.dataset.id===cur.id);
+  });
+});
+
+async function loadBook(){
+  const reader = document.getElementById('reader');
+  if(!bookId){
+    reader.innerHTML='<div class="error">未指定书籍。<br><a href="books.html">← 返回典籍列表</a></div>';
+    return;
+  }
+
+  // 找路径：先尝试 texts/cat/id.json，失败则在 index 里找
+  let path = cat ? `texts/${cat}/${bookId}.json` : null;
+  let book = null;
+  try{
+    let r = await fetch(path||`texts/index.json`);
+    if(!r.ok) throw 0;
+    if(path){
+      book = await r.json();
+    }else{
+      const idx = await r.json();
+      const b = idx.books.find(x=>x.id===bookId);
+      if(!b) throw 0;
+      r = await fetch(b.path);
+      if(!r.ok) throw 0;
+      book = await r.json();
+    }
+  }catch(e){
+    reader.innerHTML=`<div class="error">未能加载典籍「${bookId}」，可能正文尚未同步。<br><a href="books.html">← 返回典籍列表</a></div>`;
+    return;
+  }
+
+  document.title = `${book.title} · 集藏本体论`;
+  document.getElementById('topTitle').textContent = book.title;
+  document.getElementById('topSub').textContent = [book.dynasty, book.author, book.category, book.char_count?'约'+Math.round(book.char_count/10000)+'万字':null].filter(Boolean).join(' · ');
+
+  // 正文
+  let html = `<h1 class="book-h">${book.title}</h1>`;
+  if(book.author||book.dynasty){
+    html += `<p style="text-align:center;text-indent:0;color:var(--ink2);font-size:15px;margin-bottom:32px;">${[book.dynasty,book.author].filter(Boolean).join(' · ')}</p>`;
+  }
+  html += book.content;
+  reader.innerHTML = html;
+
+  renderToc(book.chapters);
+}
+
+loadBook();
+</script>
+</body>
+</html>
