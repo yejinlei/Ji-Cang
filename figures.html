@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文人群像 · 集藏本体论</title>
+<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',jade:'#2f6b5f',gold:'#a9801f',violet:'#6b3fa0'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
+</script>
+<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 85% 12%,rgba(168,50,45,.05) 0,transparent 42%)}.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}</style>
+</head>
+<body class="font-sans text-ink paper-bg min-h-screen">
+<header class="sticky top-0 z-50 bg-ink/95 border-b border-cinnabar/30">
+  <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-[28px] h-[28px] rounded-md bg-cinnabar text-paper flex items-center justify-center font-serif font-bold text-[16px] shrink-0">集</span>
+      <span class="text-paper font-serif font-bold text-[16px]">集藏本体论</span></a>
+    <nav class="flex items-center gap-4 text-paper2/85 text-[13.5px]">
+      <a href="index.html" class="hover:text-gold2">首页</a>
+      <a href="timeline.html" class="hover:text-gold2">时间轴</a>
+      <a href="schools.html" class="hover:text-gold2">流派对比</a></nav>
+  </div>
+</header>
+<main class="max-w-6xl mx-auto px-4 py-8">
+  <div class="flex items-end justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">文人群像</h1>
+      <p class="text-ink2 text-[15px] mt-2 max-w-2xl leading-relaxed">诗人、词人、文家、曲家、小说家、文论家——历代文人的字号、生卒、生平与代表成就。</p>
+    </div>
+    <div id="tabs" class="flex flex-wrap gap-2 text-[13px]"></div>
+  </div>
+  <div id="count" class="text-[13px] text-ink3 mt-4"></div>
+  <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 mt-3"></div>
+</main>
+<script src="data/network.js"></script>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
+const tabs=document.querySelector('#tabs'),grid=document.querySelector('#grid'),count=document.querySelector('#count');
+const cats=['诗人','词人','文家','曲家','小说家','文论家'];
+const catColor={'诗人':'#a8322d','词人':'#2f6b5f','文家':'#31427b','曲家':'#6b3fa0','小说家':'#b5651d','文论家':'#a9801f'};
+function render(cat){
+  const arr=JICANG_NETWORK.nodes.filter(n=>n.cat===cat);
+  grid.innerHTML='';
+  arr.forEach(n=>{
+    grid.appendChild(el(`<article class="rounded-xl bg-white/72 border border-ink/10 p-3.5">
+      <div class="flex items-center justify-between"><h2 class="font-serif font-bold text-[16.5px] text-ink">${esc(n.n)}</h2>
+      <span class="tag" style="background:${catColor[cat]}18;color:${catColor[cat]};border:1px solid ${catColor[cat]}33">${esc(n.d)}</span></div>
+      <div class="text-[12px] text-ink3 mt-1">${n.z?'字 '+esc(n.z):''}${n.h?' · 号 '+esc(n.h):''} · ${esc(n.by)}—${esc(n.dy)}</div>
+      <p class="text-[13px] text-ink2 leading-relaxed mt-2">${esc(n.bio)}</p></article>`));
+  });
+  count.textContent=`${cat} · 共 ${arr.length} 位`;
+}
+cats.forEach(c=>{
+  const b=el(`<button class="px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar">${c}</button>`);
+  b.addEventListener('click',()=>{[...tabs.children].forEach(x=>x.className='px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar');b.className='px-3 py-1.5 rounded-md border bg-ink text-paper border-ink';render(c);});
+  tabs.appendChild(b);
+});
+// 默认总览
+grid.innerHTML=`<div class="sm:col-span-2 lg:col-span-3 xl:col-span-4 flex flex-wrap gap-1.5">${cats.map(c=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${c} · ${JICANG_NETWORK.nodes.filter(n=>n.cat===c).length}</span>`).join('')}</div>`;
+count.textContent='请选择上方人物类型查看详情。';
+</script>
+</body>
+</html>

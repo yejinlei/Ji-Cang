@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>流派对比 · 集藏本体论</title>
+<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',jade:'#2f6b5f',gold:'#a9801f',violet:'#6b3fa0'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
+</script>
+<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 20% 10%,rgba(107,63,160,.05) 0,transparent 42%)}.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}select{background:#fff}</style>
+</head>
+<body class="font-sans text-ink paper-bg min-h-screen">
+<header class="sticky top-0 z-50 bg-ink/95 border-b border-cinnabar/30">
+  <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-[28px] h-[28px] rounded-md bg-cinnabar text-paper flex items-center justify-center font-serif font-bold text-[16px] shrink-0">集</span>
+      <span class="text-paper font-serif font-bold text-[16px]">集藏本体论</span></a>
+    <nav class="flex items-center gap-4 text-paper2/85 text-[13.5px]">
+      <a href="index.html" class="hover:text-gold2">首页</a>
+      <a href="dict.html" class="hover:text-gold2">文论词典</a>
+      <a href="figures.html" class="hover:text-gold2">文人群像</a></nav>
+  </div>
+</header>
+<main class="max-w-6xl mx-auto px-4 py-8">
+  <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">流派对比</h1>
+  <p class="text-ink2 text-[15px] mt-2 max-w-3xl leading-relaxed">选定两派，比对其时代、宗主、主张、风格、成员与代表作品。</p>
+  <div class="flex flex-wrap items-center gap-3 mt-4">
+    <label for="a" class="text-[13.5px] text-ink2">流派一</label>
+    <select id="a" class="px-3 py-2 rounded-md border border-ink/20 text-[14px]"></select>
+    <span class="text-ink3">对</span>
+    <label for="b" class="text-[13.5px] text-ink2">流派二</label>
+    <select id="b" class="px-3 py-2 rounded-md border border-ink/20 text-[14px]"></select>
+  </div>
+  <div id="cmp" class="grid md:grid-cols-2 gap-4 mt-5"></div>
+  <h2 class="font-serif font-bold text-[22px] text-ink mt-10 mb-3">全部流派</h2>
+  <div id="all" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
+</main>
+<script src="data/network.js"></script>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
+const S=JICANG_NETWORK.schools;
+const pick=s=>`<div class="rounded-xl bg-white/75 border border-ink/10 p-5">
+  <div class="flex items-center justify-between"><h3 class="font-serif font-bold text-[20px] text-ink">${esc(s.name)}</h3>
+  <span class="tag bg-cinnabar/10 text-cinnabar border border-cinnabar/20">${esc(s.kind)}</span></div>
+  <dl class="mt-3 text-[13.5px] space-y-2">
+    <div class="flex gap-2"><dt class="text-ink3 w-16 shrink-0">时代</dt><dd class="text-ink2">${esc(s.era)}</dd></div>
+    <div class="flex gap-2"><dt class="text-ink3 w-16 shrink-0">宗主</dt><dd class="text-ink2">${esc(s.advocate)}</dd></div>
+    <div class="flex gap-2"><dt class="text-ink3 w-16 shrink-0">主张</dt><dd class="text-ink2">${esc(s.desc)}</dd></div>
+    <div class="flex gap-2"><dt class="text-ink3 w-16 shrink-0">风格</dt><dd class="text-ink2">${esc(s.style)}</dd></div>
+    <div class="flex gap-2"><dt class="text-ink3 w-16 shrink-0">成员</dt><dd class="flex flex-wrap gap-1.5">${s.members.map(m=>`<span class="tag bg-jade/10 text-jade border border-jade/20">${esc(m)}</span>`).join('')}</dd></div>
+    <div class="flex gap-2"><dt class="text-ink3 w-16 shrink-0">代表</dt><dd class="text-ink2">${s.works.map(esc).join('、')}</dd></div>
+  </dl></div>`;
+function fill(sel,def){S.forEach((s,i)=>{sel.appendChild(el(`<option value="${i}">${esc(s.name)}（${esc(s.era)}）</option>`));});sel.value=def;}
+const A=document.querySelector('#a'),B=document.querySelector('#b'),C=document.querySelector('#cmp');
+fill(A,0);fill(B,4);
+function upd(){C.innerHTML='';C.appendChild(el(pick(S[A.value])));C.appendChild(el(pick(S[B.value])));}
+A.addEventListener('change',upd);B.addEventListener('change',upd);upd();
+const box=document.querySelector('#all');
+S.forEach(s=>{box.appendChild(el(`<article class="rounded-xl bg-white/72 border border-ink/10 p-4">
+  <div class="flex items-center justify-between"><h3 class="font-serif font-bold text-[16.5px] text-ink">${esc(s.name)}</h3>
+  <span class="tag bg-paper3 text-ink3">${esc(s.kind)}</span></div>
+  <div class="text-[12.5px] text-ink3 mt-1">${esc(s.era)} · ${esc(s.advocate)}</div>
+  <p class="text-[13px] text-ink2 leading-relaxed mt-2">${esc(s.desc)}</p></article>`));});
+</script>
+</body>
+</html>

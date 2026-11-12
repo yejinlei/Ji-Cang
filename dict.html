@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文论词典 · 集藏本体论</title>
+<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',jade:'#2f6b5f',gold:'#a9801f'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
+</script>
+<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 88% 8%,rgba(47,107,95,.05) 0,transparent 40%)}.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}</style>
+</head>
+<body class="font-sans text-ink paper-bg min-h-screen">
+<header class="sticky top-0 z-50 bg-ink/95 border-b border-cinnabar/30">
+  <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-[28px] h-[28px] rounded-md bg-cinnabar text-paper flex items-center justify-center font-serif font-bold text-[16px] shrink-0">集</span>
+      <span class="text-paper font-serif font-bold text-[16px]">集藏本体论</span></a>
+    <nav class="flex items-center gap-4 text-paper2/85 text-[13.5px]">
+      <a href="index.html" class="hover:text-gold2">首页</a>
+      <a href="ontology.html" class="hover:text-gold2">本体总纲</a>
+      <a href="schools.html" class="hover:text-gold2">流派对比</a></nav>
+  </div>
+</header>
+<main class="max-w-6xl mx-auto px-4 py-8">
+  <div class="flex items-end justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">文论词典</h1>
+      <p class="text-ink2 text-[15px] mt-2 max-w-2xl leading-relaxed">集部文论核心范畴三十六条，每条系以出处、原文与释义。</p>
+    </div>
+    <input id="q" type="search" placeholder="检索概念 / 出处 / 释义…" class="w-full sm:w-72 px-3 py-2 rounded-md border border-ink/20 bg-white/80 text-[14px] focus:outline-none focus:border-cinnabar">
+  </div>
+  <div id="grid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3.5 mt-6"></div>
+  <p class="text-center text-[12.5px] text-ink3 mt-8">集藏本体论 · 释义参酌历代诗话词话</p>
+</main>
+<script src="data/theory.js"></script>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
+const grid=document.querySelector('#grid');
+function render(kw){
+  grid.innerHTML='';
+  JICANG_THEORY.concepts.filter(c=>!kw||(c.name+c.src+c.note+c.quote).includes(kw)).forEach(c=>{
+    grid.appendChild(el(`<article class="rounded-xl bg-white/72 border border-ink/10 p-4">
+      <div class="flex items-center justify-between">
+        <h2 class="font-serif font-bold text-[17.5px] text-cinnabar">${esc(c.name)}</h2>
+        <span class="tag bg-paper3 text-ink3">${esc(c.d)}</span></div>
+      <div class="text-[12.5px] text-ink3 mt-1">出处 · ${esc(c.src)}</div>
+      <blockquote class="mt-2.5 pl-3 border-l-2 border-cinnabar/40 text-[13.5px] text-ink2 leading-relaxed font-kai">「${esc(c.quote)}」</blockquote>
+      <p class="text-[13px] text-ink2 leading-relaxed mt-2">${esc(c.note)}</p></article>`));
+  });
+  if(!grid.children.length) grid.innerHTML='<p class="text-ink3 text-[14px]">未找到相关概念。</p>';
+}
+render('');
+document.querySelector('#q').addEventListener('input',e=>render(e.target.value.trim()));
+</script>
+</body>
+</html>

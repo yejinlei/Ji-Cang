@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>意象图谱 · 集藏本体论</title>
+<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<script src="https://aisearch-task.bj.bcebos.com/static/echarts-5.6.0.min.js"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',jade:'#2f6b5f',gold:'#a9801f',violet:'#6b3fa0',ochre:'#b5651d'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
+</script>
+<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 15% 80%,rgba(181,101,29,.05) 0,transparent 42%)}.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}</style>
+</head>
+<body class="font-sans text-ink paper-bg min-h-screen">
+<header class="sticky top-0 z-50 bg-ink/95 border-b border-cinnabar/30">
+  <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-[28px] h-[28px] rounded-md bg-cinnabar text-paper flex items-center justify-center font-serif font-bold text-[16px] shrink-0">集</span>
+      <span class="text-paper font-serif font-bold text-[16px]">集藏本体论</span></a>
+    <nav class="flex items-center gap-4 text-paper2/85 text-[13.5px]">
+      <a href="index.html" class="hover:text-gold2">首页</a>
+      <a href="dict.html" class="hover:text-gold2">文论词典</a>
+      <a href="figures.html" class="hover:text-gold2">文人群像</a></nav>
+  </div>
+</header>
+<main class="max-w-6xl mx-auto px-4 py-8">
+  <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">文学意象图谱</h1>
+  <p class="text-ink2 text-[15px] mt-2 max-w-3xl leading-relaxed">意象者，物象与情思之结晶。下表以桑基图呈现『意象—情感—代表诗人』的流向，下附十六类核心意象及历代名句。</p>
+  <div class="rounded-xl bg-white/72 border border-ink/10 p-2 mt-4">
+    <div id="sankey" style="height:460px"></div>
+  </div>
+  <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-6"></div>
+</main>
+<script src="data/network.js"></script>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
+// 桑基图：意象 → 情感 → 诗人
+(function(){
+  const nodes=[],links=[];const idx={};
+  function add(name,cat){const key=cat+':'+name;if(idx[key]==null){idx[key]=nodes.length;nodes.push({name,itemStyle:{color:cat==='意象'?'#a8322d':cat==='情感'?'#2f6b5f':'#a9801f'}});}return idx[key];}
+  const poets=new Set();
+  JICANG_NETWORK.imagery.forEach(im=>{
+    const i=add(im.name,'意象'), s=add(im.sym,'情感');
+    links.push({source:i,target:s,value:2});
+    im.poets.slice(0,2).forEach(p=>{const pi=add(p,'诗人');links.push({source:s,target:pi,value:1});});
+  });
+  const chart=echarts.init(document.querySelector('#sankey'));
+  chart.setOption({tooltip:{trigger:'item',triggerOn:'mousemove'},series:[{type:'sankey',left:6,right:6,top:10,bottom:10,
+    nodeWidth:14,nodeGap:9,draggable:false,emphasis:{focus:'adjacency'},
+    label:{color:'#4a463f',fontSize:12},lineStyle:{color:'gradient',opacity:.32,curveness:.5},
+    data:nodes.map(n=>({name:n.name,itemStyle:n.itemStyle})),links}]});
+})();
+// 意象卡片
+(function(){
+  const box=document.querySelector('#grid');
+  JICANG_NETWORK.imagery.forEach(im=>{
+    const q=im.quotes.map(x=>`<li class="text-[13px] text-ink2 leading-relaxed font-kai">「${esc(x.t)}」<span class="text-ink3">— ${esc(x.a)}</span></li>`).join('');
+    box.appendChild(el(`<article class="rounded-xl bg-white/72 border border-ink/10 p-4">
+      <div class="flex items-baseline gap-2"><h2 class="font-serif font-bold text-[19px] text-ink">${esc(im.name)}</h2>
+      <span class="text-[12.5px] text-cinnabar">${esc(im.sym)}</span></div>
+      <ul class="mt-2.5 space-y-1.5">${q}</ul>
+      <div class="mt-2.5 flex flex-wrap gap-1.5">${im.poets.map(p=>`<span class="tag bg-paper3 text-ink2">${esc(p)}</span>`).join('')}</div></article>`));
+  });
+})();
+</script>
+</body>
+</html>

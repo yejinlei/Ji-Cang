@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文学时间轴 · 集藏本体论</title>
+<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',jade:'#2f6b5f',gold:'#a9801f',violet:'#6b3fa0'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
+</script>
+<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 12% 18%,rgba(168,50,45,.045) 0,transparent 42%)}.tl-item{position:relative;padding-left:30px}.tl-item::before{content:'';position:absolute;left:11px;top:6px;bottom:-14px;width:2px;background:#e0d6c0}.tl-item:last-child::before{display:none}.tl-dot{position:absolute;left:4px;top:4px;width:16px;height:16px;border-radius:9999px;border:3px solid #f7f3ea;box-shadow:0 0 0 1px #cfc4ac}</style>
+</head>
+<body class="font-sans text-ink paper-bg min-h-screen">
+<header class="sticky top-0 z-50 bg-ink/95 border-b border-cinnabar/30">
+  <div class="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-[28px] h-[28px] rounded-md bg-cinnabar text-paper flex items-center justify-center font-serif font-bold text-[16px] shrink-0">集</span>
+      <span class="text-paper font-serif font-bold text-[16px]">集藏本体论</span>
+    </a>
+    <nav class="flex items-center gap-4 text-paper2/85 text-[13.5px]">
+      <a href="index.html" class="hover:text-gold2">首页</a>
+      <a href="ontology.html" class="hover:text-gold2">本体总纲</a>
+      <a href="figures.html" class="hover:text-gold2">文人群像</a>
+    </nav>
+  </div>
+</header>
+<main class="max-w-5xl mx-auto px-4 py-8">
+  <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">中华文学发展时间轴</h1>
+  <p class="text-ink2 text-[15px] mt-2 max-w-3xl leading-relaxed">自先秦楚辞至近代，三千年的文学脉络：每一时代有其标志文体、代表作家与重要流派。</p>
+  <div id="timeline" class="mt-7 space-y-0"></div>
+  <p class="text-center text-[12.5px] text-ink3 mt-8">集藏本体论 · 时间轴据文学史通说整理</p>
+</main>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ERA=[
+ {era:'先秦',color:'#7c4a2d',genre:'楚辞·诗经',who:['屈原','宋玉'],note:'《诗经》四言与楚辞骚体并峙，《尚书》提出『诗言志』，为中国诗学之滥觞。'},
+ {era:'秦汉',color:'#8b5a2b',genre:'汉赋·乐府·散文',who:['司马相如','司马迁','扬雄'],note:'汉赋铺采摘文，乐府采集民歌，《史记》开传记散文之先河。'},
+ {era:'魏晋南北朝',color:'#8b2f2f',genre:'五言古诗·骈文·文论',who:['曹植','陶渊明','谢灵运','刘勰','钟嵘'],note:'文学自觉之时代：建安风骨、正始之音、山水田园迭兴，《文心雕龙》《诗品》奠定文论基业。'},
+ {era:'隋唐',color:'#a8322d',genre:'近体诗·古文·词之萌',who:['王维','李白','杜甫','韩愈','白居易','李商隐'],note:'诗歌之黄金时代：初唐四杰、盛唐气象、中唐新乐府、晚唐小李杜；古文运动与词体萌芽并起。'},
+ {era:'五代两宋',color:'#2f6b5f',genre:'词·古文·诗话',who:['李煜','柳永','苏轼','李清照','辛弃疾','严羽'],note:'词之极盛，婉约豪放并流；唐宋八大家古文大成，诗话、词话之体兴。'},
+ {era:'辽金元',color:'#7b3f9d',genre:'散曲·杂剧',who:['元好问','关汉卿','马致远','王实甫'],note:'元曲崛起，本色当行；元曲四大家标举一代，俗文学登上大雅之堂。'},
+ {era:'明',color:'#31427b',genre:'小说·传奇·小品',who:['罗贯中','吴承恩','汤显祖','袁宏道','冯梦龙'],note:'长篇小说成熟，临川四梦为戏曲巅峰；公安派倡性灵，小品文盛。'},
+ {era:'清',color:'#b5651d',genre:'小说·词·文派',who:['蒲松龄','吴敬梓','曹雪芹','纳兰性德','袁枚','姚鼐'],note:'古典小说之巅（红楼、聊斋、儒林）；词学中兴，桐城派主盟文坛。'},
+ {era:'近代',color:'#5d4037',genre:'词学·诗界革命',who:['王国维','龚自珍'],note:'《人间词话》集意境论之大成，诗界革命与新文学接踵而起。'}
+];
+const box=document.querySelector('#timeline');
+ERA.forEach(e=>{
+  box.insertAdjacentHTML('beforeend',`<div class="tl-item pb-6">
+    <span class="tl-dot" style="background:${e.color}"></span>
+    <div class="rounded-xl bg-white/72 border border-ink/10 p-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <h2 class="font-serif font-bold text-[21px] text-ink">${esc(e.era)}</h2>
+        <span class="tag" style="background:${e.color}18;color:${e.color};border:1px solid ${e.color}33">${esc(e.genre)}</span>
+      </div>
+      <p class="text-[14px] text-ink2 leading-relaxed mt-2">${esc(e.note)}</p>
+      <div class="mt-2.5 flex flex-wrap gap-1.5">${e.who.map(w=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(w)}</span>`).join('')}</div>
+    </div></div>`);
+});
+</script>
+</body>
+</html>

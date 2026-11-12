@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本体总纲 · 四轴 × 七层 - 集藏本体论</title>
+<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<script src="https://aisearch-task.bj.bcebos.com/static/echarts-5.6.0.min.js"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',seal:'#8b2f2f',jade:'#2f6b5f',gold:'#a9801f',violet:'#6b3fa0'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
+</script>
+<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 12% 18%,rgba(168,50,45,.045) 0,transparent 42%),radial-gradient(circle at 88% 8%,rgba(47,107,95,.05) 0,transparent 40%)}.lk{color:#a8322d}.lk:hover{text-decoration:underline}.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}</style>
+</head>
+<body class="font-sans text-ink paper-bg min-h-screen">
+<header class="sticky top-0 z-50 bg-ink/95 border-b border-cinnabar/30">
+  <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-[28px] h-[28px] rounded-md bg-cinnabar text-paper flex items-center justify-center font-serif font-bold text-[16px] shrink-0">集</span>
+      <span class="text-paper font-serif font-bold text-[16px]">集藏本体论</span>
+    </a>
+    <nav class="flex items-center gap-4 text-paper2/85 text-[13.5px]">
+      <a href="index.html" class="hover:text-gold2">首页</a>
+      <a href="books.html" class="hover:text-gold2">全藏原典</a>
+      <a href="dict.html" class="hover:text-gold2">文论词典</a>
+      <a href="timeline.html" class="hover:text-gold2">时间轴</a>
+    </nav>
+  </div>
+</header>
+<main class="max-w-6xl mx-auto px-4 py-8">
+  <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">本体总纲 <span class="text-cinnabar">四轴 × 七层</span></h1>
+  <p class="text-ink2 text-[15px] mt-2 max-w-3xl leading-relaxed">集藏本体论由四条正交的建模轴线构成：<b>层级轴</b>（L0—L6，纵向抽象层次）、<b>类轴</b>（九类实体类型）、<b>关系轴</b>（十种语义关系）、<b>实例轴</b>（典籍、人物、流派、概念等具体实例）。</p>
+
+  <section class="mt-8">
+    <h2 class="font-serif font-bold text-[22px] text-ink mb-3">层级轴 · 七层架构</h2>
+    <div id="layers" class="space-y-3"></div>
+  </section>
+
+  <section class="mt-9">
+    <h2 class="font-serif font-bold text-[22px] text-ink mb-3">类轴 · 九类实体</h2>
+    <div id="classChart" style="height:400px" class="bg-white/70 rounded-xl border border-ink/10 p-2"></div>
+  </section>
+
+  <section class="mt-9">
+    <h2 class="font-serif font-bold text-[22px] text-ink mb-3">关系轴 · 十种语义关系</h2>
+    <div class="overflow-x-auto rounded-xl border border-ink/10 bg-white/70">
+      <table class="w-full text-[13.5px]">
+        <thead class="bg-paper2 text-ink2"><tr>
+          <th class="text-left px-3 py-2">关系</th><th class="text-left px-3 py-2">英文</th>
+          <th class="text-left px-3 py-2">域 → 值域</th><th class="text-left px-3 py-2">含义</th>
+          <th class="text-right px-3 py-2">实例</th></tr></thead>
+        <tbody id="relBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mt-9">
+    <h2 class="font-serif font-bold text-[22px] text-ink mb-3">实例轴 · 各类实例</h2>
+    <div id="instTabs" class="flex flex-wrap gap-2 text-[13px] mb-3"></div>
+    <div id="instBody" class="rounded-xl bg-white/70 border border-ink/10 p-4"></div>
+  </section>
+  <p class="text-center text-[12.5px] text-ink3 mt-8">集藏本体论 · 数据出自殆知阁集藏</p>
+</main>
+<script src="data/ontology.js"></script>
+<script src="data/books.js"></script>
+<script src="data/network.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
+
+// 层级轴
+(function(){
+  const box=$('#layers');
+  JICANG_LAYERS.forEach(L=>{
+    const tags=L.concepts.map(c=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(c.name)}</span>`).join('');
+    box.appendChild(el(`<article class="rounded-xl bg-white/72 border border-ink/10 p-4">
+      <div class="flex items-center gap-3">
+        <span class="w-[36px] h-[36px] rounded-lg flex items-center justify-center text-paper font-serif font-bold text-[13px] shrink-0" style="background:${L.color}">${L.id}</span>
+        <div><h3 class="font-serif font-bold text-[17px] text-ink">${esc(L.name)}</h3>
+        <div class="text-[11px] tracking-wider text-ink3 uppercase">${esc(L.en)}</div></div>
+      </div>
+      <p class="text-[13.5px] text-ink2 leading-relaxed mt-2">${esc(L.desc)}</p>
+      <div class="mt-2.5 flex flex-wrap gap-1.5">${tags}</div></article>`));
+  });
+})();
+
+// 类轴
+(function(){
+  const chart=echarts.init($('#classChart'));
+  const d=JICANG_CLASSES.map(c=>({name:c.name,value:c.total,itemStyle:{color:c.color}}));
+  chart.setOption({tooltip:{trigger:'item',formatter:'{b}：{c} 项'},legend:{bottom:0,textStyle:{fontSize:11,color:'#4a463f'}},
+    series:[{type:'treemap',roam:false,breadcrumb:{show:false},label:{fontSize:13,color:'#fff',formatter:'{b}\n{c}'},
+      itemStyle:{borderColor:'#f7f3ea',borderWidth:2,gapWidth:2},data:JICANG_CLASSES.map(c=>({name:c.name,value:c.total,itemStyle:{color:c.color}}))}]});
+})();
+
+// 关系轴
+(function(){
+  const t=$('#relBody');
+  JICANG_RELATIONS.forEach(r=>{
+    t.appendChild(el(`<tr class="border-t border-ink/8">
+      <td class="px-3 py-2"><span class="inline-flex items-center gap-1.5"><span class="w-[9px] h-[9px] rounded-full" style="background:${r.color}"></span>${esc(r.name)}</span></td>
+      <td class="px-3 py-2 text-ink3">${esc(r.en)}</td>
+      <td class="px-3 py-2 text-ink2">${esc(r.from)} → ${esc(r.to)}</td>
+      <td class="px-3 py-2 text-ink2">${esc(r.desc)}</td>
+      <td class="px-3 py-2 text-right font-semibold text-cinnabar">${r.count}</td></tr>`));
+  });
+})();
+
+// 实例轴
+(function(){
+  const groups=[
+    {name:'典籍',items:Object.keys(JICANG_BOOKS).map(c=>JICANG_BOOKS[c].items.slice(0,6).map(b=>b.t)).flat().slice(0,40)},
+    {name:'文人',items:JICANG_NETWORK.nodes.map(n=>n.n)},
+    {name:'流派',items:JICANG_NETWORK.schools.map(s=>s.name)},
+    {name:'意象',items:JICANG_NETWORK.imagery.map(i=>i.name)},
+    {name:'文体',items:JICANG_CLASSES[0].members},
+    {name:'概念',items:JICANG_CLASSES[4].members}
+  ];
+  const tabs=$('#instTabs'),body=$('#instBody');
+  function render(g){
+    body.innerHTML=`<div class="flex flex-wrap gap-1.5">${g.items.map(x=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(x)}</span>`).join('')}</div>`;
+  }
+  function overview(){
+    body.innerHTML=`<p class="text-[13.5px] text-ink2 mb-2.5">点击上方类别，查看该类实例（示例）：</p>
+      <div class="flex flex-wrap gap-1.5">${groups.map(g=>`<span class="tag bg-paper2 text-ink2 border border-ink/10">${g.name} · ${g.items.length}</span>`).join('')}</div>`;
+  }
+  groups.forEach((g)=>{
+    const b=el(`<button class="px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar">${g.name}</button>`);
+    b.addEventListener('click',()=>{[...tabs.children].forEach(x=>x.className='px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar');b.className='px-3 py-1.5 rounded-md border bg-ink text-paper border-ink';render(g);});
+    tabs.appendChild(b);
+  });
+  overview();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全藏原典 · 集藏本体论</title>
+<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',jade:'#2f6b5f',gold:'#a9801f'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
+</script>
+<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 12% 18%,rgba(168,50,45,.045) 0,transparent 42%)}.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}.lk{color:#a8322d}.lk:hover{text-decoration:underline}.cat-card{cursor:pointer;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,border-color .25s}.cat-card:hover{transform:translateY(-3px);box-shadow:0 12px 26px -14px rgba(34,32,29,.35)}</style>
+</head>
+<body class="font-sans text-ink paper-bg min-h-screen">
+<header class="sticky top-0 z-50 bg-ink/95 border-b border-cinnabar/30">
+  <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-[28px] h-[28px] rounded-md bg-cinnabar text-paper flex items-center justify-center font-serif font-bold text-[16px] shrink-0">集</span>
+      <span class="text-paper font-serif font-bold text-[16px]">集藏本体论</span></a>
+    <nav class="flex items-center gap-4 text-paper2/85 text-[13.5px]">
+      <a href="index.html" class="hover:text-gold2">首页</a>
+      <a href="ontology.html" class="hover:text-gold2">本体总纲</a>
+      <a href="books.html" class="text-gold2">全藏原典</a></nav>
+  </div>
+</header>
+<main class="max-w-6xl mx-auto px-4 py-8">
+  <div class="flex items-end justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">集藏原典库</h1>
+      <p class="text-ink2 text-[15px] mt-2 max-w-2xl leading-relaxed">殆知阁集藏全部典籍，按九类编次。<span id="tot" class="text-cinnabar font-semibold"></span>原文可至殆知阁在线阅读。</p>
+    </div>
+    <input id="q" type="search" placeholder="检索书名 / 著者…" class="w-full sm:w-72 px-3 py-2 rounded-md border border-ink/20 bg-white/80 text-[14px] focus:outline-none focus:border-cinnabar">
+  </div>
+  <div id="tabs" class="flex flex-wrap gap-2 text-[13px] mt-4"></div>
+  <div id="meta" class="text-[13px] text-ink3 mt-3 mb-3"></div>
+  <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
+  <div id="moreWrap" class="text-center mt-6" style="display:none"><button id="more" class="px-6 py-2 rounded-md border border-ink/25 text-ink text-[14px] hover:border-cinnabar hover:text-cinnabar">加载更多</button></div>
+</main>
+<script src="data/books.js"></script>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
+const cats=Object.keys(JICANG_BOOKS);
+const palette=['#a8322d','#2f6b5f','#a9801f','#6b3fa0','#31427b','#b5651d','#4a8b7d','#c0524b','#7a736a'];
+const tabs=document.querySelector('#tabs'),grid=document.querySelector('#grid'),meta=document.querySelector('#meta'),moreWrap=document.querySelector('#moreWrap');
+let cur=null,kw='',shown=0,list=[];const PAGE=48;
+document.querySelector('#tot').textContent=`共 ${JICANG_STATS.total} 部`;
+function overview(){
+  grid.innerHTML='';moreWrap.style.display='none';
+  meta.textContent='按类浏览：点击下方分类查看典籍清单。';
+  cats.forEach((c,i)=>{
+    const n=JICANG_BOOKS[c].items.length;
+    const card=el(`<div class="cat-card rounded-xl bg-white/72 border border-ink/10 p-4">
+      <div class="flex items-center justify-between"><h2 class="font-serif font-bold text-[17px] text-ink">${esc(JICANG_BOOKS[c].label)}</h2>
+      <span class="text-[20px] font-serif font-bold" style="color:${palette[i]}">${n}</span></div>
+      <p class="text-[12.5px] text-ink3 mt-1.5">${JICANG_BOOKS[c].items.slice(0,4).map(b=>esc(b.t)).join('、')}…</p></div>`);
+    card.addEventListener('click',()=>{selectCat(c);});
+    grid.appendChild(card);
+  });
+}
+function build(){list=JICANG_BOOKS[cur].items.filter(b=>!kw||(b.t+b.a).includes(kw));}
+function render(reset){
+  if(reset){grid.innerHTML='';shown=0;}
+  list.slice(shown,shown+PAGE).forEach(b=>{
+    const src=b.s?`<a class="lk text-[12px]" href="${esc(b.s)}" target="_blank" rel="noopener">殆知阁原文</a>`:`<span class="text-[12px] text-ink3">${esc(b.ex||'')}</span>`;
+    grid.appendChild(el(`<article class="rounded-lg bg-white/72 border border-ink/10 p-3">
+      <div class="flex items-start justify-between gap-2"><h2 class="font-serif font-semibold text-[15.5px] text-ink leading-snug">${esc(b.t)}</h2>
+      <span class="tag bg-paper3 text-ink3 shrink-0">${esc(b.d)}</span></div>
+      <div class="text-[12.5px] text-ink3 mt-1">${b.a?esc(b.a):'佚名 / 未详'}</div>
+      <div class="mt-1.5">${src}</div></article>`));
+  });
+  shown+=Math.min(list.length-shown,PAGE);
+  meta.textContent=`「${JICANG_BOOKS[cur].label}」共 ${list.length} 部，已显示 ${shown} 部。`;
+  moreWrap.style.display=shown>=list.length?'none':'block';
+}
+function activate(c){
+  [...tabs.children].forEach(x=>x.className='px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar');
+  tabs.querySelector(`[data-cat="${CSS.escape(c)}"]`).className='px-3 py-1.5 rounded-md border bg-ink text-paper border-ink';
+}
+function selectCat(c){cur=c;activate(c);build();render(true);}
+cats.forEach(c=>{
+  const b=el(`<button data-cat="${esc(c)}" class="px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar">${esc(JICANG_BOOKS[c].label)} <span class="opacity-70">${JICANG_BOOKS[c].items.length}</span></button>`);
+  b.addEventListener('click',()=>selectCat(c));
+  tabs.appendChild(b);
+});
+document.querySelector('#q').addEventListener('input',e=>{kw=e.target.value.trim();if(cur){build();render(true);}else{overview();}});
+document.querySelector('#more').addEventListener('click',()=>render(false));
+overview();
+</script>
+</body>
+</html>
