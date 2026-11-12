@@ -153,31 +153,50 @@ async function loadBook(){
     reader.innerHTML='<div class="error">未指定书籍。<br><a href="books.html">← 返回典籍列表</a></div>';
     return;
   }
+  reader.innerHTML='<div class="loading"><div class="spin"></div><div>正在加载典籍…</div></div>';
 
-  // 找路径：先尝试 texts/cat/id.json，失败则在 index 里找
-  let path = cat ? `texts/${cat}/${bookId}.json` : null;
-  let book = null;
+  // 先查索引
+  let bookMeta = null;
   try{
-    let r = await fetch(path||`texts/index.json`);
-    if(!r.ok) throw 0;
-    if(path){
-      book = await r.json();
-    }else{
-      const idx = await r.json();
-      const b = idx.books.find(x=>x.id===bookId);
-      if(!b) throw 0;
-      r = await fetch(b.path);
-      if(!r.ok) throw 0;
-      book = await r.json();
+    const idxR = await fetch('texts/index.json', {cache:'no-cache'});
+    if(idxR.ok){
+      const idx = await idxR.json();
+      bookMeta = idx.books.find(x=>x.id===bookId);
     }
-  }catch(e){
-    reader.innerHTML=`<div class="error">未能加载典籍「${bookId}」，可能正文尚未同步。<br><a href="books.html">← 返回典籍列表</a></div>`;
+  }catch(e){}
+
+  // 方案A：优先本地 JSON（完全离线、完全站内）
+  let book = null;
+  if(bookMeta){
+    try{
+      const r = await fetch(bookMeta.path);
+      if(r.ok) book = await r.json();
+    }catch(e){}
+  }else if(cat){
+    try{
+      const r = await fetch(`texts/${cat}/${bookId}.json`);
+      if(r.ok) book = await r.json();
+    }catch(e){}
+  }
+
+  // 方案B：本地无正文时，从 GitHub 原始 Markdown 实时拉取、本页渲染（仍在站内，不跳转）
+  if(!book){
+    try{
+      book = await loadFromRemoteMd(bookId, cat, bookMeta);
+    }catch(e){
+      console.warn('remote md load failed', e);
+    }
+  }
+
+  if(!book){
+    reader.innerHTML=`<div class="error">未能加载典籍「${bookId}」。<br><a href="books.html">← 返回典籍列表</a></div>`;
     return;
   }
 
   document.title = `${book.title} · 集藏本体论`;
   document.getElementById('topTitle').textContent = book.title;
-  document.getElementById('topSub').textContent = [book.dynasty, book.author, book.category, book.char_count?'约'+Math.round(book.char_count/10000)+'万字':null].filter(Boolean).join(' · ');
+  const sub = [book.dynasty, book.author, book.category_cn||book.category, book.char_count?'约'+Math.round(book.char_count/10000)+'万字':null].filter(Boolean).join(' · ');
+  document.getElementById('topSub').textContent = sub;
 
   // 正文
   let html = `<h1 class="book-h">${book.title}</h1>`;
@@ -187,7 +206,112 @@ async function loadBook(){
   html += book.content;
   reader.innerHTML = html;
 
-  renderToc(book.chapters);
+  renderToc(book.chapters||[]);
+}
+
+// —— 方案B：从 GitHub raw 拉取殆知阁 md，解析 YAML + 正文，实时渲染 ——
+const CAT_EN2PATH = {
+  bieji:"四库别集", baojuan:"宝卷", xiaoshuo:"小说",
+  wenji:"文总集", wenping:"文评", yanyi:"演义",
+  xiaohua:"笑话", huaben:"话本", miyu:"谜语"
+};
+const CAT_CN = {"bieji":"四库别集","baojuan":"宝卷","xiaoshuo":"小说","wenji":"文总集","wenping":"文评","yanyi":"演义","xiaohua":"笑话","huaben":"话本","miyu":"谜语"};
+
+function encodeBookPath(title){
+  // 殆知阁路径用 UTF-8 URL 编码
+  return encodeURIComponent(title);
+}
+
+// 非常轻量的 YAML 头解析（仅处理 title/authors/category）
+function parseYamlHead(yml){
+  const meta = {};
+  const t = yml.match(/title:\s*\n\s*zh-hans:\s*(.+)/);
+  if(t) meta.title = t[1].trim();
+  const d = yml.match(/dynasty:\s*(.+)/);
+  if(d) meta.dynasty = d[1].trim();
+  const a = yml.match(/- name:\s*(.+)/);
+  if(a) meta.author = a[1].trim();
+  const c = yml.match(/category:\s*\/集藏\/(.+)/);
+  if(c) meta.category_cn = c[1].trim();
+  return meta;
+}
+
+// 简单 YAML 头解析器
+function splitYaml(text){
+  if(text.startsWith('---')){
+    const end = text.indexOf('\n---',3);
+    if(end!==-1){
+      return {yaml:text.slice(3,end), body:text.slice(end+4).replace(/^\ufeff/,'').replace(/^\n+/,'')};
+    }
+  }
+  return {yaml:'', body:text};
+}
+
+function renderMdToHtml(body){
+  const lines = body.replace(/\ufeff/g,'').split('\n');
+  const chapters = [];
+  const out = [];
+  let cidx = 0;
+  for(const raw of lines){
+    let line = raw.replace(/^\u3000+/,'').replace(/^ +/,'').replace(/\t+/g,'').trim();
+    if(!line){ out.push(''); continue; }
+    // 识别卷/回
+    let isChap = false, chapTitle = null;
+    let m = line.match(/^第[一二三四五六七八九十百零〇\d]+[卷回篇章部]/);
+    if(m && line.length<40){ isChap=true; chapTitle=line; }
+    else if(line.startsWith('●') && line.length<40){ isChap=true; chapTitle=line.replace(/^●/,'').trim(); }
+    else if(/^卷[一二三四五六七八九十百零〇\d]+/.test(line) && line.length<30){ isChap=true; chapTitle=line; }
+    else if(['序','跋','提要','目录','总目'].includes(line)){ isChap=true; chapTitle=line; }
+    if(isChap && chapTitle){
+      const cid = 'c'+cidx;
+      chapters.push({id:cid, title:chapTitle});
+      out.push(`<h2 id="${cid}">${chapTitle}</h2>`);
+      cidx++;
+    }else{
+      out.push(`<p>${line}</p>`);
+    }
+  }
+  return {chapters, html: out.join('\n')};
+}
+
+async function loadFromRemoteMd(bookId, cat0, bookMeta){
+  // 构造候选路径：title 从 meta 里拿，或用 id 反推
+  const candidates = [];
+  if(bookMeta){
+    const catPath = CAT_EN2PATH[bookMeta.category] || CAT_EN2PATH[cat0] || '';
+    candidates.push(`https://raw.githubusercontent.com/daizhige-org/daizhigev20/data/%E9%9B%86%E8%97%8F/${encodeURIComponent(catPath)}/${encodeURIComponent(bookMeta.title)}.md`);
+  }
+  if(cat0 && bookId){
+    const catPath = CAT_EN2PATH[cat0] || '';
+    const title = bookId.replace(/_/g,' ');
+    candidates.push(`https://raw.githubusercontent.com/daizhige-org/daizhigev20/data/%E9%9B%86%E8%97%8F/${encodeURIComponent(catPath)}/${encodeURIComponent(title)}.md`);
+  }
+  // 加 jsdelivr CDN 作为备选（更快、跨域友好）
+  const cdnCandidates = candidates.map(u=>u.replace('https://raw.githubusercontent.com/daizhige-org/daizhigev20/data/','https://cdn.jsdelivr.net/gh/daizhige-org/daizhigev20@data/'));
+  const all = [...candidates, ...cdnCandidates];
+
+  for(const url of all){
+    try{
+      const r = await fetch(url);
+      if(!r.ok) continue;
+      const text = await r.text();
+      if(!text || text.length<100) continue;
+      const {yaml, body} = splitYaml(text);
+      const meta = parseYamlHead(yaml);
+      const {chapters, html} = renderMdToHtml(body);
+      return {
+        id: bookId,
+        title: meta.title || bookMeta?.title || bookId.replace(/_/g,' '),
+        dynasty: meta.dynasty || bookMeta?.dynasty || '',
+        author: meta.author || bookMeta?.author || '',
+        category: cat0 || bookMeta?.category || '',
+        category_cn: meta.category_cn || (cat0?CAT_CN[cat0]:''),
+        chapters, content: html,
+        char_count: body.length,
+      };
+    }catch(e){ continue; }
+  }
+  return null;
 }
 
 loadBook();
