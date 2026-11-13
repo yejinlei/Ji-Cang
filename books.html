@@ -26,7 +26,7 @@ tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:
   <div class="flex items-end justify-between flex-wrap gap-3">
     <div>
       <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">集藏原典库</h1>
-      <p class="text-ink2 text-[15px] mt-2 max-w-2xl leading-relaxed">殆知阁集藏全部典籍，按九类编次。<span id="tot" class="text-cinnabar font-semibold"></span>原文可至殆知阁在线阅读。</p>
+      <p class="text-ink2 text-[15px] mt-2 max-w-2xl leading-relaxed">殆知阁集藏全部典籍，按九类编次。<span id="tot" class="text-cinnabar font-semibold"></span>全部典籍已嵌入本站，点击「📖 站内阅读」即可在线阅览。</p>
     </div>
     <input id="q" type="search" placeholder="检索书名 / 著者…" class="w-full sm:w-72 px-3 py-2 rounded-md border border-ink/20 bg-white/80 text-[14px] focus:outline-none focus:border-cinnabar">
   </div>
@@ -43,6 +43,7 @@ const cats=Object.keys(JICANG_BOOKS);
 const palette=['#a8322d','#2f6b5f','#a9801f','#6b3fa0','#31427b','#b5651d','#4a8b7d','#c0524b','#7a736a'];
 const tabs=document.querySelector('#tabs'),grid=document.querySelector('#grid'),meta=document.querySelector('#meta'),moreWrap=document.querySelector('#moreWrap');
 let cur=null,kw='',shown=0,list=[];const PAGE=48;
+const JICANG_STATS={total:cats.reduce((s,c)=>s+JICANG_BOOKS[c].items.length,0)};
 document.querySelector('#tot').textContent=`共 ${JICANG_STATS.total} 部`;
 function overview(){
   grid.innerHTML='';moreWrap.style.display='none';
@@ -61,7 +62,8 @@ function build(){list=JICANG_BOOKS[cur].items.filter(b=>!kw||(b.t+b.a).includes(
 function render(reset){
   if(reset){grid.innerHTML='';shown=0;}
   list.slice(shown,shown+PAGE).forEach(b=>{
-    const src=b.s?`<a class="lk text-[12px]" href="${esc(b.s)}">📖 站内阅读</a>`:`<span class="text-[12px] text-ink3">${esc(b.ex||'')}</span>`;
+    const href = `reader.html?f=${encodeURIComponent(b.f)}`;
+    const src=`<a class="lk text-[12px]" href="${esc(href)}">📖 站内阅读</a>`;
     grid.appendChild(el(`<article class="rounded-lg bg-white/72 border border-ink/10 p-3">
       <div class="flex items-start justify-between gap-2"><h2 class="font-serif font-semibold text-[15.5px] text-ink leading-snug">${esc(b.t)}</h2>
       <span class="tag bg-paper3 text-ink3 shrink-0">${esc(b.d)}</span></div>
