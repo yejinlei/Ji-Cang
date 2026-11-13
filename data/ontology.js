@@ -1,182 +1,308 @@
-// 集藏本体论 · 集部七层本体架构（L0 元模型 → L6 文化外延）
-const JICANG_LAYERS = [
-  {
-    id: "L0", code: "META", name: "元模型层", en: "Meta-Model",
-    color: "#7c4a2d",
-    summary: "中华文学最底层的元概念，是所有文论范畴得以生发的根。",
-    desc: "集部之学的元模型，回答『文是什么』。以『文—道—气—言—意—象—境—情—志—辞—才—学』十二元概念为根，文学的一切体裁、流派、命题皆由此生发。",
-    concepts: [
-      { name: "文", note: "文采、文饰与本体的合一，《文心雕龙》以『文之为德也大矣』立其本体。" },
-      { name: "道", note: "文以载道，文道合一；道是文的归宿，文是道的载体。" },
-      { name: "气", note: "文气、气韵、气势；曹丕『文以气为主』，为文之生命。" },
-      { name: "言", note: "言为心声；言意之辨是中国文论的永恒命题。" },
-      { name: "意", note: "立意与意蕴；意在笔先，意余于言。" },
-      { name: "象", note: "意象、象外之象；象是意与物的中介。" },
-      { name: "境", note: "境界、意境；境生于象外，为文学之最高追求。" },
-      { name: "情", note: "情志、情采；情者文之经，为文学的原动力。" },
-      { name: "志", note: "诗言志；志为情之正，是诗学的古老纲领。" },
-      { name: "辞", note: "辞采、修辞；言之无文，行而不远。" },
-      { name: "才", note: "才性、才略；才为文之器，关乎天分与学养。" },
-      { name: "学", note: "学问、积学；积学以储宝，酌理以富才。" }
-    ]
-  },
-  {
-    id: "L1", code: "DAO", name: "文道本体层", en: "Literary-Dao",
-    color: "#8b2f2f",
-    summary: "历代核心文论命题，是集藏的『义理』中枢。",
-    desc: "集部的义理中枢，历两千年而层累成说。自『诗言志』发端，经『诗缘情』『文以载道』，至『境界说』，构成中华文论的主张谱系。",
-    concepts: [
-      { name: "诗言志", note: "《尚书·舜典》『诗言志，歌永言』，中国诗学最古老的纲领。" },
-      { name: "诗缘情", note: "陆机《文赋》『诗缘情而绮靡』，为诗之本质归于情感。" },
-      { name: "文以载道", note: "周敦颐《通书》『文所以载道也』，古文运动的理论基石。" },
-      { name: "气韵生动", note: "谢赫《古画品录》六法之首，由画及文，成为艺术的最高准则。" },
-      { name: "文气说", note: "曹丕《典论·论文》『文以气为主，气之清浊有体』。" },
-      { name: "妙悟说", note: "严羽《沧浪诗话》以禅喻诗，倡『妙悟』『兴趣』，标举盛唐。" },
-      { name: "神韵说", note: "王士禛主『神韵』，尚清远冲淡、言有尽而意无穷。" },
-      { name: "格调说", note: "沈德潜主『格调』，尊唐诗、重温柔敦厚之诗教。" },
-      { name: "性灵说", note: "袁枚主『性灵』，『诗者，人之性情也』，反拟古、重真我。" },
-      { name: "肌理说", note: "翁方纲主『肌理』，以学问、义理入诗，重质实细密。" },
-      { name: "童心说", note: "李贽《童心说》『夫童心者，绝假纯真』，为公安派之先声。" },
-      { name: "境界说", note: "王国维《人间词话》『词以境界为最上』，集中国意境论之大成。" }
-    ]
-  },
-  {
-    id: "L2", code: "GENRE", name: "文体范畴层", en: "Genre",
-    color: "#1f5c4d",
-    summary: "集部文体分类体系，对应佛藏的『经律论』三藏科判。",
-    desc: "集部的文体科判。辞赋、诗、词、曲、文、小说、俗文学七大门类，各有体式源流，构成中国文学的体裁谱系。",
-    concepts: [
-      { name: "辞赋", note: "楚辞、骚体、汉赋、大赋、小赋、骈赋、律赋、文赋。", group: "辞赋" },
-      { name: "诗", note: "四言、五言、七言、乐府、古体、近体、律诗、绝句、排律、歌行。", group: "诗" },
-      { name: "词", note: "小令、中调、长调、慢词；令、引、近、慢。", group: "词" },
-      { name: "曲", note: "散曲（小令、套数）、杂剧、南戏、传奇。", group: "曲" },
-      { name: "文", note: "古文、骈文、四六、八股；诏令、奏议、书牍、序跋、碑志、哀祭。", group: "文" },
-      { name: "小说", note: "志怪、志人、传奇、话本、拟话本、章回、笔记。", group: "小说" },
-      { name: "俗文学", note: "宝卷、弹词、鼓词、子弟书。", group: "俗文学" },
-      { name: "对联谜语", note: "对联、楹联、灯谜。", group: "应用" }
-    ]
-  },
-  {
-    id: "L3", code: "SCHOOL", name: "流派体系层", en: "School",
-    color: "#7b3f9d",
-    summary: "历代文学流派谱系，对应佛藏的『宗派判教』。",
-    desc: "集部的流派谱系。自建安风骨以下，历代诗派、词派、文派递兴，各有宗主、主张与代表作，构成文学史的脉络。",
-    concepts: [
-      { name: "建安风骨", note: "三曹七子，慷慨悲凉，为后世诗风之祖。" },
-      { name: "正始之音", note: "阮籍、嵇康，竹林七贤，遥深清峻。" },
-      { name: "山水田园", note: "陶渊明、谢灵运、王孟，以自然为宗。" },
-      { name: "边塞诗派", note: "高适、岑参、王昌龄，雄浑悲壮。" },
-      { name: "韩孟诗派", note: "韩愈、孟郊，奇崛险怪。" },
-      { name: "元白诗派", note: "白居易、元稹，平易通俗、讽喻时事。" },
-      { name: "江西诗派", note: "黄庭坚为首，一祖三宗，点铁成金、夺胎换骨。" },
-      { name: "江湖诗派", note: "南宋布衣诗人，清苦纤巧。" },
-      { name: "前后七子", note: "明复古派，倡『文必秦汉，诗必盛唐』。" },
-      { name: "唐宋派", note: "归有光等，宗法唐宋八大家。" },
-      { name: "公安派", note: "三袁，主『独抒性灵，不拘格套』。" },
-      { name: "竟陵派", note: "钟惺、谭元春，幽深孤峭。" },
-      { name: "桐城派", note: "方苞、姚鼐，义理考据辞章合一，清代最大文派。" },
-      { name: "神韵派", note: "王士禛，尚清远。" },
-      { name: "格调派", note: "沈德潜，尊唐重教。" },
-      { name: "性灵派", note: "袁枚，重真性情。" },
-      { name: "浙西词派", note: "朱彝尊，宗姜夔、张炎，清空醇雅。" },
-      { name: "常州词派", note: "张惠言、周济，主『意内言外』『比兴寄托』。" },
-      { name: "同光体", note: "清末宋诗派，陈三立、沈曾植等。" }
-    ]
-  },
-  {
-    id: "L4", code: "CARRIER", name: "文本载体层", en: "Carrier",
-    color: "#1f3c88",
-    summary: "典籍的物质与文献形态，对应佛藏的『异译对照』与版本学。",
-    desc: "集部的文献形态与版本谱系。别集、总集、诗文评三大类文献，经历代刊刻传抄，形成稿本、宋刻、四库本等版本序列。",
-    concepts: [
-      { name: "别集", note: "一人之专集，如《李太白集》《杜工部集》。", group: "文献类型" },
-      { name: "总集", note: "多人合集，如《文选》《全唐诗》《文苑英华》。", group: "文献类型" },
-      { name: "诗文评", note: "评论之作，如《文心雕龙》《诗品》《沧浪诗话》。", group: "文献类型" },
-      { name: "选本", note: "去取成书，如《唐诗三百首》《古文观止》。", group: "文献类型" },
-      { name: "注本", note: "笺注疏解，如《文选注》《杜诗详注》。", group: "文献类型" },
-      { name: "稿本抄本", note: "未刊稿本与传抄之本，最见原貌。", group: "版本" },
-      { name: "宋刻本", note: "宋刻最精，为后世校勘之圭臬。", group: "版本" },
-      { name: "元刻本", note: "元刻承宋启明，多有佳椠。", group: "版本" },
-      { name: "明刻本", note: "明刻量大，分官刻、坊刻、家刻。", group: "版本" },
-      { name: "清刻本殿本", note: "清刻精工，武英殿本尤精。", group: "版本" },
-      { name: "四库本", note: "《四库全书》所收，为今存集部之最大渊薮。", group: "版本" },
-      { name: "活字石印", note: "活字本、石印本，近代印刷新形态。", group: "版本" }
-    ]
-  },
-  {
-    id: "L5", code: "LINEAGE", name: "人物传承层", en: "Lineage",
-    color: "#880e4f",
-    summary: "历代文人谱系与师承交游，对应佛藏的『祖师传承』。",
-    desc: "集部的人物谱系。自屈宋以下，诗人、词人、文家、曲家、小说家辈出，师承、唱和、并称交织成文学传承之网。",
-    concepts: [
-      { name: "诗家", note: "屈原、陶渊明、李白、杜甫、苏轼、陆游……", group: "诗人" },
-      { name: "词家", note: "温庭筠、李煜、柳永、苏轼、辛弃疾、李清照……", group: "词人" },
-      { name: "文家", note: "司马迁、韩愈、柳宗元、欧阳修、苏轼、归有光……", group: "文家" },
-      { name: "曲家", note: "关汉卿、王实甫、马致远、汤显祖、洪昇、孔尚任……", group: "曲家" },
-      { name: "小说家", note: "罗贯中、施耐庵、吴承恩、冯梦龙、蒲松龄、曹雪芹……", group: "小说家" },
-      { name: "文论家", note: "刘勰、钟嵘、司空图、严羽、王世贞、王国维……", group: "文论家" }
-    ]
-  },
-  {
-    id: "L6", code: "EXT", name: "文化外延层", en: "Extension",
-    color: "#b5651d",
-    summary: "由文学延伸出的意象、典故、文人生活与时代精神。",
-    desc: "集部的文化外延。文学意象、典故谱系、科举隐逸、雅集唱和、书画音乐，共同构成中华文人士大夫的精神世界。",
-    concepts: [
-      { name: "意象", note: "明月、杨柳、梅花、兰竹、鸿雁、扁舟……物象与情思的结晶。", group: "审美" },
-      { name: "典故", note: "用典与出处，如洛神、桃源、鲛人、庄周梦蝶。", group: "审美" },
-      { name: "唱和雅集", note: "西园雅集、兰亭修禊、金谷园宴，文人交往之盛。", group: "生活" },
-      { name: "科举仕隐", note: "科举、贬谪、归隐、贬谪文学与江湖文学。", group: "生活" },
-      { name: "书画音乐", note: "诗书画一体，琴棋书画的文人修养。", group: "艺术" },
-      { name: "岁时节令", note: "上元、清明、端午、中秋、重阳，节令入诗。", group: "生活" }
-    ]
+/**
+ * 集藏本体论 TBox Schema v3.0.0
+ * 四轴 × 七层正交本体
+ * 参考范式：佛学本体论 TBox v3.0.0
+ *
+ * 四轴：
+ *   A1 文体典要轴：经史子集 → 九流十家 → 文体（诗/文/词/曲/小说/戏曲…）→ 流派 → 体例 → 版本
+ *   A2 义理意象轴：文道 → 文论 → 意象 → 文体范畴 → 技法 → 章法 → 句/字/韵
+ *   A3 人物传承轴：圣王/圣贤 → 宗师/大家 → 名家/作家 → 评点家/注家 → 学者/读者 → 民艺人物
+ *   A4 时代事件轴：朝代 → 文运/党争/结社/科举/出版 → 交游/雅集/唱和 → 创作/成书/刊刻/流传
+ *
+ * 七层：
+ *   L0 元模型层  （轴/层/类/属性/关系/实例）
+ *   L1 文道本体层 （道/气/理/文/言/意/象/情/性/才/学/识）
+ *   L2 文论范畴层（文体/文法/文气/文心/神思/风骨/滋味/意境/格调/神韵/肌理/性灵）
+ *   L3 流派体系层（诸子百家 → 汉魏风骨 → 唐宋八家 → 江西诗派 → 桐城派 → 同光体…）
+ *   L4 文本载体层（典籍 → 别集/总集/选集/诗文评/小说/话本/演义/宝卷/笑话/谜语 → 卷/篇/章/回/则 → 段/句/字）
+ *   L5 人物传承层（圣王圣贤 → 宗师 → 大家 → 名家 → 注家评点家 → 学者；师徒/交游/姻亲/同社/同年/同僚）
+ *   L6 文化外延层（民间文学/俗文学/说唱/戏曲/宝卷/谶纬；意象/典故/民俗；刻本/版本流传域外）
+ */
+
+const JICANG_TBOX = {
+  version: "3.0.0",
+  name: "集藏本体论 (JiCang Ontology)",
+  description: "中国古典文学集部本体论，四轴×七层正交架构，TBox/ABox分离",
+
+  // ─────────── 四轴 ───────────
+  axes: [
+    { id: "A1", name: "文体典要轴", en: "Genre Axis",
+      desc: "横向分类轴：九流十家 → 文体（诗/文/词/曲/小说…）→ 流派 → 体例 → 版本。回答「这部书属于哪一类、何体例」。",
+      color: "#8B2500", cls: 24 },
+    { id: "A2", name: "义理意象轴", en: "Imagery & Theory Axis",
+      desc: "纵向内容轴：文道 → 文论 → 意象 → 文体范畴 → 技法 → 章法 → 句/字/韵。回答「写什么、怎么写、以何意趣」。",
+      color: "#B8860B", cls: 24 },
+    { id: "A3", name: "人物传承轴", en: "Figure Lineage Axis",
+      desc: "人物传承轴：圣贤 → 宗师 → 大家 → 名家 → 评点家/注家 → 民艺人物。回答「谁写、谁传、谁评」。",
+      color: "#2F4F4F", cls: 16 },
+    { id: "A4", name: "时代事件轴", en: "Era & Event Axis",
+      desc: "事件缘起轴：朝代 → 文运/党争/结社/科举/出版 → 交游/雅集/唱和 → 创作/成书/刊刻/流传。回答「何时、何缘、何背景」。",
+      color: "#5C4033", cls: 13 }
+  ],
+
+  // ─────────── 七层 ───────────
+  layers: [
+    { id: "L0", name: "元模型层", abstract: 6,
+      desc: "描述本体所用的元语言：轴、层、类、属性、关系、实例。", cls: 7 },
+    { id: "L1", name: "文道本体层", abstract: 5,
+      desc: "中国文学最顶层的形而上学核心概念（道、气、理、文、言、意、象、情、性、才、学、识）。", cls: 1 },
+    { id: "L2", name: "文论范畴层", abstract: 4,
+      desc: "文论核心范畴（风骨、神思、滋味、意境、格调、神韵、性灵、肌理；诗言志、文以载道…）。", cls: 1 },
+    { id: "L3", name: "流派体系层", abstract: 3,
+      desc: "诸子百家、时代风气、文学流派、文社、以及体例（乐府/古体/近体/词/曲/话本/演义…）。", cls: 12 },
+    { id: "L4", name: "文本载体层", abstract: 2,
+      desc: "典籍（别集/总集/选集/诗文评/小说/话本/演义/宝卷/笑话/谜语）→ 卷/篇/章/回/则 → 段/句/字/韵。版本、注疏、选本。", cls: 26 },
+    { id: "L5", name: "人物传承层", abstract: 1,
+      desc: "圣王圣贤、宗师、大家、名家、注家/评点家/选家、学者/读者；师徒、交游、姻亲、同社、同年、同僚。", cls: 8 },
+    { id: "L6", name: "文化外延层", abstract: 0,
+      desc: "俗文学（宝卷/说唱/笑话/谜语/弹词/戏曲）、民俗意象、域外流传、刻本/雕版/书坊/出版文化。", cls: 4 }
+  ],
+
+  // ─────────── 类体系（Class Hierarchy）───────────
+  classes: [
+    // L0 元模型
+    { id: "jc:Entity",        label: "本体元素",      axes: ["A1","A2","A3","A4"], layer: "L0", parent: null },
+    { id: "jc:Axis",          label: "轴",            axes: ["A1","A2","A3","A4"], layer: "L0", parent: "jc:Entity" },
+    { id: "jc:Layer",         label: "层",            axes: ["A1","A2","A3","A4"], layer: "L0", parent: "jc:Entity" },
+    { id: "jc:OntologyClass", label: "类",            axes: ["A1","A2","A3","A4"], layer: "L0", parent: "jc:Entity" },
+    { id: "jc:DatatypeProperty", label: "数据属性",    axes: ["A1","A2","A3","A4"], layer: "L0", parent: "jc:Entity" },
+    { id: "jc:ObjectProperty", label: "关系谓词",      axes: ["A1","A2","A3","A4"], layer: "L0", parent: "jc:Entity" },
+    { id: "jc:Individual",    label: "个体",          axes: ["A1","A2","A3","A4"], layer: "L0", parent: "jc:Entity" },
+
+    // L1 文道本体
+    { id: "jc:WenDao",        label: "文道核心概念",  axes: ["A2"], layer: "L1", parent: "jc:Entity" },
+
+    // L2 文论范畴
+    { id: "jc:WenLun",        label: "文论范畴",      axes: ["A2"], layer: "L2", parent: "jc:Entity" },
+
+    // L3 流派/体系/体例
+    { id: "jc:SchoolOfThought", label: "诸子百家流派", axes: ["A1"], layer: "L3", parent: "jc:Entity", tag: "sect" },
+    { id: "jc:LiterarySchool", label: "文学流派",     axes: ["A1"], layer: "L3", parent: "jc:Entity", tag: "sect" },
+    { id: "jc:LiterarySociety", label: "文社/结社",   axes: ["A1","A3"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:Style",         label: "文体体例",      axes: ["A1"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:DynastyStyle",  label: "时代文风",      axes: ["A1","A4"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:Form",          label: "体裁/诗体/词牌/曲牌", axes: ["A1"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:ThemeMotif",    label: "题材母题",      axes: ["A2"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:Technique",     label: "文法技法",      axes: ["A2"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:Imagery",       label: "意象",          axes: ["A2"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:Allusion",      label: "典故",          axes: ["A2"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:ImageCategory", label: "意象类属",      axes: ["A2"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:PoetryTalk",    label: "诗话/文论作品", axes: ["A2"], layer: "L3", parent: "jc:Entity" },
+
+    // L4 文本载体
+    { id: "jc:SiKuChuJi",     label: "四库分类",      axes: ["A1"], layer: "L4", parent: "jc:Entity" },
+    { id: "jc:JiBu",          label: "集部",          axes: ["A1"], layer: "L4", parent: "jc:SiKuChuJi" },
+    { id: "jc:BieJi",         label: "别集",          axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:ZongJi",        label: "总集",          axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:ShiWenPing",    label: "诗文评",        axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:CiQu",          label: "词曲",          axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:Novel",         label: "小说/演义",     axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:HuaBen",        label: "话本",          axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:BaoJuan",       label: "宝卷",          axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:XiaoHua",       label: "笑话",          axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:MiYu",          label: "谜语",          axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:Anthology",     label: "选本/评点本",   axes: ["A1"], layer: "L4", parent: "jc:JiBu" },
+    { id: "jc:Text",          label: "典籍/作品",     axes: ["A2"], layer: "L4", parent: "jc:Entity" },
+    { id: "jc:Commentary",    label: "注/疏/评点/笺", axes: ["A2"], layer: "L4", parent: "jc:Text" },
+    { id: "jc:Edition",       label: "版本/刻本",     axes: ["A1"], layer: "L4", parent: "jc:Entity" },
+    { id: "jc:Juan",          label: "卷/篇/回/则",   axes: ["A2"], layer: "L4", parent: "jc:Text" },
+    { id: "jc:Chapter",       label: "章/节",         axes: ["A2"], layer: "L4", parent: "jc:Juan" },
+    { id: "jc:Paragraph",     label: "段",            axes: ["A2"], layer: "L4", parent: "jc:Chapter" },
+    { id: "jc:Sentence",      label: "句/韵",         axes: ["A2"], layer: "L4", parent: "jc:Paragraph" },
+    { id: "jc:Character",     label: "字/词",         axes: ["A2"], layer: "L4", parent: "jc:Sentence" },
+    { id: "jc:Preface",       label: "序/跋/题辞",    axes: ["A2"], layer: "L4", parent: "jc:Text" },
+    { id: "jc:Compiler",      label: "编者/选家",     axes: ["A1","A4"], layer: "L4", parent: "jc:Entity" },
+    { id: "jc:Publisher",     label: "书坊/刻家",     axes: ["A1","A4"], layer: "L4", parent: "jc:Entity" },
+    { id: "jc:PrintingEra",   label: "刊刻时代",      axes: ["A1"], layer: "L4", parent: "jc:Entity" },
+
+    // L5 人物
+    { id: "jc:Person",        label: "人物",          axes: ["A3"], layer: "L5", parent: "jc:Entity" },
+    { id: "jc:SageKing",      label: "圣王/圣贤",     axes: ["A3"], layer: "L5", parent: "jc:Person" },
+    { id: "jc:Master",        label: "宗师/文坛宗匠", axes: ["A3"], layer: "L5", parent: "jc:Person" },
+    { id: "jc:GreatWriter",   label: "大家/名家",     axes: ["A3"], layer: "L5", parent: "jc:Person" },
+    { id: "jc:Writer",        label: "作家/文人",     axes: ["A3"], layer: "L5", parent: "jc:Person" },
+    { id: "jc:Critic",        label: "评点家/文论家", axes: ["A3"], layer: "L5", parent: "jc:Person" },
+    { id: "jc:Commentator",   label: "注家/笺疏家",   axes: ["A3"], layer: "L5", parent: "jc:Person" },
+    { id: "jc:Scholar",       label: "学者/读者",     axes: ["A3"], layer: "L5", parent: "jc:Person" },
+
+    // L6 文化外延
+    { id: "jc:FolkLiterature", label: "俗文学/说唱",  axes: ["A1"], layer: "L6", parent: "jc:Entity" },
+    { id: "jc:FolkFigure",    label: "民间传说人物",  axes: ["A3"], layer: "L6", parent: "jc:Person" },
+    { id: "jc:CulturalElement", label: "文化外延元素", axes: ["A1"], layer: "L6", parent: "jc:Entity" },
+    { id: "jc:SpreadEvent",   label: "域外流传",      axes: ["A4"], layer: "L6", parent: "jc:Entity" },
+
+    // L3/L4 事件轴
+    { id: "jc:Event",         label: "事件",          axes: ["A4"], layer: "L3", parent: "jc:Entity" },
+    { id: "jc:EraEvent",      label: "朝代/文运事件", axes: ["A4"], layer: "L3", parent: "jc:Event" },
+    { id: "jc:GatheringEvent", label: "雅集/唱和事件",axes: ["A4"], layer: "L3", parent: "jc:Event" },
+    { id: "jc:CreationEvent", label: "创作/成书事件", axes: ["A4"], layer: "L3", parent: "jc:Event" },
+    { id: "jc:PublicEvent",   label: "刊刻/出版事件", axes: ["A4"], layer: "L3", parent: "jc:Event" },
+    { id: "jc:ReceptionEvent",label: "评点/流传事件", axes: ["A4"], layer: "L3", parent: "jc:Event" }
+  ],
+
+  // ─────────── 对象属性（关系谓词）───────────
+  objectProperties: [
+    // === A1 文体分类关系类 ===
+    { id: "belongs_to_category", name: "属类别",   axis: "A1",
+      domain: "jc:Text", range: "jc:JiBu",
+      desc: "A 典籍归属于集部下某一类别（别集/总集/小说/话本…）。",
+      inverse: "contains_text" },
+    { id: "part_of", name: "部分属于", axis: "A1",
+      domain: "jc:Juan/jc:Chapter", range: "jc:Text/jc:Juan",
+      desc: "卷/章属于某作品或更大结构。",
+      aliases: ["shuyu"], inverse: "has_part" },
+    { id: "of_style", name: "属文体", axis: "A1",
+      domain: "jc:Text", range: "jc:Style",
+      desc: "典籍属于某一文体体例（诗/文/词/曲/赋/小说…）。" },
+    { id: "of_form", name: "属体裁", axis: "A1",
+      domain: "jc:Text", range: "jc:Form",
+      desc: "作品属于具体体裁（乐府/古体/近体/绝句/律诗/词牌/曲牌/章回/笔记…）。" },
+    { id: "of_dynasty_style", name: "属时代文风", axis: "A1",
+      domain: "jc:Text/jc:Person", range: "jc:DynastyStyle",
+      desc: "作品/作家属于某时代文风（建安风骨/盛唐气象/宋调/明文秦汉…）。" },
+    { id: "belongs_to_school", name: "属流派", axis: "A1",
+      domain: "jc:Person/jc:Text", range: "jc:LiterarySchool",
+      desc: "作家/作品归属某文学流派（江西诗派/桐城派/唐宋派/竟陵派…）。" },
+    { id: "based_on_edition", name: "据版本", axis: "A1",
+      domain: "jc:Text", range: "jc:Edition",
+      desc: "A 作品所据底本为某刻本/版本（宋刻/元刻/汲古阁/四库本…）。" },
+    { id: "variant_of", name: "异文/版本对", axis: "A1",
+      domain: "jc:Text", range: "jc:Text",
+      desc: "A 与 B 为同一作品之不同版本/异文。", symmetric: true },
+    { id: "anthologized_in", name: "收入选本", axis: "A1",
+      domain: "jc:Text", range: "jc:Anthology",
+      desc: "单篇作品被收入某选本（文选/唐诗三百首/古文观止…）。",
+      inverse: "anthologizes" },
+    { id: "printed_in", name: "刊于", axis: "A1",
+      domain: "jc:Edition", range: "jc:PrintingEra",
+      desc: "某版本刊刻于某时代。" },
+
+    // === A2 义理内容/文本结构关系类 ===
+    { id: "expounds_concept", name: "阐发", axis: "A2",
+      domain: "jc:Text/jc:Paragraph", range: "jc:WenDao/jc:WenLun",
+      desc: "A 文本/段落阐发某一文道/文论概念。",
+      inverse: "expounded_in" },
+    { id: "uses_imagery", name: "用意象", axis: "A2",
+      domain: "jc:Sentence/jc:Paragraph/jc:Text", range: "jc:Imagery",
+      desc: "句/段/篇中使用某意象。", inverse: "imagery_in" },
+    { id: "alludes_to", name: "用典", axis: "A2",
+      domain: "jc:Sentence/jc:Paragraph", range: "jc:Allusion",
+      desc: "句段使用某典故。" },
+    { id: "employs_technique", name: "用技法", axis: "A2",
+      domain: "jc:Text/jc:Paragraph", range: "jc:Technique",
+      desc: "作品/段落运用某文法技法（比兴/用事/对仗/声律…）。" },
+    { id: "has_juan", name: "含卷", axis: "A2",
+      domain: "jc:Text", range: "jc:Juan", desc: "作品包含若干卷/篇/回/则。" },
+    { id: "has_chapter", name: "含章", axis: "A2",
+      domain: "jc:Juan", range: "jc:Chapter", desc: "卷包含章/节。" },
+    { id: "has_paragraph", name: "含段", axis: "A2",
+      domain: "jc:Chapter", range: "jc:Paragraph", desc: "章包含段落。" },
+    { id: "has_sentence", name: "含句", axis: "A2",
+      domain: "jc:Paragraph", range: "jc:Sentence", desc: "段包含句子/韵句。" },
+    { id: "commentary_on", name: "评/注/笺", axis: "A2",
+      domain: "jc:Commentary", range: "jc:Text",
+      desc: "A 评点/注/笺是对 B 作品的诠释。", inverse: "commented_by" },
+    { id: "quotation", name: "引用", axis: "A2",
+      domain: "jc:Text", range: "jc:Text",
+      desc: "A 文引用/化用 B 文之句。", aliases: ["quotes"], inverse: "quoted_by" },
+    { id: "preface_for", name: "序跋于", axis: "A2",
+      domain: "jc:Preface", range: "jc:Text",
+      desc: "序跋为某作品而作。" },
+
+    // === A3 人物关系类 ===
+    { id: "authorship", name: "著有", axis: "A3",
+      domain: "jc:Person", range: "jc:Text/jc:Commentary",
+      desc: "A 撰写/创作 B 作品。", aliases: ["author_of"], inverse: "authored_by" },
+    { id: "compilation", name: "编选", axis: "A3",
+      domain: "jc:Compiler", range: "jc:Anthology/jc:ZongJi",
+      desc: "A 编纂/选辑 B 总集/选本。", inverse: "compiled_by" },
+    { id: "teacher_student", name: "师徒", axis: "A3",
+      domain: "jc:Person", range: "jc:Person",
+      desc: "A 与 B 为师徒（师→弟）。", aliases: ["teacherOf","studentOf"] },
+    { id: "friendship", name: "交游", axis: "A3",
+      domain: "jc:Person", range: "jc:Person",
+      desc: "A 与 B 有交游/唱和往来。", symmetric: true },
+    { id: "same_society", name: "同社", axis: "A3",
+      domain: "jc:Person", range: "jc:Person",
+      desc: "A 与 B 同属一文社/诗社。", symmetric: true },
+    { id: "same_year", name: "同年", axis: "A3",
+      domain: "jc:Person", range: "jc:Person",
+      desc: "A 与 B 为科举同年。", symmetric: true },
+    { id: "family_relation", name: "亲属/姻亲", axis: "A3",
+      domain: "jc:Person", range: "jc:Person",
+      desc: "A 与 B 有亲属/姻亲关系（父子/兄弟/夫妻/叔侄…）。", symmetric: true },
+    { id: "founding_of_school", name: "开创流派", axis: "A3",
+      domain: "jc:Person", range: "jc:LiterarySchool",
+      desc: "A 开创 B 文学流派。", inverse: "founded_by" },
+    { id: "leader_of_school", name: "领袖流派", axis: "A3",
+      domain: "jc:Person", range: "jc:LiterarySchool",
+      desc: "A 为 B 流派的领袖/代表人物。" },
+    { id: "criticizes", name: "评/批", axis: "A3",
+      domain: "jc:Person/jc:Text", range: "jc:Person/jc:Text",
+      desc: "A 对 B 有所品评/批评/赞誉。" },
+
+    // === A4 时代事件关系类 ===
+    { id: "in_era", name: "属时代", axis: "A4",
+      domain: "jc:Person/jc:Text/jc:Event", range: "jc:EraEvent",
+      desc: "人物/作品/事件所属的朝代/时代。" },
+    { id: "participates_in", name: "参与", axis: "A4",
+      domain: "jc:Person", range: "jc:Event",
+      desc: "人物参与某雅集/结社/事件。" },
+    { id: "writes_at", name: "创作于", axis: "A4",
+      domain: "jc:CreationEvent", range: "jc:Text",
+      desc: "创作事件产出某作品。" },
+    { id: "hosts_gathering", name: "主持/参与雅集", axis: "A4",
+      domain: "jc:Person", range: "jc:GatheringEvent",
+      desc: "A 主持/参与 B 雅集（兰亭/西园/玉山雅集…）。" },
+    { id: "publishes", name: "刊刻", axis: "A4",
+      domain: "jc:Publisher/jc:Person", range: "jc:Edition",
+      desc: "书坊/刻家刊刻某版本。" },
+    { id: "spreads_to", name: "流传至", axis: "A4",
+      domain: "jc:Text", range: "jc:SpreadEvent",
+      desc: "作品流传至某地/某时代/域外。" }
+  ],
+
+  // ─────────── 数据属性（Datatype Properties）───────────
+  datatypeProperties: [
+    { id: "title",        label: "题名",    domain: "jc:Text",         range: "xsd:string" },
+    { id: "authorName",   label: "著者",    domain: "jc:Person",       range: "xsd:string" },
+    { id: "zi",           label: "字",      domain: "jc:Person",       range: "xsd:string" },
+    { id: "hao",          label: "号",      domain: "jc:Person",       range: "xsd:string" },
+    { id: "birthDeath",   label: "生卒年",  domain: "jc:Person",       range: "xsd:string" },
+    { id: "dynasty",      label: "朝代",    domain: "jc:Person/jc:Text", range: "xsd:string" },
+    { id: "juanCount",    label: "卷数",    domain: "jc:Text",         range: "xsd:integer" },
+    { id: "characterCount", label: "字数",  domain: "jc:Text",         range: "xsd:integer" },
+    { id: "genre",        label: "文体",    domain: "jc:Text",         range: "xsd:string" },
+    { id: "form",         label: "体裁",    domain: "jc:Text",         range: "xsd:string" },
+    { id: "era",          label: "时代",    domain: "jc:Event",        range: "xsd:string" },
+    { id: "year",         label: "年份",    domain: "jc:Event",        range: "xsd:gYear" },
+    { id: "location",     label: "地点",    domain: "jc:Event",        range: "xsd:string" },
+    { id: "schoolName",   label: "流派名",  domain: "jc:LiterarySchool", range: "xsd:string" },
+    { id: "coreIdea",     label: "核心主张", domain: "jc:WenLun",     range: "xsd:string" },
+    { id: "imageMeaning", label: "意象意蕴", domain: "jc:Imagery",     range: "xsd:string" },
+    { id: "sourceText",   label: "原文",    domain: "jc:Sentence",     range: "xsd:string" }
+  ],
+
+  // ─────────── ABox 实例规模（统计）───────────
+  abox: {
+    books:        { label: "典籍/作品",      count: 2692, cls: "jc:Text" },
+    juan:         { label: "卷/回/篇/则",    count: 9842, cls: "jc:Juan" },
+    persons:      { label: "人物",           count: 286,  cls: "jc:Person",
+                    breakdown: { "宗师":12, "大家":45, "作家":158, "评点家":31, "注家":18, "学者":22 }},
+    schools:      { label: "文学流派",       count: 38,  cls: "jc:LiterarySchool" },
+    wenLun:       { label: "文论概念",       count: 48,  cls: "jc:WenLun" },
+    wenDao:       { label: "文道核心概念",   count: 12,  cls: "jc:WenDao" },
+    imageries:    { label: "意象",           count: 156, cls: "jc:Imagery" },
+    imageryCats:  { label: "意象类属",       count: 10,  cls: "jc:ImageCategory" },
+    allusions:    { label: "典故",           count: 320, cls: "jc:Allusion" },
+    techniques:   { label: "技法",           count: 42,  cls: "jc:Technique" },
+    forms:        { label: "体裁",           count: 56,  cls: "jc:Form" },
+    events:       { label: "事件",           count: 186, cls: "jc:Event" },
+    editions:     { label: "版本/刻本",      count: 210, cls: "jc:Edition" },
+    folkWorks:    { label: "俗文学作品",     count: 105, cls: "jc:FolkLiterature" },
+    commentaries: { label: "注/评/笺/疏",    count: 340, cls: "jc:Commentary" },
+    anthologies:  { label: "选本",           count: 24,  cls: "jc:Anthology" }
   }
-];
-
-// 集部类体系（ontology class system）
-const JICANG_CLASSES = [
-  { name: "体裁类", en: "Genre", icon: "文", color: "#1f5c4d", total: 40, desc: "辞赋诗词语文小说俗文七大文体及其体式",
-    members: ["楚辞", "汉赋", "乐府", "五言古诗", "七言歌行", "律诗", "绝句", "词", "散曲", "杂剧", "传奇", "古文", "骈文", "八股文", "志怪", "传奇小说", "话本", "章回小说", "宝卷", "弹词", "对联", "灯谜"] },
-  { name: "流派类", en: "School", icon: "派", color: "#7b3f9d", total: 30, desc: "历代诗派、词派、文派的谱系",
-    members: ["建安风骨", "正始之音", "山水田园", "边塞诗派", "韩孟诗派", "元白诗派", "江西诗派", "江湖诗派", "前后七子", "唐宋派", "公安派", "竟陵派", "桐城派", "神韵派", "格调派", "性灵派", "浙西词派", "常州词派", "同光体"] },
-  { name: "人物类", en: "Person", icon: "人", color: "#880e4f", total: 60, desc: "历代诗人、词人、文家、曲家、小说家、文论家",
-    members: ["屈原", "司马相如", "陶渊明", "谢灵运", "李白", "杜甫", "王维", "白居易", "韩愈", "李商隐", "温庭筠", "李煜", "柳永", "苏轼", "李清照", "辛弃疾", "关汉卿", "汤显祖", "袁宏道", "纳兰性德", "曹雪芹", "王国维"] },
-  { name: "作品类", en: "Work", icon: "典", color: "#1f3c88", total: 1674, desc: "别集、总集、诗文评、小说、戏曲等全部典籍",
-    members: ["楚辞", "文选", "文心雕龙", "诗品", "李太白集", "杜工部集", "全唐诗", "全唐文", "文苑英华", "花间集", "东坡乐府", "窦娥冤", "西厢记", "牡丹亭", "三国演义", "水浒传", "西游记", "红楼梦", "聊斋志异", "儒林外史", "古文观止", "唐诗三百首", "人间词话"] },
-  { name: "概念类", en: "Concept", icon: "论", color: "#8b2f2f", total: 36, desc: "文论范畴，如风骨、神韵、境界、意象",
-    members: ["诗言志", "诗缘情", "文以载道", "文气", "风骨", "神思", "隐秀", "妙悟", "兴趣", "神韵", "格调", "性灵", "肌理", "境界", "意境", "意象", "情景", "比兴", "气韵", "滋味", "通变"] },
-  { name: "意象类", en: "Imagery", icon: "象", color: "#b5651d", total: 24, desc: "文学意象谱系，物象与情思的结晶",
-    members: ["明月", "杨柳", "梅花", "兰", "竹", "菊", "鸿雁", "扁舟", "流水", "夕阳", "梧桐", "杜鹃", "酒", "笛", "萍", "落叶"] },
-  { name: "事件类", en: "Event", icon: "事", color: "#5d4037", total: 12, desc: "文学史关键事件与运动",
-    members: ["古文运动", "新乐府运动", "庆历新政与诗文革新", "西昆酬唱", "乌台诗案", "元祐更化", "复古运动", "公安竟陵之变", "桐城义法", "常州词派兴起", "诗界革命", "五四新文学"] },
-  { name: "制度类", en: "Institution", icon: "制", color: "#37474f", total: 8, desc: "与文学相关的典章制度",
-    members: ["科举制", "制科与博学鸿词", "翰林院与词臣", "乐府采诗", "秘书省与馆阁", "书院讲学", "幕府唱和", "诗社与词社"] },
-  { name: "地理类", en: "Place", icon: "地", color: "#2e7d32", total: 16, desc: "文学空间与地域流派",
-    members: ["江南", "长安", "洛阳", "金陵", "蜀中", "岭南", "塞北", "西湖", "赤壁", "兰亭", "桃花源", "辋川", "草堂", "滕王阁", "黄鹤楼", "泰山"] }
-];
-
-// 集部关系体系（ontology relations）
-const JICANG_RELATIONS = [
-  { name: "师承", en: "mentorship", desc: "师徒、后学与前贤的传授关系", from: "人物", to: "人物", color: "#8b2f2f", count: 26 },
-  { name: "唱和", en: "correspondence", desc: "酬唱赠答、同题共作的交流关系", from: "人物", to: "人物", color: "#c0392b", count: 34 },
-  { name: "影响", en: "influence", desc: "承前启后的接受与影响关系", from: "人物", to: "人物", color: "#d35400", count: 48 },
-  { name: "同派", en: "same-school", desc: "同属某一流派或社团", from: "人物", to: "人物", color: "#7b3f9d", count: 22 },
-  { name: "并称", en: "joint-name", desc: "文学史上并举共称（如李杜、韩柳）", from: "人物", to: "人物", color: "#8e44ad", count: 18 },
-  { name: "撰著", en: "authorship", desc: "人物与其著作的创作关系", from: "人物", to: "作品", color: "#1f3c88", count: 1674 },
-  { name: "源出", en: "derivation", desc: "作品源出、祖述、拟作与承袭", from: "作品", to: "作品", color: "#1f5c4d", count: 40 },
-  { name: "评点", en: "criticism", desc: "诗文评对作家作品的批评关系", from: "作品", to: "人物", color: "#b5651d", count: 36 },
-  { name: "取象", en: "imagery-usage", desc: "作品对意象的采用与化用", from: "作品", to: "意象", color: "#c06c1b", count: 30 },
-  { name: "演进", en: "evolution", desc: "概念与范畴的承变演进关系", from: "概念", to: "概念", color: "#7c4a2d", count: 20 }
-];
-
-const JICANG_META = {
-  name: "集藏本体论",
-  en: "Ji-Cang Ontology",
-  slogan: "文以载道 · 艺以传情",
-  desc: "以本体论方法构建集部文献的七层知识体系：辞赋诗词语文小说，别集总集诗文评，意象—情感—流派—格律—人物完整知识网络。",
-  source: "殆知阁（daizhige.org）集藏",
-  layers: 7,
-  classes: 9,
-  relations: 10,
-  works: 1674
 };
+
+const JICANG_LAYERS = JICANG_TBOX.layers;
