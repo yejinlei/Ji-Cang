@@ -53,3 +53,6 @@ const JICANG_THEORY = {
     { text: "落红不是无情物，化作春泥更护花。", author: "龚自珍", work: "己亥杂诗", d: "清" }
   ]
 };
+
+// 显式挂到 window，供 ES module 读取
+window.JICANG_THEORY = JICANG_THEORY;

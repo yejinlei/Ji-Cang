@@ -684,13 +684,20 @@ $('#menuBtn').addEventListener('click',()=>$('#mobileMenu').classList.toggle('hi
 </script>
 <script type="module">
 import { mountOntology3D } from './vendor/ontology3d.js';
-// 等待页面脚本执行完，JICANG_ORTHO 已挂到 window
-window.addEventListener('load', () => {
+// 轮询等待数据就绪，最多等 5 秒
+function tryMount(attempt = 0) {
   const c = document.getElementById('ontology3d');
-  if (c && window.JiCangOntology3D) {
+  if (c && window.JiCangOntology3D && window.JICANG_TBOX && window.JICANG_ORTHO) {
+    if (window.__onto3d && window.__onto3d.dispose) window.__onto3d.dispose();
     window.__onto3d = mountOntology3D('ontology3d');
+  } else if (attempt < 50) {
+    setTimeout(() => tryMount(attempt + 1), 100);
+  } else {
+    if (c) c.innerHTML = '<div class="p-8 text-center text-gray-500">本体数据加载失败，请刷新页面重试</div>';
   }
-});
+}
+if (document.readyState === 'complete') tryMount();
+else window.addEventListener('load', tryMount);
 </script>
 </body>
 </html>

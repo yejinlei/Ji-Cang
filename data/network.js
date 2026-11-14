@@ -146,3 +146,6 @@ const JICANG_NETWORK = {
     { name: "同光体", era: "清末", kind: "诗", advocate: "陈三立 沈曾植", members: ["陈三立", "沈曾植", "郑孝胥"], works: ["散原精舍诗"], desc: "宋诗派余绪，以生涩奥衍为尚，为古典诗最后之流派。", style: "生涩奥衍 · 理趣深微" }
   ]
 };
+
+// 显式挂到 window，供 ES module 读取
+window.JICANG_NETWORK = JICANG_NETWORK;
