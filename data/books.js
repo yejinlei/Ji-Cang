@@ -16280,12 +16280,12 @@ const JICANG_BOOKS = [
   "authors": [
    {
     "name": "李雨堂",
-    "dynasty": "清"
+    "dynasty": null
    }
   ],
-  "dynasty": "清",
-  "size": 778836,
-  "chars": 259112,
+  "dynasty": null,
+  "size": 778820,
+  "chars": 259106,
   "file": "texts/xiaoshuo/万花楼.js"
  },
  {
@@ -19064,12 +19064,12 @@ const JICANG_BOOKS = [
   "authors": [
    {
     "name": "李清",
-    "dynasty": "明"
+    "dynasty": null
    }
   ],
-  "dynasty": "明",
-  "size": 1054581,
-  "chars": 351027,
+  "dynasty": null,
+  "size": 1054565,
+  "chars": 351021,
   "file": "texts/xiaoshuo/梼杌闲评.js"
  },
  {
@@ -19640,12 +19640,12 @@ const JICANG_BOOKS = [
   "authors": [
    {
     "name": "朱名世",
-    "dynasty": "明"
+    "dynasty": null
    }
   ],
-  "dynasty": "明",
-  "size": 80891,
-  "chars": 26463,
+  "dynasty": null,
+  "size": 80875,
+  "chars": 26458,
   "file": "texts/xiaoshuo/牛郎织女传.js"
  },
  {
@@ -21928,12 +21928,12 @@ const JICANG_BOOKS = [
   "authors": [
    {
     "name": "俞达",
-    "dynasty": "清"
+    "dynasty": null
    }
   ],
-  "dynasty": "清",
-  "size": 666984,
-  "chars": 221828,
+  "dynasty": null,
+  "size": 666968,
+  "chars": 221822,
   "file": "texts/xiaoshuo/青楼梦.js"
  },
  {
@@ -24056,12 +24056,12 @@ const JICANG_BOOKS = [
   "authors": [
    {
     "name": "罗贯中",
-    "dynasty": "明"
+    "dynasty": null
    }
   ],
-  "dynasty": "明",
-  "size": 1826579,
-  "chars": 608359,
+  "dynasty": null,
+  "size": 1826563,
+  "chars": 608354,
   "file": "texts/yanyi/三国演义.js"
  },
  {
@@ -24120,12 +24120,12 @@ const JICANG_BOOKS = [
   "authors": [
    {
     "name": "谢诏",
-    "dynasty": "明"
+    "dynasty": null
    }
   ],
-  "dynasty": "明",
-  "size": 507431,
-  "chars": 168643,
+  "dynasty": null,
+  "size": 507415,
+  "chars": 168638,
   "file": "texts/yanyi/东汉秘史.js"
  },
  {
