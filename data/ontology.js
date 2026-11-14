@@ -477,8 +477,6 @@ const JICANG_CLASSES = [
     members:['说唱','弹词','戏曲','宝卷','谶纬','刻本','书坊','域外','民俗','弹词'] }
 ];
 const JICANG_RELATIONS = JICANG_TBOX.objectProperties;
-// JICANG_STATS 由各页面自行基于 JICANG_BOOKS 动态计算，保留空占位以免报错
-const JICANG_STATS = { cats:{}, dyn:{}, topAuthors:[] };
 
 // ───────────────────────────────────────────────
 // 九类专业分区配置（v3.1 扩展）
@@ -690,7 +688,7 @@ window.JICANG_TBOX = JICANG_TBOX;
 window.JICANG_LAYERS = JICANG_LAYERS;
 window.JICANG_CLASSES = JICANG_CLASSES;
 window.JICANG_RELATIONS = JICANG_RELATIONS;
-window.JICANG_STATS = JICANG_STATS;
+// JICANG_STATS 由 books.js 定义
 window.JICANG_PARTITIONS = JICANG_PARTITIONS;
 window.JICANG_PARTITION_MAP = JICANG_PARTITION_MAP;
 window.JICANG_ORTHO = JICANG_ORTHO;
