@@ -15,23 +15,40 @@
 }
 </script>
 <script>
-tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',seal:'#8b2f2f',jade:'#2f6b5f',gold:'#a9801f',violet:'#6b3fa0'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
+tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#1a1612',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',seal:'#8b2f2f',jade:'#2f6b5f',gold:'#b8860b',gold2:'#d4a017',bone:'#f2ecd9',violet:'#6b3fa0'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
 </script>
-<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 12% 18%,rgba(168,50,45,.045) 0,transparent 42%),radial-gradient(circle at 88% 8%,rgba(47,107,95,.05) 0,transparent 40%)}.lk{color:#a8322d}.lk:hover{text-decoration:underline}.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}</style>
+<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 12% 18%,rgba(168,50,45,.04) 0,transparent 42%),radial-gradient(circle at 88% 8%,rgba(47,107,95,.04) 0,transparent 40%)}.lk{color:#a8322d}.lk:hover{text-decoration:underline}.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}.seal{display:inline-flex;align-items:center;justify-content:center;font-family:'Songti SC',serif;font-weight:700;color:#f7f3ea;background:#a8322d;border-radius:4px}</style>
 </head>
 <body class="font-sans text-ink paper-bg min-h-screen">
-<header class="sticky top-0 z-50 bg-ink/95 border-b border-cinnabar/30">
-  <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
-    <a href="index.html" class="flex items-center gap-2">
-      <span class="w-[28px] h-[28px] rounded-md bg-cinnabar text-paper flex items-center justify-center font-serif font-bold text-[16px] shrink-0">集</span>
-      <span class="text-paper font-serif font-bold text-[16px]">集藏本体论</span>
-    </a>
-    <nav class="flex items-center gap-4 text-paper2/85 text-[13.5px]">
-      <a href="index.html" class="hover:text-gold2">首页</a>
-      <a href="books.html" class="hover:text-gold2">全藏原典</a>
-      <a href="dict.html" class="hover:text-gold2">文论词典</a>
-      <a href="timeline.html" class="hover:text-gold2">时间轴</a>
-    </nav>
+<header class="sticky top-0 z-50">
+  <div class="bg-[#14100c] text-bone/75 border-b border-gold/20 text-[12.5px]">
+    <div class="max-w-6xl mx-auto px-4 py-1.5 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 hover:text-gold2 transition-colors">
+        <span class="seal w-[20px] h-[20px] text-[11px]">藏</span>
+        <span class="tracking-[.3em]">集藏本体论 · JI-CANG ONTOLOGY</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-4">
+        <a href="index.html" class="hover:text-gold2">首页</a>
+        <a href="ontology.html" class="text-gold2">本体</a>
+        <a href="books.html" class="hover:text-gold2">全文库</a>
+        <a href="dict.html" class="hover:text-gold2">文论</a>
+        <a href="schools.html" class="hover:text-gold2">流派</a>
+        <a href="figures.html" class="hover:text-gold2">文人</a>
+      </nav>
+    </div>
+  </div>
+  <div class="bg-[#241d16]/95 backdrop-blur border-b border-gold/15">
+    <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <span class="seal w-[32px] h-[32px] text-[16px]">本</span>
+        <div class="leading-tight"><div class="font-serif font-bold text-bone text-[16px] tracking-wide">本体总纲</div><div class="text-[10px] tracking-widest text-gold2/80">BENTI · 四 軸 × 七 層</div></div>
+      </a>
+      <nav class="flex items-center gap-3 text-bone/90 text-[14px]">
+        <a href="index.html" class="hover:text-gold2 font-serif">☰ 总览</a>
+        <a href="ontology.html" class="text-gold2 font-serif">⬡ 本体</a>
+        <a href="books.html" class="hover:text-gold2 font-serif">書 全文库</a>
+      </nav>
+    </div>
   </div>
 </header>
 <main class="max-w-6xl mx-auto px-4 py-8">
@@ -128,13 +145,16 @@ const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d
 
 // 实例轴
 (function(){
+  const BOOKS=window.JICANG_BOOKS||[];
+  const booksArr=Array.isArray(BOOKS)?BOOKS:[];
+  const bookTitles=booksArr.slice(0,60).map(b=>b.title||b.id);
   const groups=[
-    {name:'典籍',items:Object.keys(JICANG_BOOKS).map(c=>JICANG_BOOKS[c].items.slice(0,6).map(b=>b.t)).flat().slice(0,40)},
-    {name:'文人',items:JICANG_NETWORK.nodes.map(n=>n.n)},
-    {name:'流派',items:JICANG_NETWORK.schools.map(s=>s.name)},
-    {name:'意象',items:JICANG_NETWORK.imagery.map(i=>i.name)},
-    {name:'文体',items:JICANG_CLASSES[3].members},
-    {name:'概念',items:JICANG_CLASSES[1].members}
+    {name:'典籍',items:bookTitles},
+    {name:'文人',items:(JICANG_NETWORK.nodes||[]).map(n=>n.n)},
+    {name:'流派',items:(JICANG_NETWORK.schools||[]).map(s=>s.name)},
+    {name:'意象',items:(JICANG_NETWORK.imagery||[]).map(i=>i.name)},
+    {name:'文体',items:((JICANG_CLASSES&&JICANG_CLASSES[3]&&JICANG_CLASSES[3].members)||[])},
+    {name:'概念',items:((JICANG_CLASSES&&JICANG_CLASSES[1]&&JICANG_CLASSES[1].members)||[])}
   ];
   const tabs=$('#instTabs'),body=$('#instBody');
   function render(g){
