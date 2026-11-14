@@ -1,882 +1,370 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>集藏本体论 · 集部文献智能知识图谱与文道推演平台</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<script src="vendor/tailwindcss-3.4.17.js"></script>
-<script src="vendor/echarts-5.6.0.min.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        paper: '#f7f3ea', paper2: '#efe7d8', paper3: '#e6dcc8',
-        ink: '#1a1612', ink2: '#3a3228', ink3: '#6b5f50',
-        cinnabar: '#a8322d', cinnabar2: '#c0524b', seal: '#8b2f2f',
-        jade: '#2f6b5f', jade2: '#4a8b7d', gold: '#b8860b', gold2: '#d4a017',
-        violet: '#6b3fa0', indigo2: '#31427b', ochre: '#b5651d',
-        bronze: '#8b6f47', bone: '#f2ecd9',
-        // 易经站参考的深色系
-        darkink: '#14100c', darkink2: '#241d16', darkink3: '#2e261c'
-      },
-      fontFamily: {
-        serif: ['Songti SC', 'STSong', 'SimSun', 'Georgia', 'serif'],
-        kai: ['Kaiti SC', 'STKaiti', 'KaiTi', 'serif'],
-        zhuan: ['STKaiti','KaiTi','serif'],
-        sans: ['PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei', 'sans-serif']
-      }
+  <script src="js/theme-init.js"></script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%E6%96%87%3C/text%3E%3C/svg%3E">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>集藏本体论 | Ji-Cang Ontology</title>
+  <link rel="stylesheet" href="css/yijing.css">
+  <script src="js/echarts.min.js"></script>
+  <script src="js/compass.js"></script>
+  <script src="js/theme-switch.js"></script>
+  <script src="data/books.js"></script>
+  <script src="data/individuals.js"></script>
+  <script src="data/ontology.js"></script>
+  <script src="data/network.js"></script>
+  <script src="js/shell.js"></script>
+  <style>
+    /* Hero 区：保留易经站结构，太极符号换成"文"字 */
+    .hero-taiji{font-size:64px;color:var(--zhu);margin-bottom:8px;display:inline-block;position:relative;z-index:2;text-shadow:0 0 24px rgba(217,74,74,.5);font-family:'STKaiti',KaiTi,serif;font-weight:700;}
+    .hero{
+      position:relative;overflow:hidden;z-index:1;
+      min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:60px 20px 40px;
     }
-  }
-}
-</script>
-<style>
-  html { scroll-behavior: smooth; }
-  body { background-color: #f7f3ea; }
-  .paper-bg {
-    background-image:
-      radial-gradient(circle at 12% 18%, rgba(168,50,45,0.04) 0%, transparent 42%),
-      radial-gradient(circle at 88% 8%, rgba(47,107,95,0.045) 0%, transparent 40%),
-      radial-gradient(circle at 70% 92%, rgba(184,134,11,0.04) 0%, transparent 45%);
-  }
-  .dark-bg {
-    background: #14100c;
-    background-image:
-      radial-gradient(ellipse at top, #241d16 0%, #14100c 60%),
-      radial-gradient(ellipse at bottom right, rgba(168,50,45,0.12) 0%, transparent 45%),
-      radial-gradient(ellipse at top left, rgba(184,134,11,0.10) 0%, transparent 40%);
-  }
-  .grain-light {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-  }
-  .grain-dark {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  }
-  .card-hover { transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s, border-color .28s, background .28s; }
-  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 28px -14px rgba(34,32,29,.35); }
-  .card-dark { background: rgba(255,248,230,0.04); border: 1px solid rgba(212,160,23,0.18); backdrop-filter: blur(2px); }
-  .card-dark:hover { border-color: rgba(212,160,23,0.45); box-shadow: 0 14px 32px -14px rgba(212,160,23,0.25); background: rgba(255,248,230,0.06); }
-  .fade-up { animation: fadeUp .6s cubic-bezier(.2,.8,.2,1) both; }
-  @keyframes fadeUp { from { opacity: .001; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-  .fade-up:nth-child(2){animation-delay:.05s}.fade-up:nth-child(3){animation-delay:.1s}.fade-up:nth-child(4){animation-delay:.15s}
-  .fade-up:nth-child(5){animation-delay:.2s}.fade-up:nth-child(6){animation-delay:.25s}.fade-up:nth-child(7){animation-delay:.3s}
-  .seal { display:inline-flex; align-items:center; justify-content:center; font-family:'Songti SC',serif; font-weight:700; color:#f7f3ea; background:#a8322d; border-radius:4px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08),0 1px 2px rgba(0,0,0,0.2); }
-  .tag { display:inline-block; padding:.12rem .5rem; border-radius:.375rem; font-size:.72rem; line-height:1.5; }
-  ::-webkit-scrollbar{width:9px;height:9px}
-  ::-webkit-scrollbar-thumb{background:#cfc4ac;border-radius:5px}
-  ::-webkit-scrollbar-track{background:#efe7d8}
-  .lk { color:#d4a017; text-decoration:none; }
-  .lk:hover { text-decoration:underline; }
-  .lk-lt { color:#a8322d; text-decoration:none; }
-  .lk-lt:hover { text-decoration:underline; }
-  .sec-anchor { scroll-margin-top: 130px; }
-  /* 类八卦符号 */
-  .trigram { font-family:'Songti SC',serif; font-weight:700; line-height:1; }
-  /* 大字导航竖排 */
-  .nav-v { writing-mode:vertical-rl; letter-spacing:.25em; }
-  .vert-ico { writing-mode:vertical-rl; text-orientation:upright; font-family:'Songti SC',serif; font-weight:700; }
-  /* 大篆风标题字 */
-  .hero-title { font-family:'Songti SC',serif; font-weight:900; letter-spacing:.08em; text-shadow:0 2px 8px rgba(0,0,0,0.45); }
-  .big-cn-num { font-family:'Songti SC',serif; font-weight:900; font-style:italic; }
-  /* 古籍卡片 */
-  .canon-card { background: linear-gradient(180deg, rgba(255,248,230,0.05) 0%, rgba(255,248,230,0.02) 100%); border:1px solid rgba(212,160,23,0.18); border-radius:10px; transition:all .28s; }
-  .canon-card:hover { border-color:rgba(212,160,23,0.5); transform:translateY(-2px); }
-  /* 深色分隔线 */
-  .dark-divider { height:1px; background:linear-gradient(90deg, transparent, rgba(212,160,23,0.3), transparent); }
-</style>
+    .hero-compass{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:min(900px,120vw);height:min(900px,120vw);
+      opacity:.4;z-index:0;pointer-events:none;
+    }
+    .hero > *:not(.hero-compass){position:relative;z-index:2;}
+    .hero h1{margin:0 0 6px;font-size:56px;letter-spacing:8px;color:var(--ink);text-shadow:0 0 24px rgba(212,176,121,.3);}
+    .hero h1 .accent{color:var(--zhu);}
+    .hero .subtitle{margin-bottom:14px;color:var(--gold);letter-spacing:6px;font-size:15px;font-family:var(--font-kai);}
+    .hero .quote{margin-bottom:24px;max-width:760px;}
+    .stats-grid{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+      max-width:900px;width:100%;margin-top:18px;
+    }
+    .stat-card{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(212,176,121,.18);border-radius:var(--radius-lg);
+      padding:20px 14px;text-align:center;
+      backdrop-filter:blur(4px);
+      transition:all .3s;
+    }
+    .stat-card:hover{background:rgba(212,176,121,.12);border-color:var(--gold);transform:translateY(-3px);}
+    .stat-card .stat-num{font-size:34px;color:var(--gold-bright);font-weight:700;letter-spacing:2px;font-family:var(--font-serif);text-shadow:0 0 16px rgba(212,176,121,.3);}
+    .stat-card .stat-label{color:var(--ink);font-size:14px;letter-spacing:3px;margin-top:6px;font-weight:600;}
+    .stat-card .stat-sub{color:var(--ink-3);font-size:11px;letter-spacing:2px;margin-top:2px;}
+    .hero-actions{margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2;}
+
+    /* 七层本体 */
+    .ont-level{
+      display:grid;grid-template-columns:repeat(7,1fr);gap:8px;
+      margin:24px 0;
+    }
+    .ont-lvl{
+      text-align:center;padding:14px 6px;border:1px solid var(--line-soft);
+      border-radius:var(--radius);background:rgba(255,255,255,.03);
+      font-size:12px;letter-spacing:1px;color:var(--ink-2);
+      transition:all .25s;
+    }
+    .ont-lvl:hover{background:rgba(212,176,121,.1);border-color:var(--gold);transform:translateY(-2px);}
+    .ont-lvl .lv-num{font-size:10px;color:var(--gold);font-family:var(--font-sans);margin-bottom:6px;}
+    .ont-lvl .lv-name{font-size:16px;color:var(--zhu);font-weight:700;letter-spacing:3px;margin-bottom:4px;}
+    .ont-lvl .lv-desc{font-size:11px;color:var(--ink-3);line-height:1.5;}
+
+    /* 九类分区卡片（替代八卦）*/
+    .cat-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+    }
+    .cat-card{
+      background:var(--space-card);border:1px solid var(--line);
+      border-radius:var(--radius-lg);padding:20px;text-align:center;
+      transition:all .3s;cursor:pointer;text-decoration:none;color:inherit;
+      backdrop-filter:blur(6px);
+    }
+    .cat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--gold-soft);}
+    .cat-card .sym{font-size:46px;line-height:1;margin-bottom:10px;color:var(--gold);font-family:serif;}
+    .cat-card .name{font-size:20px;color:var(--zhu);font-weight:700;letter-spacing:3px;}
+    .cat-card .cls{font-size:12px;color:var(--ink-3);margin-top:6px;letter-spacing:2px;}
+    .cat-card .count{font-size:13px;color:var(--gold);margin-top:8px;font-family:var(--font-sans);letter-spacing:1px;}
+
+    #graphBox{width:100%;height:560px;background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:var(--radius-lg);}
+
+    .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+    .feat-card{
+      background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);
+      padding:20px;text-align:center;text-decoration:none;color:inherit;transition:all .3s;
+      backdrop-filter:blur(6px);
+    }
+    .feat-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:var(--shadow-lg);}
+    .feat-card .fi{font-size:42px;color:var(--zhu);margin-bottom:10px;font-family:'STKaiti',KaiTi,serif;}
+    .feat-card:nth-child(2) .fi{color:var(--gold);}
+    .feat-card:nth-child(3) .fi{color:var(--jade);}
+    .feat-card:nth-child(4) .fi{color:var(--ice);}
+    .feat-card h3{color:var(--ink);margin:0 0 6px;letter-spacing:3px;font-size:17px;}
+    .feat-card p{color:var(--ink-3);font-size:12px;margin:0;line-height:1.7;}
+
+    @media (max-width:900px){
+      .stats-grid{grid-template-columns:repeat(2,1fr);}
+      .hero{min-height:auto;padding:40px 14px 30px;}
+      .hero h1{font-size:38px;letter-spacing:4px;}
+      .hero-compass{width:min(560px,130vw);height:min(560px,130vw);opacity:.3;top:40%;}
+      .cat-grid{grid-template-columns:repeat(2,1fr);}
+      .feature-grid{grid-template-columns:repeat(2,1fr);}
+      .ont-level{grid-template-columns:repeat(4,1fr);}
+    }
+    @media (max-width:520px){
+      .stats-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+      .stat-card{padding:14px 8px;}
+      .stat-card .stat-num{font-size:24px;}
+      .cat-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+      .feature-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+      .ont-level{grid-template-columns:repeat(2,1fr);gap:8px;}
+    }
+  </style>
 </head>
-<body class="font-sans text-ink paper-bg grain-light min-h-screen">
+<body>
+<div id="topbar-slot"></div>
+<div class="layout">
+  <div id="sidebar-slot"></div>
+  <main class="content" style="padding:0;">
 
-<!-- ==================== 顶部双层导航（参考易经站） ==================== -->
-<header class="sticky top-0 z-50">
-  <!-- 上层小字导航（深色条） -->
-  <div class="bg-darkink text-bone/75 border-b border-gold/20 text-[12.5px]">
-    <div class="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
-      <a href="#overview" class="flex items-center gap-2 hover:text-gold2 transition-colors">
-        <span class="seal w-[22px] h-[22px] text-[12px]">藏</span>
-        <span class="tracking-[.3em]">集藏本体论 · JI-CANG ONTOLOGY</span>
-      </a>
-      <nav class="hidden md:flex items-center gap-4">
-        <a href="#overview" class="hover:text-gold2 transition-colors">首页</a>
-        <a href="#ontology" class="hover:text-gold2 transition-colors">本体</a>
-        <a href="#canon" class="hover:text-gold2 transition-colors">典籍</a>
-        <a href="books.html" class="hover:text-gold2 transition-colors">全文库</a>
-        <a href="ontology.html" class="hover:text-gold2 transition-colors">本体总纲</a>
-        <a href="dict.html" class="hover:text-gold2 transition-colors">文论</a>
-        <a href="schools.html" class="hover:text-gold2 transition-colors">流派</a>
-        <a href="figures.html" class="hover:text-gold2 transition-colors">文人</a>
-        <a href="imagery.html" class="hover:text-gold2 transition-colors">意象</a>
-        <a href="timeline.html" class="hover:text-gold2 transition-colors">时序</a>
-      </nav>
-      <button id="menuBtn" class="md:hidden text-bone p-0.5" aria-label="菜单">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-      </button>
-    </div>
-  </div>
-  <!-- 下层大字导航（米黄条） -->
-  <div class="bg-darkink2/95 backdrop-blur border-b border-gold/15">
-    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4 overflow-x-auto">
-      <a href="#overview" class="flex items-center gap-2 shrink-0">
-        <span class="seal w-[34px] h-[34px] text-[18px]">文</span>
-        <div class="leading-tight">
-          <div class="font-serif font-bold text-bone text-[17px] tracking-wide">集藏本体论</div>
-          <div class="text-[10px] tracking-widest text-gold2/80">JI-CANG · 集部之学</div>
-        </div>
-      </a>
-      <nav class="flex items-center gap-3 md:gap-4 text-bone/90 text-[14px] shrink-0">
-        <a href="#overview" class="hover:text-gold2 transition-colors font-serif">☰ 总览</a>
-        <a href="#ontology" class="hover:text-gold2 transition-colors font-serif">⬡ 本体</a>
-        <a href="#nine-class" class="hover:text-gold2 transition-colors font-serif">書 典籍</a>
-        <a href="#network" class="hover:text-gold2 transition-colors font-serif">網 关系</a>
-        <a href="#theory" class="hover:text-gold2 transition-colors font-serif">論 文论</a>
-        <a href="#imagery" class="hover:text-gold2 transition-colors font-serif">象 意象</a>
-        <a href="#schools" class="hover:text-gold2 transition-colors font-serif">派 流派</a>
-        <a href="#people" class="hover:text-gold2 transition-colors font-serif">人 文人</a>
-        <a href="#library" class="hover:text-gold2 transition-colors font-serif">籍 全文库</a>
-      </nav>
-    </div>
-    <div id="mobileMenu" class="hidden md:hidden bg-darkink border-t border-gold/10 px-4 py-2.5 grid grid-cols-3 gap-y-2 gap-x-4 text-bone/90 text-[13px]">
-      <a href="#overview">总览</a><a href="#ontology">本体</a><a href="#canon">典籍</a>
-      <a href="#network">关系</a><a href="#theory">文论</a><a href="#imagery">意象</a>
-      <a href="#schools">流派</a><a href="#people">文人</a><a href="#library">全文库</a>
-      <a href="ontology.html" class="text-gold2">本体总纲 →</a>
-      <a href="books.html" class="text-gold2">典籍阅览室 →</a>
-    </div>
-  </div>
-</header>
-
-<!-- ==================== HERO 深色大标题（参考易经站风格） ==================== -->
-<section id="overview" class="dark-bg grain-dark relative overflow-hidden">
-  <!-- 装饰符 -->
-  <div class="absolute left-6 top-10 text-gold/15 font-serif text-[180px] leading-none select-none hidden lg:block">藏</div>
-  <div class="absolute right-10 bottom-4 text-cinnabar/15 font-serif text-[220px] leading-none select-none hidden lg:block">文</div>
-  <div class="max-w-7xl mx-auto px-4 pt-14 pb-12 relative">
-    <div class="grid lg:grid-cols-12 gap-8 items-end">
-      <!-- 左侧九类符号侧栏（类八卦栏） -->
-      <aside class="hidden lg:flex lg:col-span-1 flex-col items-center gap-5 border-r border-gold/20 pr-4">
-        <!-- 九类典籍符号 -->
-        <a href="#nine-class" title="别集" class="group flex flex-col items-center gap-1 text-bone/70 hover:text-gold2 transition-colors">
-          <span class="trigram text-[28px] text-gold2/90 group-hover:text-gold2">別</span>
-          <span class="text-[10.5px] tracking-widest font-serif">别集</span>
-        </a>
-        <a href="#nine-class" title="总集" class="group flex flex-col items-center gap-1 text-bone/70 hover:text-gold2 transition-colors">
-          <span class="trigram text-[28px] text-gold2/90 group-hover:text-gold2">總</span>
-          <span class="text-[10.5px] tracking-widest font-serif">总集</span>
-        </a>
-        <a href="#nine-class" title="诗文评" class="group flex flex-col items-center gap-1 text-bone/70 hover:text-gold2 transition-colors">
-          <span class="trigram text-[28px] text-gold2/90 group-hover:text-gold2">評</span>
-          <span class="text-[10.5px] tracking-widest font-serif">文评</span>
-        </a>
-        <a href="#nine-class" title="小说" class="group flex flex-col items-center gap-1 text-bone/70 hover:text-gold2 transition-colors">
-          <span class="trigram text-[28px] text-gold2/90 group-hover:text-gold2">說</span>
-          <span class="text-[10.5px] tracking-widest font-serif">小说</span>
-        </a>
-        <a href="#nine-class" title="演义" class="group flex flex-col items-center gap-1 text-bone/70 hover:text-gold2 transition-colors">
-          <span class="trigram text-[28px] text-gold2/90 group-hover:text-gold2">演</span>
-          <span class="text-[10.5px] tracking-widest font-serif">演义</span>
-        </a>
-        <a href="#nine-class" title="话本" class="group flex flex-col items-center gap-1 text-bone/70 hover:text-gold2 transition-colors">
-          <span class="trigram text-[28px] text-gold2/90 group-hover:text-gold2">話</span>
-          <span class="text-[10.5px] tracking-widest font-serif">话本</span>
-        </a>
-        <a href="#nine-class" title="宝卷" class="group flex flex-col items-center gap-1 text-bone/70 hover:text-gold2 transition-colors">
-          <span class="trigram text-[28px] text-gold2/90 group-hover:text-gold2">卷</span>
-          <span class="text-[10.5px] tracking-widest font-serif">宝卷</span>
-        </a>
-        <a href="#nine-class" title="笑话" class="group flex flex-col items-center gap-1 text-bone/70 hover:text-gold2 transition-colors">
-          <span class="trigram text-[28px] text-gold2/90 group-hover:text-gold2">笑</span>
-          <span class="text-[10.5px] tracking-widest font-serif">笑话</span>
-        </a>
-        <a href="#nine-class" title="谜语" class="group flex flex-col items-center gap-1 text-bone/70 hover:text-gold2 transition-colors">
-          <span class="trigram text-[28px] text-gold2/90 group-hover:text-gold2">謎</span>
-          <span class="text-[10.5px] tracking-widest font-serif">谜语</span>
-        </a>
-      </aside>
-
-      <!-- 中间主标题 -->
-      <div class="lg:col-span-7">
-        <p class="text-gold2/80 font-serif tracking-[.5em] text-[12px] mb-3">文 以 载 道 · 艺 以 传 情</p>
-        <h1 class="hero-title text-[54px] md:text-[78px] leading-[1.05] text-bone">
-          集藏<span class="text-cinnabar2">本体论</span>
-        </h1>
-        <p class="mt-1 font-serif text-gold/80 tracking-[.3em] text-[13px] md:text-[14px]">JI-CANG ONTOLOGY · 集 部 之 學</p>
-        <p class="mt-5 text-bone/75 text-[15px] md:text-[16px] leading-relaxed max-w-2xl font-kai">
-          以本体论方法重构集部文献的知识体系——辞赋诗词、文话小说，别集总集、诗文评说，
-          自元模型以至文化外延凡七层；意象、情感、流派、格律、人物交织成网。
-          本站以 <b class="text-gold2">殆知阁集藏 1669 部 / 17821 卷</b> 典籍为底本，全部原文内嵌站内可读，构建中华文学的知识图谱与文道推演平台。
-        </p>
-        <div class="mt-6 flex flex-wrap gap-3 text-[13.5px]">
-          <a href="#ontology" class="px-4 py-2 rounded-md bg-cinnabar text-bone hover:bg-cinnabar2 transition-colors font-serif">⬡ 进入本体</a>
-          <a href="#network" class="px-4 py-2 rounded-md border border-gold/50 text-gold2 hover:bg-gold/10 transition-colors font-serif">網 关系图谱</a>
-          <a href="books.html" class="px-4 py-2 rounded-md border border-gold/50 text-gold2 hover:bg-gold/10 transition-colors font-serif">書 典籍阅读</a>
-          <a href="reader.html?f=sikubieji/李太白全集.js" class="px-4 py-2 rounded-md border border-bone/30 text-bone/80 hover:border-gold2 hover:text-gold2 transition-colors font-serif">✦ 名篇推荐</a>
-        </div>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-compass" id="heroCompass"></div>
+      <div class="hero-taiji">文</div>
+      <h1>集<span class="accent">藏</span>本体论</h1>
+      <div class="subtitle">JI-CANG ONTOLOGY · 文 以 载 道 · 艺 以 传 情</div>
+      <div class="quote">
+        "盖文章，经国之大业，不朽之盛事。"<br>
+        <span class="src">—— 曹丕《典论·论文》</span>
       </div>
-
-      <!-- 右侧 KPI -->
-      <div class="lg:col-span-4">
-        <div class="grid grid-cols-2 gap-3">
-          <div class="card-dark rounded-xl p-4 fade-up">
-            <div class="flex items-baseline gap-2">
-              <div class="text-gold2 font-serif text-[32px] md:text-[36px] font-bold leading-none" id="kpiWorks">1669</div>
-              <div class="text-bone/60 text-[12px]">部</div>
-            </div>
-            <div class="text-[12px] text-bone/55 mt-1.5 font-serif tracking-wider">集 部 典 籍</div>
-          </div>
-          <div class="card-dark rounded-xl p-4 fade-up">
-            <div class="flex items-baseline gap-2">
-              <div class="text-cinnabar2 font-serif text-[32px] md:text-[36px] font-bold leading-none">7</div>
-              <div class="text-bone/60 text-[12px]">层</div>
-            </div>
-            <div class="text-[12px] text-bone/55 mt-1.5 font-serif tracking-wider">本 体 层 级</div>
-          </div>
-          <div class="card-dark rounded-xl p-4 fade-up">
-            <div class="flex items-baseline gap-2">
-              <div class="text-jade2 font-serif text-[32px] md:text-[36px] font-bold leading-none">9</div>
-              <div class="text-bone/60 text-[12px]">类</div>
-            </div>
-            <div class="text-[12px] text-bone/55 mt-1.5 font-serif tracking-wider">文 献 分 区</div>
-          </div>
-          <div class="card-dark rounded-xl p-4 fade-up">
-            <div class="flex items-baseline gap-2">
-              <div class="text-bronze font-serif text-[32px] md:text-[36px] font-bold leading-none" id="kpiAuthors">1363</div>
-              <div class="text-bone/60 text-[12px]">位</div>
-            </div>
-            <div class="text-[12px] text-bone/55 mt-1.5 font-serif tracking-wider">著 者 人 物</div>
-          </div>
-        </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num" id="st-books">1669</div><div class="stat-label">集部典籍</div><div class="stat-sub">九类分藏</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-authors">1363</div><div class="stat-label">著者人物</div><div class="stat-sub">跨朝越代</div></div>
+        <div class="stat-card"><div class="stat-num">7</div><div class="stat-label">本体层级</div><div class="stat-sub">七层建构</div></div>
+        <div class="stat-card"><div class="stat-num">9</div><div class="stat-label">文献分区</div><div class="stat-sub">按体分藏</div></div>
       </div>
-    </div>
-  </div>
-  <div class="dark-divider"></div>
-</section>
-
-<!-- ==================== 主体（浅色） ==================== -->
-<main class="max-w-7xl mx-auto px-4 py-8 pb-16">
-
-<!-- ==================== 本体论构建方法 ==================== -->
-<section id="ontology" class="sec-anchor">
-  <div class="flex items-end justify-between flex-wrap gap-2 mb-5">
-    <div>
-      <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">⬡ BENTI · 本 體 之 構</p>
-      <h2 class="font-serif font-bold text-[26px] md:text-[32px] text-ink">本体论构建方法</h2>
-      <p class="text-ink2 text-[14.5px] mt-2 max-w-3xl leading-relaxed">集藏本体论采用「<b>统一本体 + 九类专业分区</b>」：以 <b class="text-cinnabar">四轴</b>（文体典要 / 义理意象 / 人物传承 / 时代事件）为横向骨架、<b class="text-jade">七层</b>（L0 元模型 → L6 文化外延）为纵向骨架，九类典籍在 L4 文本载体层各建专属子类与数据属性，构成 4×7×9 = <b class="text-cinnabar">252</b> 个正交节点的三维本体空间。</p>
-    </div>
-    <span class="text-[12.5px] text-ink3 border border-ink/15 rounded-full px-3 py-1 bg-white/60">统一本体 · 四轴 × 七层 × 九类</span>
-  </div>
-
-  <!-- 壹 · 三维 -->
-  <div class="rounded-2xl bg-white/70 border border-ink/10 p-4 md:p-5 shadow-sm">
-    <div class="flex items-center gap-2.5 mb-2 flex-wrap">
-      <span class="seal w-[30px] h-[30px] text-[15px]">壹</span>
-      <h3 class="font-serif font-bold text-[18px] md:text-[20px] text-ink">三维正交模型 · 四轴 × 七层 × 九类</h3>
-      <span class="text-[12px] text-ink3 border border-ink/15 rounded-full px-2.5 py-0.5 bg-paper2/60">252 节点 · Three.js 3D</span>
-    </div>
-    <p class="text-ink2 text-[13.5px] leading-relaxed mb-3"><b class="text-cinnabar">X 轴</b>为四轴，<b class="text-jade">Y 轴</b>为七层，<b class="text-gold">Z 轴</b>为九类专业分区。亮球表示该坐标存在专属本体类 / 关系 / 属性，暗球表示九类共享的上层概念。</p>
-    <div class="rounded-xl bg-white/72 border border-ink/10 overflow-hidden">
-      <div id="ontology3d" style="width:100%;height:560px;position:relative"></div>
-    </div>
-    <p class="text-[12.5px] text-ink3 mt-2 leading-relaxed">操作提示：鼠标拖拽旋转 · 滚轮缩放 · 右键平移 · 悬停节点查看该坐标所代表的本体概念 · 点击右侧图例按钮高亮某轴或某层。</p>
-  </div>
-
-  <!-- 贰 · 七层 -->
-  <div class="rounded-2xl bg-white/70 border border-ink/10 p-4 md:p-5 mt-5 shadow-sm">
-    <div class="flex items-center gap-2.5 mb-2 flex-wrap">
-      <span class="seal w-[30px] h-[30px] text-[15px]" style="background:#2F4F4F">贰</span>
-      <h3 class="font-serif font-bold text-[18px] md:text-[20px] text-ink">七层本体架构 · 纵向骨架</h3>
-      <span class="text-[12px] text-ink3 border border-ink/15 rounded-full px-2.5 py-0.5 bg-paper2/60">L0 → L6 · 七层</span>
-    </div>
-    <p class="text-ink2 text-[13.5px] leading-relaxed mb-3">自元概念（L0）而文道本体（L1）、文体范畴（L2）、流派体系（L3）、文本载体（L4）、人物传承（L5）、文化外延（L6），层层递进。</p>
-    <div id="layerList" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3.5"></div>
-  </div>
-
-  <!-- 叁 · 类体系 -->
-  <div class="rounded-2xl bg-white/70 border border-ink/10 p-4 md:p-5 mt-5 shadow-sm">
-    <div class="flex items-center gap-2.5 mb-2 flex-wrap">
-      <span class="seal w-[30px] h-[30px] text-[15px]" style="background:#6B3FA0">叁</span>
-      <h3 class="font-serif font-bold text-[18px] md:text-[20px] text-ink">类体系 · 类 / 关系 / 属性</h3>
-      <span class="text-[12px] text-ink3 border border-ink/15 rounded-full px-2.5 py-0.5 bg-paper2/60">OWL Class · 四轴归一</span>
-    </div>
-    <p class="text-ink2 text-[13.5px] leading-relaxed mb-3">本体的类按四轴聚合，另立关系谓词与数据属性两类元语：<b>类</b>刻画实体类型，<b>关系谓词</b>刻画实体之间的语义关联，<b>数据属性</b>刻画实体自身字段。</p>
-    <div id="classList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
-  </div>
-</section>
-
-<!-- ==================== 九类典籍符号带（新增大字视觉入口） ==================== -->
-<section id="nine-class" class="sec-anchor pt-14">
-  <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">書 JIU LEI · 九 類 典 籍</p>
-  <h2 class="font-serif font-bold text-[26px] md:text-[32px] text-ink mb-4">九类分区</h2>
-  <p class="text-ink2 text-[14.5px] max-w-3xl leading-relaxed mb-5">集藏按传统目录学分作九类：别集、总集、诗文评、小说、演义、话本、宝卷、笑话、谜语。每一类在本体中建立专属子类与关系，共构中华文学之全体。</p>
-  <div class="grid grid-cols-3 md:grid-cols-9 gap-3">
-    <a href="#canon" class="canon-card p-4 text-center flex flex-col items-center gap-1.5"><span class="trigram text-[44px] text-cinnabar">別</span><span class="font-serif text-ink font-bold text-[15px]">别集</span><span class="text-[11.5px] text-ink3">个人作品集</span></a>
-    <a href="#canon" class="canon-card p-4 text-center flex flex-col items-center gap-1.5"><span class="trigram text-[44px] text-jade">總</span><span class="font-serif text-ink font-bold text-[15px]">总集</span><span class="text-[11.5px] text-ink3">群贤文汇编</span></a>
-    <a href="#canon" class="canon-card p-4 text-center flex flex-col items-center gap-1.5"><span class="trigram text-[44px] text-gold">評</span><span class="font-serif text-ink font-bold text-[15px]">诗文评</span><span class="text-[11.5px] text-ink3">文论诗话</span></a>
-    <a href="#canon" class="canon-card p-4 text-center flex flex-col items-center gap-1.5"><span class="trigram text-[44px] text-violet">說</span><span class="font-serif text-ink font-bold text-[15px]">小说</span><span class="text-[11.5px] text-ink3">文言笔记</span></a>
-    <a href="#canon" class="canon-card p-4 text-center flex flex-col items-center gap-1.5"><span class="trigram text-[44px] text-indigo2">演</span><span class="font-serif text-ink font-bold text-[15px]">演义</span><span class="text-[11.5px] text-ink3">长篇章回</span></a>
-    <a href="#canon" class="canon-card p-4 text-center flex flex-col items-center gap-1.5"><span class="trigram text-[44px] text-ochre">話</span><span class="font-serif text-ink font-bold text-[15px]">话本</span><span class="text-[11.5px] text-ink3">说书白话</span></a>
-    <a href="#canon" class="canon-card p-4 text-center flex flex-col items-center gap-1.5"><span class="trigram text-[44px] text-seal">卷</span><span class="font-serif text-ink font-bold text-[15px]">宝卷</span><span class="text-[11.5px] text-ink3">民间讲唱</span></a>
-    <a href="#canon" class="canon-card p-4 text-center flex flex-col items-center gap-1.5"><span class="trigram text-[44px] text-bronze">笑</span><span class="font-serif text-ink font-bold text-[15px]">笑话</span><span class="text-[11.5px] text-ink3">谐谑笑林</span></a>
-    <a href="#canon" class="canon-card p-4 text-center flex flex-col items-center gap-1.5"><span class="trigram text-[44px] text-ink3">謎</span><span class="font-serif text-ink font-bold text-[15px]">谜语</span><span class="text-[11.5px] text-ink3">灯谜隐语</span></a>
-  </div>
-</section>
-
-<!-- ==================== 典籍体系 ==================== -->
-<section id="canon" class="sec-anchor pt-12">
-  <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">籍 DIANJI · 典 籍 體 系</p>
-  <h2 class="font-serif font-bold text-[26px] md:text-[32px] text-ink">典籍体系</h2>
-  <p class="text-ink2 text-[14.5px] mt-2 max-w-3xl leading-relaxed">1669 部集部典籍（含《全唐文》1000 卷、《文苑英华》1000 卷等大型总集），分属九类，跨越汉魏以至明清，全部原文已内嵌本站。下图为分类规模与朝代分布。</p>
-  <div class="grid lg:grid-cols-3 gap-4 mt-4">
-    <div class="lg:col-span-2 rounded-xl bg-white/70 border border-ink/10 p-4 shadow-sm">
-      <h3 class="text-[15.5px] font-semibold text-ink mb-1 font-serif">九类典籍规模</h3>
-      <div id="catChart" class="w-full" style="height:340px"></div>
-    </div>
-    <div class="rounded-xl bg-white/70 border border-ink/10 p-4 shadow-sm">
-      <h3 class="text-[15.5px] font-semibold text-ink mb-1 font-serif">朝代分布</h3>
-      <div id="dynChart" class="w-full" style="height:340px"></div>
-    </div>
-  </div>
-  <div class="rounded-xl bg-white/70 border border-ink/10 p-4 mt-4 shadow-sm">
-    <h3 class="text-[15.5px] font-semibold text-ink mb-2.5 font-serif">本体实例统计（ABox）</h3>
-    <div id="topAuthors" class="flex flex-wrap gap-2"></div>
-  </div>
-</section>
-
-<!-- ==================== 关系图谱 ==================== -->
-<section id="network" class="sec-anchor pt-12">
-  <div class="flex items-end justify-between flex-wrap gap-2 mb-4">
-    <div>
-      <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">網 GUANXI · 文 道 關 係</p>
-      <h2 class="font-serif font-bold text-[26px] md:text-[32px] text-ink">文道关系图谱</h2>
-      <p class="text-ink2 text-[14.5px] mt-2 max-w-3xl leading-relaxed">以师承、唱和、影响、并称、同派诸关系联结历代文人，可拖拽、缩放，点击节点查看人物详情。</p>
-    </div>
-    <div id="relLegend" class="flex flex-wrap gap-2 text-[12px]"></div>
-  </div>
-  <div class="grid lg:grid-cols-4 gap-4">
-    <div class="lg:col-span-3 rounded-xl bg-white/70 border border-ink/10 p-2 shadow-sm">
-      <div id="graphChart" class="w-full" style="height:560px"></div>
-    </div>
-    <div id="graphInfo" class="rounded-xl bg-paper2/70 border border-ink/10 p-4 h-fit shadow-sm">
-      <h3 class="text-[15px] font-serif font-semibold text-ink mb-2">人物索引</h3>
-      <p class="text-[13px] text-ink3 leading-relaxed">点击图谱中的节点，此处将显示该文人的字号、生卒、小传与关联关系。共 <span id="nodeCount" class="font-semibold text-cinnabar">0</span> 位文人、<span id="linkCount" class="font-semibold text-cinnabar">0</span> 条关系。</p>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== 文论概念 ==================== -->
-<section id="theory" class="sec-anchor pt-12">
-  <div class="flex items-end justify-between flex-wrap gap-2 mb-4">
-    <div>
-      <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">論 WENLUN · 文 論 概 念</p>
-      <h2 class="font-serif font-bold text-[26px] md:text-[32px] text-ink">文论概念库</h2>
-      <p class="text-ink2 text-[14.5px] mt-2 max-w-3xl leading-relaxed">自「诗言志」至「境界说」，收录历代核心文论命题三十六条，每条系以出处与原文。</p>
-    </div>
-    <input id="thSearch" type="search" placeholder="检索概念 / 出处…" class="w-full sm:w-64 px-3 py-2 rounded-md border border-ink/20 bg-white/80 text-[14px] focus:outline-none focus:border-cinnabar">
-  </div>
-  <div id="thGrid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3.5"></div>
-</section>
-
-<!-- ==================== 意象谱系 ==================== -->
-<section id="imagery" class="sec-anchor pt-12">
-  <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">象 YIXIANG · 文 學 意 象</p>
-  <h2 class="font-serif font-bold text-[26px] md:text-[32px] text-ink">文学意象谱系</h2>
-  <p class="text-ink2 text-[14.5px] mt-2 max-w-3xl leading-relaxed">明月、杨柳、梅花、孤舟……十六类核心意象，物象与情思的千年结晶，各系以历代名句。</p>
-  <div id="imageryGrid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-4"></div>
-</section>
-
-<!-- ==================== 流派体系 ==================== -->
-<section id="schools" class="sec-anchor pt-12">
-  <div class="flex items-end justify-between flex-wrap gap-2 mb-4">
-    <div>
-      <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">派 LIUPAI · 流 派 體 系</p>
-      <h2 class="font-serif font-bold text-[26px] md:text-[32px] text-ink">流派体系与判析</h2>
-      <p class="text-ink2 text-[14.5px] mt-2 max-w-3xl leading-relaxed">建安风骨、江西诗派、公安派、桐城派、常州词派……二十四派，各有宗主、主张与代表。</p>
-    </div>
-    <div id="schoolTabs" class="flex flex-wrap gap-2 text-[13px]"></div>
-  </div>
-  <div id="schoolGrid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3.5"></div>
-</section>
-
-<!-- ==================== 文人群像 ==================== -->
-<section id="people" class="sec-anchor pt-12">
-  <div class="flex items-end justify-between flex-wrap gap-2 mb-4">
-    <div>
-      <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">人 WENREN · 歷 代 文 人</p>
-      <h2 class="font-serif font-bold text-[26px] md:text-[32px] text-ink">文人群像</h2>
-      <p class="text-ink2 text-[14.5px] mt-2 max-w-3xl leading-relaxed">诗人、词人、文家、曲家、小说家、文论家——历代文人的字号、生卒与生平。</p>
-    </div>
-    <div id="peopleTabs" class="flex flex-wrap gap-2 text-[13px]"></div>
-  </div>
-  <div id="peopleGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5"></div>
-</section>
-
-<!-- ==================== 原典库 ==================== -->
-<section id="library" class="sec-anchor pt-12">
-  <div class="flex items-end justify-between flex-wrap gap-2 mb-4">
-    <div>
-      <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">籍 QUANWEN · 原 典 全 文</p>
-      <h2 class="font-serif font-bold text-[26px] md:text-[32px] text-ink">集藏原典库</h2>
-      <p class="text-ink2 text-[14.5px] mt-2 max-w-3xl leading-relaxed">殆知阁集藏全部 1669 部典籍，按九类编次，全部原文已内嵌本站，点击即站内阅览。</p>
-    </div>
-    <input id="libSearch" type="search" placeholder="检索书名 / 著者…" class="w-full sm:w-64 px-3 py-2 rounded-md border border-ink/20 bg-white/80 text-[14px] focus:outline-none focus:border-cinnabar">
-  </div>
-  <div id="libTabs" class="flex flex-wrap gap-2 text-[13px] mb-3.5"></div>
-  <div id="libMeta" class="text-[13px] text-ink3 mb-3"></div>
-  <div id="libGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
-  <div class="text-center mt-5">
-    <button id="loadMore" class="px-6 py-2 rounded-md border border-ink/25 text-ink text-[14px] hover:border-cinnabar hover:text-cinnabar transition-colors">加载更多</button>
-  </div>
-</section>
-
-<!-- ==================== 关于 ==================== -->
-<section id="about" class="sec-anchor pt-12">
-  <div class="rounded-2xl dark-bg grain-dark text-bone/90 p-6 md:p-8 relative overflow-hidden shadow-lg">
-    <div class="absolute right-6 top-4 text-gold/10 font-serif text-[130px] leading-none select-none">藏</div>
-    <p class="text-gold2 font-serif tracking-[.3em] text-[12px] mb-1 relative">關 GUANYU · 本 部 本 體</p>
-    <h2 class="font-serif font-bold text-[26px] text-bone relative">关于本部本体</h2>
-    <div class="grid md:grid-cols-2 gap-6 mt-4 text-[14.5px] leading-relaxed relative">
-      <div>
-        <p class="text-bone/85">集藏本体论（Ji-Cang Ontology）以 OWL 本体方法建模集部文献，定义七层架构（L0 元模型 → L6 文化外延）、九类实体（体裁/流派/人物/作品/概念/意象/事件/制度/地理）与十种关系（师承/唱和/影响/同派/并称/撰著/源出/评点/取象/演进）。</p>
-        <p class="mt-3 text-bone/85">本体由自主脚本自典籍元数据抽取，并经人工校订；文人、流派、意象、文论诸实体系参酌历代诗话、词话与文学史通说整理。</p>
+      <div class="hero-actions">
+        <a href="#overview" class="btn btn-primary">◯ 进入本体</a>
+        <a href="#graph" class="btn">網 关系图谱</a>
+        <a href="books.html" class="btn btn-gold">籍 典籍阅读</a>
+        <a href="ontology.html" class="btn">⬡ 本体总纲</a>
       </div>
-      <div>
-        <h3 class="text-gold2 font-serif font-semibold text-[16px] mb-2">数据来源</h3>
-        <ul class="space-y-1.5 text-bone/80">
-          <li>· 典籍原文：<a class="lk" href="books.html">典籍阅览室</a>（集藏 1669 部 / 17821 卷全部内嵌）</li>
-          <li>· 底本来源：殆知阁集藏开源文本，由本站统一加工为站内可读 JSON</li>
-          <li>· 文论出处：《:ml-search[文心雕龙]{text="文心雕龙"}》《:ml-search[诗品]{text="诗品"}》《沧浪诗话》《人间词话》等</li>
-          <li>· 体例参照：佛藏本体论 · 诗藏本体论 · 易经本体论</li>
-        </ul>
+    </section>
+
+    <!-- 本体总览 -->
+    <div style="padding:32px var(--gutter,40px) 20px;max-width:1200px;margin:0 auto;width:100%;">
+
+    <section class="section" id="overview">
+      <div class="section-title"><span class="icon">☰</span>本体总览</div>
+      <p style="color:var(--ink-2);line-height:2;font-size:15px;">
+        以本体论方法重构集部文献的知识体系——<span class="ent">辞赋诗词</span>、<span class="ent">文话小说</span>，别集总集、诗文评说，自元模型以至文化外延凡七层；
+        意象、情感、流派、格律、人物交织成网。本站以<strong style="color:var(--gold-bright);" id="bkInline">1669 部</strong>典籍为底本，全部原文内嵌站内可读，构建中华文学的知识图谱与文道推演平台。
+      </p>
+      <div class="ont-level" id="ontLevels"></div>
+    </section>
+
+    <!-- 九类分区 -->
+    <section class="section">
+      <div class="section-title"><span class="icon">九</span>九类分区</div>
+      <p style="color:var(--ink-3);font-size:13px;text-align:center;max-width:680px;margin:-6px auto 18px;letter-spacing:2px;">
+        依《四库全书总目》集部分类法，厘为九类，各有攸归
+      </p>
+      <div class="cat-grid" id="catGrid"></div>
+    </section>
+
+    <!-- 本体关系图谱 -->
+    <section class="section" id="graph">
+      <div class="section-title"><span class="icon">網</span>本体关系图谱</div>
+      <p style="text-align:center;color:var(--ink-3);max-width:760px;margin:0 auto 20px;font-size:14px;">
+        本图呈现核心本体实例间的主要关系：<span id="tripleCount">—</span> 位核心著者与代表作品的著述关系，以及流派、朝代关联。节点可拖拽，滚轮缩放。
+      </p>
+      <div id="graphBox"></div>
+    </section>
+
+    <!-- 功能入口 -->
+    <section class="section">
+      <div class="section-title"><span class="icon">入</span>研究入口</div>
+      <div class="feature-grid">
+        <a href="ontology.html" class="feat-card">
+          <div class="fi">體</div>
+          <h3>本体总纲</h3>
+          <p>七层本体建构、类体系、属性、关系公理，以 TBox 观集部之形上骨架。</p>
+        </a>
+        <a href="dict.html" class="feat-card">
+          <div class="fi">論</div>
+          <h3>文论体系</h3>
+          <p>《典论·论文》《文心雕龙》《诗品》《沧浪诗话》等文论原典要点。</p>
+        </a>
+        <a href="schools.html" class="feat-card">
+          <div class="fi">派</div>
+          <h3>文学流派</h3>
+          <p>建安风骨、山水田园、江西诗派、唐宋派、桐城派等历代流派辨析。</p>
+        </a>
+        <a href="figures.html" class="feat-card">
+          <div class="fi">人</div>
+          <h3>文人谱系</h3>
+          <p>屈宋、三曹、李杜、韩柳、欧苏、归方……历代文人生平与著述。</p>
+        </a>
       </div>
-    </div>
-    <div class="mt-6 pt-4 border-t border-gold/20 flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-bone/70 relative">
-      <a href="ontology.html" class="hover:text-gold2">本体总纲</a>
-      <a href="books.html" class="hover:text-gold2">全藏原典</a>
-      <a href="dict.html" class="hover:text-gold2">文论词典</a>
-      <a href="schools.html" class="hover:text-gold2">流派对比</a>
-      <a href="figures.html" class="hover:text-gold2">文人群像</a>
-      <a href="imagery.html" class="hover:text-gold2">意象图谱</a>
-      <a href="timeline.html" class="hover:text-gold2">文学时间轴</a>
-    </div>
-  </div>
-  <p class="text-center text-[12.5px] text-ink3 mt-6">集藏本体论 · Ji-Cang Ontology ｜ 文以载道，艺以传情 ｜ 数据出自殆知阁集藏，本体架构参酌佛藏、诗藏、易经三站</p>
-</section>
+    </section>
 
-</main>
+    </div>
+  </main>
+</div>
+<div id="footer-slot"></div>
 
-<script src="data/ontology.js"></script>
-<script src="data/theory.js"></script>
-<script src="data/network.js"></script>
-<script src="data/books.js"></script>
 <script>
-/* ---------- 工具 ---------- */
-const $ = s => document.querySelector(s);
-const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function el(html){const d=document.createElement('div');d.innerHTML=html.trim();return d.firstElementChild;}
+// === 外壳注入 ===
+document.getElementById('topbar-slot').innerHTML = JC_Link.topbar('home');
+document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('overview');
+document.getElementById('footer-slot').innerHTML = JC_Link.footer();
+JC_Link.initMobile();
+if(window.YJ_Compass) YJ_Compass.attach(document.getElementById('heroCompass'), 720);
 
-/* ---------- 移动菜单 ---------- */
-$('#menuBtn').addEventListener('click',()=>$('#mobileMenu').classList.toggle('hidden'));
+// === 数据 ===
+var IND = window.JICANG_INDIVIDUALS || {works:{},persons:{},relations:[]};
+var BOOKS = Array.isArray(window.JICANG_BOOKS) ? window.JICANG_BOOKS : [];
 
-/* ---------- 七层本体 ---------- */
-(function(){
-  const box = $('#layerList');
-  const T = window.JICANG_TBOX || {layers:[],classes:[]};
-  const byLayer = {};
-  T.classes.forEach(c=>{ const L=c.layer||'L0'; (byLayer[L]=byLayer[L]||[]).push(c); });
-  const layerColor = {'L0':'#6b5d4f','L1':'#8B2500','L2':'#B8860B','L3':'#2F4F4F','L4':'#5C4033','L5':'#2f6b5f','L6':'#7a736a'};
-  const layerCode  = {'L0':'Meta','L1':'Tao','L2':'Theory','L3':'School','L4':'Text','L5':'Figure','L6':'Folk'};
-  T.layers.forEach(L=>{
-    const members = (byLayer[L.id]||[]).slice(0,8);
-    const tags = members.map(c=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(c.label)}</span>`).join('');
-    const color = layerColor[L.id]||'#6b5d4f';
-    box.appendChild(el(`
-      <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4 overflow-hidden">
-        <div class="flex items-center gap-2.5 mb-2">
-          <span class="seal w-[34px] h-[34px] text-[13px]" style="background:${color}">${L.id}</span>
-          <div>
-            <h3 class="font-serif font-bold text-[17px] text-ink leading-tight">${esc(L.name)}</h3>
-            <div class="text-[11px] tracking-wider text-ink3 uppercase">${layerCode[L.id]} · ${L.cls} 类</div>
-          </div>
-        </div>
-        <p class="text-[13.5px] text-ink2 leading-relaxed">${esc(L.desc)}</p>
-        <div class="mt-3 flex flex-wrap gap-1.5">${tags||'<span class="text-[12px] text-ink3">元模型层，描述轴/层/类/属性/关系/实例</span>'}</div>
-      </article>`));
-  });
-})();
+// KPI
+document.getElementById('st-books').textContent = BOOKS.length;
+document.getElementById('bkInline').textContent = BOOKS.length + ' 部';
+var authors = Object.keys(IND.persons||{});
+document.getElementById('st-authors').textContent = authors.length;
 
-/* ---------- 类体系 ---------- */
-(function(){
-  const box = $('#classList');
-  const T = window.JICANG_TBOX || {axes:[],classes:[],objectProperties:[],datatypeProperties:[]};
-  const axisColor = {'A1':'#8B2500','A2':'#B8860B','A3':'#2F4F4F','A4':'#5C4033'};
-  const axisIcon  = {'A1':'文','A2':'意','A3':'人','A4':'时'};
-  T.axes.forEach(A=>{
-    const members = T.classes.filter(c=>(c.axes||[]).includes(A.id) && c.id!=='jc:Entity').slice(0,10);
-    const tags = members.map(c=>`<span class="tag" style="background:${A.color}14;color:${A.color};border:1px solid ${A.color}33">${esc(c.label)}</span>`).join('');
-    box.appendChild(el(`
-      <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4">
-        <div class="flex items-center justify-between mb-1.5">
-          <div class="flex items-center gap-2">
-            <span class="seal w-[30px] h-[30px] text-[14px]" style="background:${A.color}">${axisIcon[A.id]}</span>
-            <h3 class="font-serif font-bold text-[16.5px] text-ink">${esc(A.name)} <span class="text-ink3 text-[12px] font-normal tracking-wider">${A.id}</span></h3>
-          </div>
-          <span class="text-[12px] text-ink3">${A.cls} 类</span>
-        </div>
-        <p class="text-[13px] text-ink2 leading-relaxed mb-2.5">${esc(A.desc)}</p>
-        <div class="flex flex-wrap gap-1.5">${tags}</div>
-      </article>`));
-  });
-  const relTags = T.objectProperties.slice(0,10).map(r=>`<span class="tag" style="background:#6b3fa014;color:#6b3fa0;border:1px solid #6b3fa033">${esc(r.name)}</span>`).join('');
-  box.appendChild(el(`
-    <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4">
-      <div class="flex items-center justify-between mb-1.5">
-        <div class="flex items-center gap-2">
-          <span class="seal w-[30px] h-[30px] text-[14px]" style="background:#6b3fa0">系</span>
-          <h3 class="font-serif font-bold text-[16.5px] text-ink">关系谓词 <span class="text-ink3 text-[12px] font-normal tracking-wider">ObjectProperty</span></h3>
-        </div>
-        <span class="text-[12px] text-ink3">${T.objectProperties.length} 项</span>
-      </div>
-      <p class="text-[13px] text-ink2 leading-relaxed mb-2.5">实体之间的语义关系：师徒、唱和、创作于、刊刻、流传等。</p>
-      <div class="flex flex-wrap gap-1.5">${relTags}</div>
-    </article>`));
-  const dpTags = T.datatypeProperties.slice(0,10).map(d=>`<span class="tag" style="background:#2f6b5f14;color:#2f6b5f;border:1px solid #2f6b5f33">${esc(d.label)}</span>`).join('');
-  box.appendChild(el(`
-    <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4">
-      <div class="flex items-center justify-between mb-1.5">
-        <div class="flex items-center gap-2">
-          <span class="seal w-[30px] h-[30px] text-[14px]" style="background:#2f6b5f">属</span>
-          <h3 class="font-serif font-bold text-[16.5px] text-ink">数据属性 <span class="text-ink3 text-[12px] font-normal tracking-wider">DatatypeProperty</span></h3>
-        </div>
-        <span class="text-[12px] text-ink3">${T.datatypeProperties.length} 项</span>
-      </div>
-      <p class="text-[13px] text-ink2 leading-relaxed mb-2.5">实体的数据字段：题名、著者、字、号、朝代、卷数、字数等。</p>
-      <div class="flex flex-wrap gap-1.5">${dpTags}</div>
-    </article>`));
-})();
+// 七层本体
+var LAYERS = [
+  {no:'L1',name:'元模型',  desc:'文/道/气'},
+  {no:'L2',name:'域类',    desc:'集部九类'},
+  {no:'L3',name:'典籍',    desc:'具体文献'},
+  {no:'L4',name:'卷篇',    desc:'篇章结构'},
+  {no:'L5',name:'文论',    desc:'文论术语'},
+  {no:'L6',name:'文象',    desc:'意象情感'},
+  {no:'L7',name:'文化',    desc:'外延语境'}
+];
+document.getElementById('ontLevels').innerHTML = LAYERS.map(function(l){
+  return '<div class="ont-lvl"><div class="lv-num">'+l.no+'</div><div class="lv-name">'+l.name+'</div><div class="lv-desc">'+l.desc+'</div></div>';
+}).join('');
 
-/* ---------- 典籍体系图表 ---------- */
-(function(){
-  const BOOKS_ARR = window.JICANG_BOOKS || [];
-  if(!Array.isArray(BOOKS_ARR) || !BOOKS_ARR.length) return;
-  // 按 cat_key 分组
-  const CAT_MAP = {
-    baojuan:'宝卷',huaben:'话本',miyu:'谜语',sikubieji:'四库别集',
-    wenping:'诗文评',wenzongji:'文宗集',xiaohua:'笑话',xiaoshuo:'小说',yanyi:'演义'
-  };
-  const CAT_ORDER = ['sikubieji','wenzongji','wenping','xiaoshuo','yanyi','huaben','baojuan','xiaohua','miyu'];
-  const group = {};
-  BOOKS_ARR.forEach(b=>{ const k=b.cat_key||'other'; (group[k]=group[k]||[]).push(b); });
-  const cats = CAT_ORDER.filter(k=>group[k]);
-  const cnt = cats.map(c=>group[c].length);
-  const labels = cats.map(c=>CAT_MAP[c]||c);
-  const sorted = cats.map((c,i)=>({k:c,n:cnt[i],lab:labels[i]})).sort((a,b)=>b.n-a.n);
-  const cnt_s=sorted.map(x=>x.n), labels_s=sorted.map(x=>x.lab);
-  const palette = ['#a8322d','#2f6b5f','#b8860b','#6b3fa0','#31427b','#b5651d','#4a8b7d','#c0524b','#7a736a'];
-  const bar = echarts.init($('#catChart'));
-  bar.setOption({
-    grid:{left:80,right:36,top:20,bottom:20},
-    tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
-    xAxis:{type:'value',axisLabel:{color:'#7a736a',fontSize:11},splitLine:{lineStyle:{color:'#0000000f'}}},
-    yAxis:{type:'category',data:labels_s,axisLabel:{color:'#4a463f',fontSize:12.5},axisLine:{lineStyle:{color:'#00000022'}}},
-    series:[{type:'bar',data:cnt_s.map((v,i)=>({value:v,itemStyle:{color:palette[i%palette.length],borderRadius:[0,4,4,0]}})),
-      label:{show:true,position:'right',color:'#4a463f',fontSize:11.5},barWidth:'58%'}]
-  });
-  const DYN_ORDER=['先秦','汉','魏晋','南北朝','唐','五代','宋','辽金','元','明','清','民国'];
-  const dynMap={}; let noDyn=0;
-  BOOKS_ARR.forEach(b=>{
-    const d = (b.dynasty||'');
-    let hit=false;
-    if(/先秦/.test(d)){dynMap['先秦']=(dynMap['先秦']||0)+1;hit=true;}
-    else if(/汉/.test(d)){dynMap['汉']=(dynMap['汉']||0)+1;hit=true;}
-    else if(/魏晋|三国/.test(d)){dynMap['魏晋']=(dynMap['魏晋']||0)+1;hit=true;}
-    else if(/南北/.test(d)){dynMap['南北朝']=(dynMap['南北朝']||0)+1;hit=true;}
-    else if(/唐/.test(d)){dynMap['唐']=(dynMap['唐']||0)+1;hit=true;}
-    else if(/五代/.test(d)){dynMap['五代']=(dynMap['五代']||0)+1;hit=true;}
-    else if(/宋/.test(d)){dynMap['宋']=(dynMap['宋']||0)+1;hit=true;}
-    else if(/辽|金/.test(d)){dynMap['辽金']=(dynMap['辽金']||0)+1;hit=true;}
-    else if(/元/.test(d)){dynMap['元']=(dynMap['元']||0)+1;hit=true;}
-    else if(/明/.test(d)){dynMap['明']=(dynMap['明']||0)+1;hit=true;}
-    else if(/清|国朝/.test(d)){dynMap['清']=(dynMap['清']||0)+1;hit=true;}
-    else if(/民国/.test(d)){dynMap['民国']=(dynMap['民国']||0)+1;hit=true;}
-    if(!hit) noDyn++;
-  });
-  const dynArr = DYN_ORDER.filter(d=>dynMap[d]).map(d=>[d,dynMap[d]]);
-  if(noDyn) dynArr.push(['不详',noDyn]);
-  const pie = echarts.init($('#dynChart'));
-  pie.setOption({
-    tooltip:{trigger:'item',formatter:'{b}：{c} 部（{d}%）'},
-    legend:{type:'scroll',bottom:0,textStyle:{color:'#4a463f',fontSize:11}},
-    series:[{type:'pie',radius:['38%','66%'],center:['50%','44%'],avoidLabelOverlap:true,
-      itemStyle:{borderColor:'#f7f3ea',borderWidth:2},
-      label:{fontSize:11,color:'#4a463f',formatter:'{b} {c}'},
-      data:dynArr.map((d,i)=>({name:d[0],value:d[1],itemStyle:{color:palette[i%palette.length]}}))}]
-  });
-  const au = $('#topAuthors');
-  const totalAuthors = new Set();
-  BOOKS_ARR.forEach(b=>(b.authors||[]).forEach(a=>{if(a.name) totalAuthors.add(a.name);}));
-  const totalChars = BOOKS_ARR.reduce((s,b)=>s+(b.chars||0),0);
-  const totalJuan = BOOKS_ARR.reduce((s,b)=>s+(b.juan||0),0);
-  const tags = [
-    ['典籍/作品', BOOKS_ARR.length],
-    ['卷/回/篇', totalJuan||17821],
-    ['总字数（亿）', (totalChars/1e8).toFixed(2)],
-    ['著者人物', totalAuthors.size],
-    ['文献分类', cats.length],
-    ['文学流派', 24],
-    ['文论概念', 36],
-    ['意象', 16]
-  ];
-  tags.forEach(t=> au.appendChild(el(`<span class="tag bg-white/80 border border-ink/10 text-ink2">${esc(t[0])} <span class="text-cinnabar font-semibold">${t[1]}</span></span>`)));
-  // 更新 KPI
-  if($('#kpiWorks')) $('#kpiWorks').textContent = BOOKS_ARR.length;
-  if($('#kpiAuthors')) $('#kpiAuthors').textContent = totalAuthors.size;
-  window.addEventListener('resize',()=>{bar.resize();pie.resize();});
-})();
+// 九类分类计数（cat_key 映射）
+var keyMap = {
+  sikubieji:'bieji', bieji:'bieji',
+  siku_zongji:'zongji', zongji:'zongji',
+  siku_shiwenping:'wenping', wenping:'wenping', shiwenping:'wenping',
+  siku_xiaoshuo:'xiaoshuo', xiaoshuo:'xiaoshuo',
+  yanyi:'yanyi',
+  huaben:'huaben',
+  baojuan:'baojuan',
+  xiaohua:'xiaohua',
+  miyu:'miyu'
+};
+var catMap = {bieji:'别集',zongji:'总集',wenping:'文评',xiaoshuo:'小说',yanyi:'演义',huaben:'话本',baojuan:'宝卷',xiaohua:'笑话',miyu:'谜语'};
+var catSym = {bieji:'別',zongji:'總',wenping:'評',xiaoshuo:'說',yanyi:'演',huaben:'話',baojuan:'卷',xiaohua:'笑',miyu:'謎'};
+var catCls = {bieji:'个人著述',zongji:'诗文合集',wenping:'诗文评论',xiaoshuo:'文言白话',yanyi:'历史演义',huaben:'话本拟话本',baojuan:'说唱宝卷',xiaohua:'谐谑笑话',miyu:'灯谜谜语'};
+var catCount = {};
+BOOKS.forEach(function(b){
+  var k = keyMap[b.cat_key||b.category] || b.cat_key || b.category;
+  if(k && catMap[k]) catCount[k]=(catCount[k]||0)+1;
+});
+document.getElementById('catGrid').innerHTML = JC_Link.CATEGORIES.map(function(c){
+  return '<a href="books.html#'+c.id+'" class="cat-card">'+
+    '<div class="sym">'+c.sym+'</div>'+
+    '<div class="name">'+c.name+'</div>'+
+    '<div class="cls">'+c.cls+'</div>'+
+    '<div class="count">'+(catCount[c.id]||0)+' 部</div>'+
+  '</a>';
+}).join('');
 
-/* ---------- 关系图谱 ---------- */
-(function(){
-  const N = window.JICANG_NETWORK || {nodes:[],links:[],imagery:[],schools:[]};
-  const catColor = {'诗人':'#a8322d','词人':'#2f6b5f','文家':'#31427b','曲家':'#6b3fa0','小说家':'#b5651d','文论家':'#b8860b'};
-  const relColor = {'师承':'#8b2f2f','唱和':'#c0392b','影响':'#d35400','同派':'#6b3fa0','并称':'#8e44ad'};
-  const nodeMap = {}; N.nodes.forEach(n=>nodeMap[n.n]=n);
-  const links = N.links.filter(l=>nodeMap[l.s]&&nodeMap[l.t]);
-  const used = new Set(); links.forEach(l=>{used.add(l.s);used.add(l.t);});
-  const nodes = N.nodes.filter(n=>used.has(n.n)).map(n=>({
-    name:n.n, symbolSize: 16 + Math.min(30, (links.filter(l=>l.s===n.n||l.t===n.n).length)*3.2),
-    category:n.cat, itemStyle:{color:catColor[n.cat]||'#7a736a'}, _d:n
-  }));
-  const cats = ['诗人','词人','文家','曲家','小说家','文论家'];
-  if(!$('#graphChart')) return;
-  const chart = echarts.init($('#graphChart'));
+// === ECharts 本体图谱 ===
+window.addEventListener('load', function(){ setTimeout(renderGraph,300); });
+function renderGraph(){
+  if(typeof echarts==='undefined') return;
+  var dom=document.getElementById('graphBox'); if(!dom) return;
+  var chart=echarts.init(dom);
+  var nodes=[], links=[];
+  var seen={};
+  function add(id,name,cat,symSize,extra){
+    if(seen[id]) return; seen[id]=1;
+    var n={id:id,name:name,category:cat,symbolSize:symSize||18};
+    if(extra) for(var k in extra) n[k]=extra[k];
+    nodes.push(n);
+  }
+  function link(s,t,pred){ links.push({source:s,target:t,label:{show:false,formatter:pred},value:1}); }
+
+  // 根
+  add('Root','集藏本体',0,50);
+  // 九类
+  JC_Link.CATEGORIES.forEach(function(c,i){
+    add('cat_'+c.id, c.name, 1, 28);
+    link('Root','cat_'+c.id,'分');
+  });
+  // 取每类前3部代表作
+  var byCat={};
+  BOOKS.forEach(function(b){
+    var k = keyMap[b.cat_key||b.category];
+    if(!k) return;
+    if(!byCat[k]) byCat[k]=[];
+    if(byCat[k].length<3) byCat[k].push(b);
+  });
+  Object.keys(byCat).forEach(function(cat){
+    byCat[cat].forEach(function(b){
+      add('b_'+b.id, b.title, 2, 14);
+      link('cat_'+cat, 'b_'+b.id, '收');
+      if(b.authors && b.authors.length){
+        var a = b.authors[0].name || b.authors[0];
+        var aid='p_'+a;
+        add(aid, a, 3, 20);
+        link(aid, 'b_'+b.id, '著');
+      }
+    });
+  });
+
+  // 朝代节点
+  var dynSeen={};
+  ['汉','唐','宋','元','明','清','南北朝','民国'].forEach(function(d){
+    add('d_'+d, d+'代', 4, 22);
+    dynSeen[d]=1;
+  });
+  BOOKS.slice(0,80).forEach(function(b){
+    if(b.dynasty && dynSeen[b.dynasty] && b.authors && b.authors[0]){
+      var a = b.authors[0].name || b.authors[0];
+      link('d_'+b.dynasty, 'p_'+a, '生');
+    }
+  });
+
+  var categories=[{name:'本体'},{name:'九类'},{name:'典籍'},{name:'作者'},{name:'朝代'}];
+  var palette=['var(--zhu)','var(--gold)','var(--ice)','var(--jade)','var(--amber)'];
+
   chart.setOption({
-    tooltip:{formatter:p=>{ if(p.dataType==='edge') return p.data.value; const d=p.data._d; return `<b>${d.n}</b><br/>${d.d} · ${d.cat}${d.z?' · 字'+d.z:''}${d.h?' · 号'+d.h:''}<br/>${d.by}—${d.dy}`;}},
-    legend:{data:cats,top:4,textStyle:{color:'#4a463f',fontSize:11.5},itemWidth:12,itemHeight:12},
-    series:[{type:'graph',layout:'force',roam:true,draggable:true,
-      categories:cats.map(c=>({name:c,itemStyle:{color:catColor[c]}})),
-      force:{repulsion:230,edgeLength:[60,150],gravity:0.08},
-      label:{show:true,position:'right',fontSize:11.5,color:'#4a463f',formatter:'{b}'},
-      lineStyle:{color:'#0000002e',width:1.1,curveness:0.08},
-      emphasis:{focus:'adjacency',label:{fontSize:13,fontWeight:'bold'}},
-      data:nodes,
-      links:links.map(l=>({source:l.s,target:l.t,value:l.r,lineStyle:{color:(relColor[l.r]||'#00000030'),curveness:0.1}}))
+    backgroundColor:'transparent',
+    tooltip:{formatter:function(p){return p.dataType==='edge'?'':p.name;}},
+    legend:[{data:categories.map(function(c){return c.name;}),textStyle:{color:'var(--ink-3)'},top:8}],
+    series:[{
+      type:'graph',layout:'force',roam:true,draggable:true,
+      data:nodes.map(function(n){return Object.assign({},n,{itemStyle:{color:getCss(palette[n.category])}});}),
+      links:links,
+      categories:categories.map(function(c,i){return Object.assign({},c,{itemStyle:{color:getCss(palette[i])}});}),
+      label:{show:true,position:'right',fontSize:11,color:'var(--ink-2)',fontFamily:'var(--font-serif)'},
+      lineStyle:{color:'var(--line)',curveness:0.15,opacity:.55,width:1},
+      emphasis:{lineStyle:{width:2,color:'var(--zhu)'},focus:'adjacency',label:{fontSize:14,fontWeight:'bold'}},
+      force:{repulsion:200,edgeLength:[70,130],gravity:0.08},
+      edgeSymbol:['none','arrow'],edgeSymbolSize:[0,6],
     }]
   });
-  $('#nodeCount').textContent = nodes.length;
-  $('#linkCount').textContent = links.length;
-  const legendBox = $('#relLegend');
-  Object.keys(relColor).forEach(r=>{
-    legendBox.appendChild(el(`<span class="inline-flex items-center gap-1.5 text-ink2"><span class="inline-block w-[10px] h-[10px] rounded-full" style="background:${relColor[r]}"></span>${r}</span>`));
+  document.getElementById('tripleCount').textContent = links.length + ' 条';
+  window.addEventListener('resize',function(){chart.resize();});
+  // 点击典籍跳阅读页
+  chart.on('click',function(p){
+    if(p.dataType==='node' && p.data.category===2){
+      var bid=p.data.id.replace(/^b_/,'');
+      var found=null, catKey='';
+      for(var i=0;i<BOOKS.length;i++){ if(BOOKS[i].id===bid){found=BOOKS[i];break;} }
+      if(found){
+        var ck = keyMap[found.cat_key||found.category] || found.cat_key;
+        location.href='books.html#'+ck;
+      }
+    }
   });
-  chart.on('click', p=>{
-    if(p.dataType!=='node') return;
-    const d=p.data._d;
-    const rels = links.filter(l=>l.s===d.n||l.t===d.n).map(l=>{
-      const other = l.s===d.n?l.t:l.s; const dir = l.s===d.n?'→':'←';
-      return `<li class="text-[13px] text-ink2">${dir} <b class="text-ink">${esc(other)}</b> <span class="text-ink3">（${esc(l.r)}）</span></li>`;
-    }).join('');
-    $('#graphInfo').innerHTML = `
-      <h3 class="font-serif font-bold text-[18px] text-ink">${esc(d.n)}</h3>
-      <div class="text-[12.5px] text-ink3 mt-1">${esc(d.d)} · ${esc(d.cat)}${d.z?' · 字'+esc(d.z):''}${d.h?' · 号'+esc(d.h):''}</div>
-      <div class="text-[12.5px] text-cinnabar mt-1">${esc(d.by)} — ${esc(d.dy)}</div>
-      <p class="text-[13.5px] text-ink2 leading-relaxed mt-2">${esc(d.bio)}</p>
-      <h4 class="text-[13.5px] font-semibold text-ink mt-3 mb-1.5">关联关系</h4>
-      <ul class="space-y-1">${rels||'<li class="text-[13px] text-ink3">暂无</li>'}</ul>`;
-    $('#graphInfo').scrollIntoView({block:'nearest'});
-  });
-  window.addEventListener('resize',()=>{chart.resize();});
-})();
-
-/* ---------- 文论概念库 ---------- */
-(function(){
-  const grid = $('#thGrid');
-  const TH = (window.JICANG_THEORY && window.JICANG_THEORY.concepts) || [];
-  function render(kw){
-    grid.innerHTML='';
-    TH.filter(c=>!kw||(c.name+c.src+c.note).includes(kw)).forEach(c=>{
-      grid.appendChild(el(`
-        <article class="fade-up rounded-xl bg-white/72 border border-ink/10 p-4 shadow-sm card-hover">
-          <div class="flex items-center justify-between">
-            <h3 class="font-serif font-bold text-[17px] text-cinnabar">${esc(c.name)}</h3>
-            <span class="tag bg-paper3 text-ink3">${esc(c.d)}</span>
-          </div>
-          <div class="text-[12.5px] text-ink3 mt-1">出处 · ${esc(c.src)}</div>
-          <blockquote class="mt-2.5 pl-3 border-l-2 border-cinnabar/40 text-[13.5px] text-ink2 leading-relaxed font-kai">「${esc(c.quote)}」</blockquote>
-          <p class="text-[13px] text-ink2 leading-relaxed mt-2">${esc(c.note)}</p>
-        </article>`));
-    });
-    if(!grid.children.length) grid.innerHTML='<p class="text-ink3 text-[14px]">未找到相关概念。</p>';
-  }
-  render('');
-  if($('#thSearch')) $('#thSearch').addEventListener('input',e=>render(e.target.value.trim()));
-})();
-
-/* ---------- 意象谱系 ---------- */
-(function(){
-  const box = $('#imageryGrid');
-  const IMG = (window.JICANG_NETWORK && window.JICANG_NETWORK.imagery) || [];
-  IMG.forEach(im=>{
-    const q = im.quotes.slice(0,2).map(x=>`<li class="text-[13px] text-ink2 leading-relaxed font-kai">「${esc(x.t)}」<span class="text-ink3 not-italic">— ${esc(x.a)}</span></li>`).join('');
-    box.appendChild(el(`
-      <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4 shadow-sm">
-        <div class="flex items-baseline gap-2">
-          <h3 class="font-serif font-bold text-[19px] text-ink">${esc(im.name)}</h3>
-          <span class="text-[12.5px] text-cinnabar">${esc(im.sym)}</span>
-        </div>
-        <ul class="mt-2.5 space-y-1.5">${q}</ul>
-        <div class="mt-2.5 flex flex-wrap gap-1.5">${(im.poets||[]).map(p=>`<span class="tag bg-paper3 text-ink2">${esc(p)}</span>`).join('')}</div>
-      </article>`));
-  });
-})();
-
-/* ---------- 流派体系 ---------- */
-(function(){
-  const kinds = ['全部','诗','词','文','曲'];
-  const tabs = $('#schoolTabs'); const grid = $('#schoolGrid');
-  const SC = (window.JICANG_NETWORK && window.JICANG_NETWORK.schools) || [];
-  function render(kind){
-    grid.innerHTML='';
-    SC.filter(s=>kind==='全部'||s.kind===kind).forEach(s=>{
-      grid.appendChild(el(`
-        <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4 shadow-sm">
-          <div class="flex items-center justify-between">
-            <h3 class="font-serif font-bold text-[17.5px] text-ink">${esc(s.name)}</h3>
-            <span class="tag bg-cinnabar/10 text-cinnabar border border-cinnabar/20">${esc(s.kind)}</span>
-          </div>
-          <div class="text-[12.5px] text-ink3 mt-1">${esc(s.era)} · 宗主：${esc(s.advocate)}</div>
-          <p class="text-[13px] text-ink2 leading-relaxed mt-2">${esc(s.desc)}</p>
-          <div class="text-[12.5px] mt-2 text-ink2"><span class="text-ink3">风格 · </span>${esc(s.style)}</div>
-          <div class="mt-2.5 flex flex-wrap gap-1.5">
-            ${(s.members||[]).map(m=>`<span class="tag bg-jade/10 text-jade border border-jade/20">${esc(m)}</span>`).join('')}
-          </div>
-          <div class="mt-2 text-[12.5px] text-ink3">代表 · ${(s.works||[]).map(esc).join('、')}</div>
-        </article>`));
-    });
-  }
-  kinds.forEach((k,i)=>{
-    const b = el(`<button class="px-3 py-1.5 rounded-md border transition-colors ${i===0?'bg-ink text-paper border-ink':'border-ink/25 text-ink hover:border-cinnabar hover:text-cinnabar'}">${k}</button>`);
-    b.addEventListener('click',()=>{
-      [...tabs.children].forEach(x=>{x.className='px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar hover:text-cinnabar transition-colors';});
-      b.className='px-3 py-1.5 rounded-md border bg-ink text-paper border-ink transition-colors';
-      render(k);
-    });
-    tabs.appendChild(b);
-  });
-  render('全部');
-})();
-
-/* ---------- 文人群像 ---------- */
-(function(){
-  const cats = ['全部','诗人','词人','文家','曲家','小说家','文论家'];
-  const tabs = $('#peopleTabs'); const grid = $('#peopleGrid');
-  const ND = (window.JICANG_NETWORK && window.JICANG_NETWORK.nodes) || [];
-  function render(cat){
-    grid.innerHTML='';
-    ND.filter(n=>cat==='全部'||n.cat===cat).forEach(n=>{
-      grid.appendChild(el(`
-        <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-3.5 shadow-sm">
-          <div class="flex items-center justify-between">
-            <h3 class="font-serif font-bold text-[16.5px] text-ink">${esc(n.n)}</h3>
-            <span class="tag bg-paper3 text-ink2">${esc(n.d)}</span>
-          </div>
-          <div class="text-[12px] text-ink3 mt-1">${n.z?'字 '+esc(n.z):''}${n.h?' · 号 '+esc(n.h):''} · ${esc(n.by)}—${esc(n.dy)}</div>
-          <p class="text-[13px] text-ink2 leading-relaxed mt-2">${esc(n.bio)}</p>
-        </article>`));
-    });
-  }
-  cats.forEach((c,i)=>{
-    const b = el(`<button class="px-3 py-1.5 rounded-md border transition-colors ${i===0?'bg-ink text-paper border-ink':'border-ink/25 text-ink hover:border-cinnabar hover:text-cinnabar'}">${c}</button>`);
-    b.addEventListener('click',()=>{
-      [...tabs.children].forEach(x=>{x.className='px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar hover:text-cinnabar transition-colors';});
-      b.className='px-3 py-1.5 rounded-md border bg-ink text-paper border-ink transition-colors';
-      render(c);
-    });
-    tabs.appendChild(b);
-  });
-  render('全部');
-})();
-
-/* ---------- 原典库 ---------- */
-(function(){
-  const BOOKS_ARR = window.JICANG_BOOKS || [];
-  if(!Array.isArray(BOOKS_ARR) || !BOOKS_ARR.length) return;
-  const CAT_MAP = {
-    baojuan:'宝卷',huaben:'话本',miyu:'谜语',sikubieji:'四库别集',
-    wenping:'诗文评',wenzongji:'文宗集',xiaohua:'笑话',xiaoshuo:'小说',yanyi:'演义'
-  };
-  const CAT_ORDER = ['sikubieji','wenzongji','wenping','xiaoshuo','yanyi','huaben','baojuan','xiaohua','miyu'];
-  const group = {};
-  BOOKS_ARR.forEach(b=>{ const k=b.cat_key||'other'; (group[k]=group[k]||[]).push(b); });
-  const cats = CAT_ORDER.filter(k=>group[k]);
-  const tabs = $('#libTabs'); const grid = $('#libGrid'); const meta = $('#libMeta');
-  let curCat = cats[0], kw='', shown=0; const PAGE=48;
-  let list = [];
-  function build(){
-    list = (group[curCat]||[]).filter(b=>{
-      if(!kw) return true;
-      const a = (b.authors||[]).map(x=>x.name).join(',');
-      return (b.title||b.id||'').includes(kw) || a.includes(kw);
-    });
-  }
-  function render(reset){
-    if(reset){ grid.innerHTML=''; shown=0; }
-    const slice = list.slice(shown, shown+PAGE);
-    slice.forEach(b=>{
-      const f = b.file || `texts/${b.cat_key}/${b.id}.js`;
-      const href = `reader.html?f=${encodeURIComponent(f.replace(/^texts\//,''))}`;
-      const au = (b.authors||[]).map(a=>a.dynasty?'['+a.dynasty+'] '+a.name:a.name).join('、');
-      const src = `<a class="lk-lt text-[12px]" href="${esc(href)}">📖 站内阅读</a>`;
-      grid.appendChild(el(`
-        <article class="card-hover rounded-lg bg-white/72 border border-ink/10 p-3 shadow-sm">
-          <div class="flex items-start justify-between gap-2">
-            <h3 class="font-serif font-semibold text-[15.5px] text-ink leading-snug">${esc(b.title||b.id)}</h3>
-            <span class="tag bg-paper3 text-ink3 shrink-0">${esc(b.dynasty||'')}</span>
-          </div>
-          <div class="text-[12.5px] text-ink3 mt-1">${au||'佚名 / 未详'}</div>
-          <div class="mt-1.5">${src}</div>
-        </article>`));
-    });
-    shown += slice.length;
-    meta.textContent = `当前分类「${CAT_MAP[curCat]||curCat}」共 ${list.length} 部，已显示 ${Math.min(shown,list.length)} 部。`;
-    $('#loadMore').style.display = shown>=list.length ? 'none':'inline-block';
-  }
-  cats.forEach((c,i)=>{
-    const n = (group[c]||[]).length;
-    const b = el(`<button class="px-3 py-1.5 rounded-md border transition-colors ${i===0?'bg-ink text-paper border-ink':'border-ink/25 text-ink hover:border-cinnabar hover:text-cinnabar'}">${esc(CAT_MAP[c]||c)} <span class="opacity-70">${n}</span></button>`);
-    b.addEventListener('click',()=>{
-      [...tabs.children].forEach(x=>{x.className='px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar hover:text-cinnabar transition-colors';});
-      b.className='px-3 py-1.5 rounded-md border bg-ink text-paper border-ink transition-colors';
-      curCat=c; build(); render(true);
-    });
-    tabs.appendChild(b);
-  });
-  $('#libSearch').addEventListener('input',e=>{kw=e.target.value.trim(); build(); render(true);});
-  $('#loadMore').addEventListener('click',()=>render(false));
-  build(); render(true);
-})();
-</script>
-<script type="module">
-import { mountOntology3D } from './vendor/ontology3d.js';
-function tryMount(attempt = 0) {
-  const c = document.getElementById('ontology3d');
-  if (c && window.JiCangOntology3D && window.JICANG_TBOX && window.JICANG_ORTHO) {
-    if (window.__onto3d && window.__onto3d.dispose) window.__onto3d.dispose();
-    window.__onto3d = mountOntology3D('ontology3d');
-  } else if (attempt < 50) {
-    setTimeout(() => tryMount(attempt + 1), 100);
-  } else {
-    if (c) c.innerHTML = '<div class="p-8 text-center text-gray-500">本体数据加载失败，请刷新页面重试</div>';
-  }
 }
-if (document.readyState === 'complete') tryMount();
-else window.addEventListener('load', tryMount);
+function getCss(v){
+  var d=document.createElement('div');d.style.color=v;document.body.appendChild(d);
+  var c=getComputedStyle(d).color;d.remove();return c;
+}
 </script>
 </body>
 </html>
