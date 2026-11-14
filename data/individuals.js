@@ -1,4 +1,4 @@
-// 集藏本体实例层 (ABox) - 1669部作品 / 1364位作者
+// 集藏本体实例层 (ABox) - 1669部作品 / 1363位作者
 const JICANG_INDIVIDUALS = {
   "works": [
  {
@@ -15263,13 +15263,13 @@ const JICANG_INDIVIDUALS = {
   "slug": "万花楼",
   "cat_key": "xiaoshuo",
   "category": "小说",
-  "dynasty": "清",
-  "dynastyGrp": "明清",
+  "dynasty": null,
+  "dynastyGrp": null,
   "authors": [
    "李雨堂"
   ],
-  "chars": 259112,
-  "size": 778836
+  "chars": 259106,
+  "size": 778820
  },
  {
   "id": "W_万锦情林",
@@ -17873,13 +17873,13 @@ const JICANG_INDIVIDUALS = {
   "slug": "梼杌闲评",
   "cat_key": "xiaoshuo",
   "category": "小说",
-  "dynasty": "明",
-  "dynastyGrp": "明清",
+  "dynasty": null,
+  "dynastyGrp": null,
   "authors": [
    "李清"
   ],
-  "chars": 351027,
-  "size": 1054581
+  "chars": 351021,
+  "size": 1054565
  },
  {
   "id": "W_歇浦潮",
@@ -18413,13 +18413,13 @@ const JICANG_INDIVIDUALS = {
   "slug": "牛郎织女传",
   "cat_key": "xiaoshuo",
   "category": "小说",
-  "dynasty": "明",
-  "dynastyGrp": "明清",
+  "dynasty": null,
+  "dynastyGrp": null,
   "authors": [
    "朱名世"
   ],
-  "chars": 26463,
-  "size": 80891
+  "chars": 26458,
+  "size": 80875
  },
  {
   "id": "W_狐狸缘全传",
@@ -20558,13 +20558,13 @@ const JICANG_INDIVIDUALS = {
   "slug": "青楼梦",
   "cat_key": "xiaoshuo",
   "category": "小说",
-  "dynasty": "清",
-  "dynastyGrp": "明清",
+  "dynasty": null,
+  "dynastyGrp": null,
   "authors": [
    "俞达"
   ],
-  "chars": 221828,
-  "size": 666984
+  "chars": 221822,
+  "size": 666968
  },
  {
   "id": "W_青龙传",
@@ -22553,13 +22553,13 @@ const JICANG_INDIVIDUALS = {
   "slug": "三国演义",
   "cat_key": "yanyi",
   "category": "演义",
-  "dynasty": "明",
-  "dynastyGrp": "明清",
+  "dynasty": null,
+  "dynastyGrp": null,
   "authors": [
    "罗贯中"
   ],
-  "chars": 608359,
-  "size": 1826579
+  "chars": 608354,
+  "size": 1826563
  },
  {
   "id": "W_上古秘史",
@@ -22613,13 +22613,13 @@ const JICANG_INDIVIDUALS = {
   "slug": "东汉秘史",
   "cat_key": "yanyi",
   "category": "演义",
-  "dynasty": "明",
-  "dynastyGrp": "明清",
+  "dynasty": null,
+  "dynastyGrp": null,
   "authors": [
    "谢诏"
   ],
-  "chars": 168643,
-  "size": 507431
+  "chars": 168638,
+  "size": 507415
  },
  {
   "id": "W_东西晋演义",
@@ -30514,7 +30514,7 @@ const JICANG_INDIVIDUALS = {
   "id": "P_李雨堂",
   "type": "Author",
   "label": "李雨堂",
-  "dynasty": "清"
+  "dynasty": null
  },
  {
   "id": "P_罗贯中",
@@ -31282,7 +31282,7 @@ const JICANG_INDIVIDUALS = {
   "id": "P_李清",
   "type": "Author",
   "label": "李清",
-  "dynasty": "明"
+  "dynasty": null
  },
  {
   "id": "P_朱瘦菊",
@@ -31456,7 +31456,7 @@ const JICANG_INDIVIDUALS = {
   "id": "P_朱名世",
   "type": "Author",
   "label": "朱名世",
-  "dynasty": "明"
+  "dynasty": null
  },
  {
   "id": "P_醉月山人",
@@ -32074,7 +32074,7 @@ const JICANG_INDIVIDUALS = {
   "id": "P_俞达",
   "type": "Author",
   "label": "俞达",
-  "dynasty": "清"
+  "dynasty": null
  },
  {
   "id": "P_杨尔曾",
@@ -32291,12 +32291,6 @@ const JICANG_INDIVIDUALS = {
   "type": "Author",
   "label": "楼昉",
   "dynasty": "宋"
- },
- {
-  "id": "P_今人编",
-  "type": "Author",
-  "label": "今人编",
-  "dynasty": "现代"
  },
  {
   "id": "P_真徳秀",
@@ -32656,7 +32650,7 @@ const JICANG_INDIVIDUALS = {
   "id": "P_谢诏",
   "type": "Author",
   "label": "谢诏",
-  "dynasty": "明"
+  "dynasty": null
  },
  {
   "id": "P_杨尔增",
@@ -39988,11 +39982,6 @@ const JICANG_INDIVIDUALS = {
   "from": "P_楼昉",
   "pred": "authored",
   "to": "W_崇古文诀"
- },
- {
-  "from": "P_今人编",
-  "pred": "authored",
-  "to": "W_序跋集萃"
  },
  {
   "from": "P_为虞",
