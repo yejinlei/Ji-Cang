@@ -6,6 +6,14 @@
 <title>本体总纲 · 四轴 × 七层 - 集藏本体论</title>
 <script src="vendor/tailwindcss-3.4.17.js"></script>
 <script src="vendor/echarts-5.6.0.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three-0.160.0.min.js",
+    "three/addons/": "./vendor/"
+  }
+}
+</script>
 <script>
 tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',seal:'#8b2f2f',jade:'#2f6b5f',gold:'#a9801f',violet:'#6b3fa0'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
 </script>
@@ -28,7 +36,15 @@ tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:
 </header>
 <main class="max-w-6xl mx-auto px-4 py-8">
   <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">本体总纲 <span class="text-cinnabar">四轴 × 七层</span></h1>
-  <p class="text-ink2 text-[15px] mt-2 max-w-3xl leading-relaxed">集藏本体论由四条正交的建模轴线构成：<b>层级轴</b>（L0—L6，纵向抽象层次）、<b>类轴</b>（九类实体类型）、<b>关系轴</b>（十种语义关系）、<b>实例轴</b>（典籍、人物、流派、概念等具体实例）。</p>
+  <p class="text-ink2 text-[15px] mt-2 max-w-3xl leading-relaxed">集藏本体论采用「统一本体 + 九类专业分区」方案：<b>四轴</b>（文体典要/义理意象/人物传承/时代事件）、<b>七层</b>（L0 元模型 → L6 文化外延）为共享骨架，九类典籍在 L4 文本载体层各建专属子类与数据属性，形成 4×7×9 = <b class="text-cinnabar">252</b> 个正交节点的三维本体空间。</p>
+
+  <section class="mt-7">
+    <h2 class="font-serif font-bold text-[22px] text-ink mb-2">本体论构建 · 三维正交模型</h2>
+    <p class="text-ink3 text-[13.5px] mb-3">拖拽旋转 · 滚轮缩放 · 右键平移 · 悬停查看节点 · 点击图例高亮轴/层。</p>
+    <div class="rounded-xl bg-white/72 border border-ink/10 overflow-hidden">
+      <div id="ontology3d" style="width:100%;height:540px;position:relative"></div>
+    </div>
+  </section>
 
   <section class="mt-8">
     <h2 class="font-serif font-bold text-[22px] text-ink mb-3">层级轴 · 七层架构</h2>
@@ -134,6 +150,15 @@ const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d
   });
   overview();
 })();
+</script>
+<script type="module">
+import { mountOntology3D } from './vendor/ontology3d.js';
+window.addEventListener('load', () => {
+  const c = document.getElementById('ontology3d');
+  if (c && window.JiCangOntology3D) {
+    window.__onto3d_o = mountOntology3D('ontology3d');
+  }
+});
 </script>
 </body>
 </html>
