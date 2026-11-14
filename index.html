@@ -7,6 +7,14 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script src="vendor/tailwindcss-3.4.17.js"></script>
 <script src="vendor/echarts-5.6.0.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three-0.160.0.min.js",
+    "three/addons/": "./vendor/"
+  }
+}
+</script>
 <script>
 tailwind.config = {
   theme: {
@@ -67,6 +75,7 @@ tailwind.config = {
     </a>
     <nav class="hidden lg:flex items-center gap-4 text-paper2/85 text-[13.5px]">
       <a href="#overview" class="hover:text-gold2 transition-colors">总览</a>
+      <a href="#onto3d" class="hover:text-gold2 transition-colors">本体三维</a>
       <a href="#layers" class="hover:text-gold2 transition-colors">七层本体</a>
       <a href="#classes" class="hover:text-gold2 transition-colors">类体系</a>
       <a href="#canon" class="hover:text-gold2 transition-colors">典籍体系</a>
@@ -83,7 +92,7 @@ tailwind.config = {
     </button>
   </div>
   <div id="mobileMenu" class="hidden lg:hidden bg-ink border-t border-cinnabar/20 px-4 py-3 grid grid-cols-2 gap-y-2 gap-x-4 text-paper2/90 text-[14px]">
-    <a href="#overview">总览</a><a href="#layers">七层本体</a>
+    <a href="#overview">总览</a><a href="#onto3d">本体三维</a><a href="#layers">七层本体</a>
     <a href="#classes">类体系</a><a href="#canon">典籍体系</a>
     <a href="#network">关系图谱</a><a href="#theory">文论</a>
     <a href="#imagery">意象</a><a href="#schools">流派</a>
@@ -136,6 +145,21 @@ tailwind.config = {
 </section>
 
 <main class="max-w-7xl mx-auto px-4 pb-16">
+
+<!-- 本体论 3D 正交模型 -->
+<section id="onto3d" class="sec-anchor pt-8">
+  <div class="flex items-end justify-between flex-wrap gap-2 mb-3">
+    <div>
+      <h2 class="font-serif font-bold text-[24px] md:text-[28px] text-ink">本体论构建 · 四轴 × 七层 × 九类 正交模型</h2>
+      <p class="text-ink2 text-[14.5px] mt-1.5 max-w-3xl">以三维空间呈现集藏统一本体：<b>X 轴</b>为四轴（文体典要/义理意象/人物传承/时代事件），<b>Y 轴</b>为七层（自下而上 L6 文化外延 → L0 元模型），<b>Z 轴</b>为九类专业分区（别集/总集/诗文评/小说/演义/话本/宝卷/笑话/谜语），构成 4×7×9 = <b class="text-cinnabar">252</b> 个正交节点。亮球表示该位置有专属本体类/关系/属性，暗球表示共享上层概念。</p>
+    </div>
+    <span class="text-[12.5px] text-ink3 border border-ink/15 rounded-full px-3 py-1">4 轴 × 7 层 × 9 类 = 252 节点 · Three.js 3D</span>
+  </div>
+  <div class="rounded-xl bg-white/72 border border-ink/10 overflow-hidden">
+    <div id="ontology3d" style="width:100%;height:560px;position:relative"></div>
+  </div>
+  <p class="text-[12.5px] text-ink3 mt-2 leading-relaxed">操作提示：鼠标拖拽旋转 · 滚轮缩放 · 右键平移 · 悬停节点查看该坐标所代表的本体概念 · 点击右侧图例按钮高亮某轴或某层。</p>
+</section>
 
 <!-- 七层本体架构 -->
 <section id="layers" class="sec-anchor pt-8">
@@ -651,6 +675,16 @@ $('#menuBtn').addEventListener('click',()=>$('#mobileMenu').classList.toggle('hi
   $('#loadMore').addEventListener('click',()=>render(false));
   build(); render(true);
 })();
+</script>
+<script type="module">
+import { mountOntology3D } from './vendor/ontology3d.js';
+// 等待页面脚本执行完，JICANG_ORTHO 已挂到 window
+window.addEventListener('load', () => {
+  const c = document.getElementById('ontology3d');
+  if (c && window.JiCangOntology3D) {
+    window.__onto3d = mountOntology3D('ontology3d');
+  }
+});
 </script>
 </body>
 </html>
