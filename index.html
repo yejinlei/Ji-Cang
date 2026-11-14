@@ -75,9 +75,7 @@ tailwind.config = {
     </a>
     <nav class="hidden lg:flex items-center gap-4 text-paper2/85 text-[13.5px]">
       <a href="#overview" class="hover:text-gold2 transition-colors">总览</a>
-      <a href="#onto3d" class="hover:text-gold2 transition-colors">本体三维</a>
-      <a href="#layers" class="hover:text-gold2 transition-colors">七层本体</a>
-      <a href="#classes" class="hover:text-gold2 transition-colors">类体系</a>
+      <a href="#ontology" class="hover:text-gold2 transition-colors">本体论</a>
       <a href="#canon" class="hover:text-gold2 transition-colors">典籍体系</a>
       <a href="#network" class="hover:text-gold2 transition-colors">关系图谱</a>
       <a href="#theory" class="hover:text-gold2 transition-colors">文论</a>
@@ -92,8 +90,8 @@ tailwind.config = {
     </button>
   </div>
   <div id="mobileMenu" class="hidden lg:hidden bg-ink border-t border-cinnabar/20 px-4 py-3 grid grid-cols-2 gap-y-2 gap-x-4 text-paper2/90 text-[14px]">
-    <a href="#overview">总览</a><a href="#onto3d">本体三维</a><a href="#layers">七层本体</a>
-    <a href="#classes">类体系</a><a href="#canon">典籍体系</a>
+    <a href="#overview">总览</a><a href="#ontology">本体论</a>
+    <a href="#canon">典籍体系</a>
     <a href="#network">关系图谱</a><a href="#theory">文论</a>
     <a href="#imagery">意象</a><a href="#schools">流派</a>
     <a href="#people">文人群像</a><a href="#library">原典库</a>
@@ -116,7 +114,7 @@ tailwind.config = {
         本站以 <span class="font-semibold text-ink">殆知阁集藏 1669 部 / 17821 卷</span> 典籍为底本，全部原文已内嵌站点、站内可读，构建中华文学的知识图谱与文道推演平台。
       </p>
       <div class="mt-4 flex flex-wrap gap-2.5 text-[13px]">
-        <a href="#layers" class="px-3.5 py-1.5 rounded-md bg-ink text-paper hover:bg-cinnabar transition-colors">浏览七层架构 →</a>
+        <a href="#ontology" class="px-3.5 py-1.5 rounded-md bg-ink text-paper hover:bg-cinnabar transition-colors">本体论构建方法 →</a>
         <a href="#network" class="px-3.5 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar hover:text-cinnabar transition-colors">进入关系图谱</a>
         <a href="ontology.html" class="px-3.5 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar hover:text-cinnabar transition-colors">本体总纲</a>
       </div>
@@ -146,43 +144,51 @@ tailwind.config = {
 
 <main class="max-w-7xl mx-auto px-4 pb-16">
 
-<!-- 本体论 3D 正交模型 -->
-<section id="onto3d" class="sec-anchor pt-8">
-  <div class="flex items-end justify-between flex-wrap gap-2 mb-3">
-    <div>
-      <h2 class="font-serif font-bold text-[24px] md:text-[28px] text-ink">本体论构建 · 四轴 × 七层 × 九类 正交模型</h2>
-      <p class="text-ink2 text-[14.5px] mt-1.5 max-w-3xl">以三维空间呈现集藏统一本体：<b>X 轴</b>为四轴（文体典要/义理意象/人物传承/时代事件），<b>Y 轴</b>为七层（自下而上 L6 文化外延 → L0 元模型），<b>Z 轴</b>为九类专业分区（别集/总集/诗文评/小说/演义/话本/宝卷/笑话/谜语），构成 4×7×9 = <b class="text-cinnabar">252</b> 个正交节点。亮球表示该位置有专属本体类/关系/属性，暗球表示共享上层概念。</p>
-    </div>
-    <span class="text-[12.5px] text-ink3 border border-ink/15 rounded-full px-3 py-1">4 轴 × 7 层 × 9 类 = 252 节点 · Three.js 3D</span>
-  </div>
-  <div class="rounded-xl bg-white/72 border border-ink/10 overflow-hidden">
-    <div id="ontology3d" style="width:100%;height:560px;position:relative"></div>
-  </div>
-  <p class="text-[12.5px] text-ink3 mt-2 leading-relaxed">操作提示：鼠标拖拽旋转 · 滚轮缩放 · 右键平移 · 悬停节点查看该坐标所代表的本体概念 · 点击右侧图例按钮高亮某轴或某层。</p>
-</section>
-
-<!-- 七层本体架构 -->
-<section id="layers" class="sec-anchor pt-8">
+<!-- 本体论构建方法（三维模型 · 七层架构 · 类体系 三合一） -->
+<section id="ontology" class="sec-anchor pt-8">
   <div class="flex items-end justify-between flex-wrap gap-2 mb-4">
     <div>
-      <h2 class="font-serif font-bold text-[24px] md:text-[28px] text-ink">集部七层本体架构</h2>
-      <p class="text-ink2 text-[14.5px] mt-1.5 max-w-3xl">自元概念（L0）而文献载体（L4），而人物传承（L5），而文化外延（L6），层层递进，构成集部之学的完整本体。</p>
+      <h2 class="font-serif font-bold text-[24px] md:text-[28px] text-ink">本体论构建方法</h2>
+      <p class="text-ink2 text-[14.5px] mt-1.5 max-w-3xl">集藏本体论采用「统一本体 + 九类专业分区」：以 <b>四轴</b>（文体典要 / 义理意象 / 人物传承 / 时代事件）为横向骨架、<b>七层</b>（L0 元模型 → L6 文化外延）为纵向骨架，九类典籍在 L4 文本载体层各建专属子类与数据属性，构成 4×7×9 = <b class="text-cinnabar">252</b> 个正交节点的三维本体空间。下面的三维模型、七层架构、类体系，是同一套本体构建方法的三个切面。</p>
     </div>
-    <span class="text-[12.5px] text-ink3 border border-ink/15 rounded-full px-3 py-1">L0 → L6 · 七层</span>
+    <span class="text-[12.5px] text-ink3 border border-ink/15 rounded-full px-3 py-1">统一本体 · 四轴 × 七层 × 九类</span>
   </div>
-  <div id="layerList" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3.5"></div>
-</section>
 
-<!-- 类体系 -->
-<section id="classes" class="sec-anchor pt-12">
-  <div class="flex items-end justify-between flex-wrap gap-2 mb-4">
-    <div>
-      <h2 class="font-serif font-bold text-[24px] md:text-[28px] text-ink">集部类体系</h2>
-      <p class="text-ink2 text-[14.5px] mt-1.5 max-w-3xl">九大本体类：体裁、流派、人物、作品、概念、意象、事件、制度、地理，涵盖集部文献的全部实体类型。</p>
+  <!-- 切面一 · 三维正交模型 -->
+  <div class="rounded-2xl bg-white/62 border border-ink/10 p-4 md:p-5">
+    <div class="flex items-center gap-2.5 mb-2 flex-wrap">
+      <span class="w-[28px] h-[28px] rounded-md flex items-center justify-center text-paper font-serif font-bold text-[14px] shrink-0" style="background:#8B2500">壹</span>
+      <h3 class="font-serif font-bold text-[18px] md:text-[19.5px] text-ink">三维正交模型 · 四轴 × 七层 × 九类</h3>
+      <span class="text-[12px] text-ink3 border border-ink/15 rounded-full px-2.5 py-0.5">252 节点 · Three.js 3D</span>
     </div>
-    <span class="text-[12.5px] text-ink3 border border-ink/15 rounded-full px-3 py-1">9 类 · OWL Class</span>
+    <p class="text-ink2 text-[13.5px] leading-relaxed mb-3"><b>X 轴</b>为四轴（文体典要 / 义理意象 / 人物传承 / 时代事件），<b>Y 轴</b>为七层（自下而上 L6 文化外延 → L0 元模型），<b>Z 轴</b>为九类专业分区（别集 / 总集 / 诗文评 / 小说 / 演义 / 话本 / 宝卷 / 笑话 / 谜语）。亮球表示该坐标存在专属本体类 / 关系 / 属性，暗球表示九类共享的上层概念。</p>
+    <div class="rounded-xl bg-white/72 border border-ink/10 overflow-hidden">
+      <div id="ontology3d" style="width:100%;height:560px;position:relative"></div>
+    </div>
+    <p class="text-[12.5px] text-ink3 mt-2 leading-relaxed">操作提示：鼠标拖拽旋转 · 滚轮缩放 · 右键平移 · 悬停节点查看该坐标所代表的本体概念 · 点击右侧图例按钮高亮某轴或某层。</p>
   </div>
-  <div id="classList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
+
+  <!-- 切面二 · 七层本体架构 -->
+  <div class="rounded-2xl bg-white/62 border border-ink/10 p-4 md:p-5 mt-5">
+    <div class="flex items-center gap-2.5 mb-2 flex-wrap">
+      <span class="w-[28px] h-[28px] rounded-md flex items-center justify-center text-paper font-serif font-bold text-[14px] shrink-0" style="background:#2F4F4F">贰</span>
+      <h3 class="font-serif font-bold text-[18px] md:text-[19.5px] text-ink">七层本体架构 · 纵向骨架</h3>
+      <span class="text-[12px] text-ink3 border border-ink/15 rounded-full px-2.5 py-0.5">L0 → L6 · 七层</span>
+    </div>
+    <p class="text-ink2 text-[13.5px] leading-relaxed mb-3">自元概念（L0）而文道本体（L1）、文体范畴（L2）、流派体系（L3）、文本载体（L4）、人物传承（L5）、文化外延（L6），层层递进，构成集部之学的完整本体骨架。</p>
+    <div id="layerList" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3.5"></div>
+  </div>
+
+  <!-- 切面三 · 类体系 -->
+  <div class="rounded-2xl bg-white/62 border border-ink/10 p-4 md:p-5 mt-5">
+    <div class="flex items-center gap-2.5 mb-2 flex-wrap">
+      <span class="w-[28px] h-[28px] rounded-md flex items-center justify-center text-paper font-serif font-bold text-[14px] shrink-0" style="background:#6B3FA0">叁</span>
+      <h3 class="font-serif font-bold text-[18px] md:text-[19.5px] text-ink">类体系 · 类 / 关系 / 属性</h3>
+      <span class="text-[12px] text-ink3 border border-ink/15 rounded-full px-2.5 py-0.5">OWL Class · 四轴归一</span>
+    </div>
+    <p class="text-ink2 text-[13.5px] leading-relaxed mb-3">本体的类按四轴聚合，另立关系谓词与数据属性两类元语：<b>类</b>刻画实体类型，<b>关系谓词</b>刻画实体之间的语义关联，<b>数据属性</b>刻画实体自身字段。</p>
+    <div id="classList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
+  </div>
 </section>
 
 <!-- 典籍体系 -->
