@@ -438,3 +438,4 @@ export function mountOntology3D(containerId) {
 }
 
 window.JiCangOntology3D = { mount: mountOntology3D };
+export { mountOntology3D };
