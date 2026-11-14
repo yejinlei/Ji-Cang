@@ -1,192 +1,102 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>本体总纲 · 四轴 × 七层 - 集藏本体论</title>
-<script src="vendor/tailwindcss-3.4.17.js"></script>
-<script src="vendor/echarts-5.6.0.min.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/"
-  }
-}
-</script>
-<script>
-tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#1a1612',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',seal:'#8b2f2f',jade:'#2f6b5f',gold:'#b8860b',gold2:'#d4a017',bone:'#f2ecd9',violet:'#6b3fa0'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
-</script>
-<style>body{background:#f7f3ea}.paper-bg{background-image:radial-gradient(circle at 12% 18%,rgba(168,50,45,.04) 0,transparent 42%),radial-gradient(circle at 88% 8%,rgba(47,107,95,.04) 0,transparent 40%)}.lk{color:#a8322d}.lk:hover{text-decoration:underline}.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}.seal{display:inline-flex;align-items:center;justify-content:center;font-family:'Songti SC',serif;font-weight:700;color:#f7f3ea;background:#a8322d;border-radius:4px}</style>
+  <script src="js/theme-init.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>本体总纲 · 集藏本体论</title>
+  <link rel="stylesheet" href="css/yijing.css">
+  <script src="js/echarts.min.js"></script>
+  <script src="data/ontology.js"></script>
+  <script src="data/books.js"></script>
+  <script src="js/shell.js"></script>
+  <style>
+    .page-hero{text-align:center;padding:48px 20px 36px;border-bottom:1px solid var(--line);
+      background:radial-gradient(ellipse 800px 400px at 50% 40%, rgba(40,70,130,.25) 0%, transparent 70%);}
+    .page-hero h1{font-size:38px;color:var(--ink);letter-spacing:8px;margin:0 0 6px;}
+    .page-hero h1 .accent{color:var(--zhu);}
+    .page-hero .sub{color:var(--gold);letter-spacing:4px;font-size:14px;}
+    .class-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+    .class-card{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;border-left:3px solid var(--zhu);}
+    .class-card h3{margin:0 0 6px;color:var(--gold-bright);letter-spacing:3px;font-size:18px;}
+    .class-card .cls{color:var(--ink-3);font-size:12px;letter-spacing:1px;font-family:var(--font-sans);margin-bottom:10px;}
+    .class-card p{color:var(--ink-2);font-size:13px;line-height:1.8;margin:0;}
+    @media(max-width:768px){.class-grid{grid-template-columns:1fr;}.page-hero h1{font-size:28px;}}
+  </style>
 </head>
-<body class="font-sans text-ink paper-bg min-h-screen">
-<header class="sticky top-0 z-50">
-  <div class="bg-[#14100c] text-bone/75 border-b border-gold/20 text-[12.5px]">
-    <div class="max-w-6xl mx-auto px-4 py-1.5 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-2 hover:text-gold2 transition-colors">
-        <span class="seal w-[20px] h-[20px] text-[11px]">藏</span>
-        <span class="tracking-[.3em]">集藏本体论 · JI-CANG ONTOLOGY</span>
-      </a>
-      <nav class="hidden md:flex items-center gap-4">
-        <a href="index.html" class="hover:text-gold2">首页</a>
-        <a href="ontology.html" class="text-gold2">本体</a>
-        <a href="books.html" class="hover:text-gold2">全文库</a>
-        <a href="dict.html" class="hover:text-gold2">文论</a>
-        <a href="schools.html" class="hover:text-gold2">流派</a>
-        <a href="figures.html" class="hover:text-gold2">文人</a>
-      </nav>
+<body>
+<div id="topbar-slot"></div>
+<div class="layout">
+  <div id="sidebar-slot"></div>
+  <main class="content" style="padding:0;">
+    <section class="page-hero">
+      <h1>本<span class="accent">体</span>总纲</h1>
+      <div class="sub">ONTOLOGY · TBox 类 体 系 · 七 层 架 构</div>
+    </section>
+    <div style="padding:28px var(--gutter,40px) 60px;max-width:1200px;margin:0 auto;width:100%;">
+
+      <section class="section">
+        <div class="section-title"><span class="icon">☰</span>本体层级（七层）</div>
+        <p style="color:var(--ink-2);line-height:1.9;font-size:14px;">集藏本体自元模型以至文化外延共分七层，层层细化，下学上达。</p>
+        <div class="ont-level" id="levelsBox" style="grid-template-columns:repeat(7,1fr);"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><span class="icon">類</span>核心类（Classes）</div>
+        <div class="class-grid" id="classGrid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><span class="icon">綱</span>关系与公理</div>
+        <p style="color:var(--ink-2);font-size:14px;line-height:2;">
+          核心对象属性：<span style="color:var(--gold);">著述(authorOf)</span>、<span style="color:var(--gold);">收于(partOf)</span>、
+          <span style="color:var(--gold);">属于流派(schoolOf)</span>、<span style="color:var(--gold);">使用意象(usesImagery)</span>、
+          <span style="color:var(--gold);">主情(expressesEmotion)</span>、<span style="color:var(--gold);">承继(inherits)</span>、
+          <span style="color:var(--gold);">作于(datedTo)</span>。
+        </p>
+        <div class="quote">
+          "诗者，志之所之也，在心为志，发言为诗。"
+          <span class="src">—— 《毛诗序》</span>
+        </div>
+      </section>
+
     </div>
-  </div>
-  <div class="bg-[#241d16]/95 backdrop-blur border-b border-gold/15">
-    <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
-      <a href="index.html" class="flex items-center gap-2">
-        <span class="seal w-[32px] h-[32px] text-[16px]">本</span>
-        <div class="leading-tight"><div class="font-serif font-bold text-bone text-[16px] tracking-wide">本体总纲</div><div class="text-[10px] tracking-widest text-gold2/80">BENTI · 四 軸 × 七 層</div></div>
-      </a>
-      <nav class="flex items-center gap-3 text-bone/90 text-[14px]">
-        <a href="index.html" class="hover:text-gold2 font-serif">☰ 总览</a>
-        <a href="ontology.html" class="text-gold2 font-serif">⬡ 本体</a>
-        <a href="books.html" class="hover:text-gold2 font-serif">書 全文库</a>
-      </nav>
-    </div>
-  </div>
-</header>
-<main class="max-w-6xl mx-auto px-4 py-8">
-  <h1 class="font-serif font-bold text-[30px] md:text-[36px] text-ink">本体总纲 <span class="text-cinnabar">四轴 × 七层</span></h1>
-  <p class="text-ink2 text-[15px] mt-2 max-w-3xl leading-relaxed">集藏本体论采用「统一本体 + 九类专业分区」方案：<b>四轴</b>（文体典要/义理意象/人物传承/时代事件）、<b>七层</b>（L0 元模型 → L6 文化外延）为共享骨架，九类典籍在 L4 文本载体层各建专属子类与数据属性，形成 4×7×9 = <b class="text-cinnabar">252</b> 个正交节点的三维本体空间。</p>
-
-  <section class="mt-7">
-    <h2 class="font-serif font-bold text-[22px] text-ink mb-2">本体论构建 · 三维正交模型</h2>
-    <p class="text-ink3 text-[13.5px] mb-3">拖拽旋转 · 滚轮缩放 · 右键平移 · 悬停查看节点 · 点击图例高亮轴/层。</p>
-    <div class="rounded-xl bg-white/72 border border-ink/10 overflow-hidden">
-      <div id="ontology3d" style="width:100%;height:540px;position:relative"></div>
-    </div>
-  </section>
-
-  <section class="mt-8">
-    <h2 class="font-serif font-bold text-[22px] text-ink mb-3">层级轴 · 七层架构</h2>
-    <div id="layers" class="space-y-3"></div>
-  </section>
-
-  <section class="mt-9">
-    <h2 class="font-serif font-bold text-[22px] text-ink mb-3">类轴 · 九类实体</h2>
-    <div id="classChart" style="height:400px" class="bg-white/70 rounded-xl border border-ink/10 p-2"></div>
-  </section>
-
-  <section class="mt-9">
-    <h2 class="font-serif font-bold text-[22px] text-ink mb-3">关系轴 · 十种语义关系</h2>
-    <div class="overflow-x-auto rounded-xl border border-ink/10 bg-white/70">
-      <table class="w-full text-[13.5px]">
-        <thead class="bg-paper2 text-ink2"><tr>
-          <th class="text-left px-3 py-2">关系</th><th class="text-left px-3 py-2">标识</th>
-          <th class="text-left px-3 py-2">域 → 值域</th><th class="text-left px-3 py-2">含义</th>
-          <th class="text-left px-3 py-2">轴线</th></tr></thead>
-        <tbody id="relBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="mt-9">
-    <h2 class="font-serif font-bold text-[22px] text-ink mb-3">实例轴 · 各类实例</h2>
-    <div id="instTabs" class="flex flex-wrap gap-2 text-[13px] mb-3"></div>
-    <div id="instBody" class="rounded-xl bg-white/70 border border-ink/10 p-4"></div>
-  </section>
-  <p class="text-center text-[12.5px] text-ink3 mt-8">集藏本体论 · 数据出自殆知阁集藏</p>
-</main>
-<script src="data/ontology.js"></script>
-<script src="data/books.js"></script>
-<script src="data/individuals.js"></script>
-<script src="data/network.js"></script>
+  </main>
+</div>
+<div id="footer-slot"></div>
 <script>
-const $=s=>document.querySelector(s);
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
+document.getElementById('topbar-slot').innerHTML = JC_Link.topbar('ontology');
+document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('layers');
+document.getElementById('footer-slot').innerHTML = JC_Link.footer();
+JC_Link.initMobile();
 
-// 层级轴
-(function(){
-  const box=$('#layers');
-  const LC={L0:'#7a736a',L1:'#8B2500',L2:'#B8860B',L3:'#2F4F4F',L4:'#6b3fa0',L5:'#2f6b5f',L6:'#b5651d'};
-  JICANG_LAYERS.forEach(L=>{
-    const members=JICANG_TBOX.classes.filter(c=>c.layer===L.id);
-    const tags=members.slice(0,10).map(c=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(c.label)}</span>`).join('');
-    box.appendChild(el(`<article class="rounded-xl bg-white/72 border border-ink/10 p-4">
-      <div class="flex items-center gap-3">
-        <span class="w-[36px] h-[36px] rounded-lg flex items-center justify-center text-paper font-serif font-bold text-[13px] shrink-0" style="background:${LC[L.id]||'#4a463f'}">${L.id}</span>
-        <div><h3 class="font-serif font-bold text-[17px] text-ink">${esc(L.name)}</h3>
-        <div class="text-[11px] tracking-wider text-ink3">${L.cls} 个类</div></div>
-      </div>
-      <p class="text-[13.5px] text-ink2 leading-relaxed mt-2">${esc(L.desc)}</p>
-      <div class="mt-2.5 flex flex-wrap gap-1.5">${tags}</div></article>`));
-  });
-})();
+var LAYERS = [
+  {no:'L1',name:'元模型',  desc:'文/道/气'},
+  {no:'L2',name:'域类',    desc:'集部九类'},
+  {no:'L3',name:'典籍',    desc:'具体文献'},
+  {no:'L4',name:'卷篇',    desc:'篇章结构'},
+  {no:'L5',name:'文论',    desc:'文论术语'},
+  {no:'L6',name:'文象',    desc:'意象情感'},
+  {no:'L7',name:'文化',    desc:'外延语境'}
+];
+document.getElementById('levelsBox').innerHTML = LAYERS.map(function(l){
+  return '<div class="ont-lvl"><div class="lv-num">'+l.no+'</div><div class="lv-name">'+l.name+'</div><div class="lv-desc">'+l.desc+'</div></div>';
+}).join('');
 
-// 类轴
-(function(){
-  const chart=echarts.init($('#classChart'));
-  const d=JICANG_CLASSES.map(c=>({name:c.name,value:c.total,itemStyle:{color:c.color}}));
-  chart.setOption({tooltip:{trigger:'item',formatter:'{b}：{c} 项'},legend:{bottom:0,textStyle:{fontSize:11,color:'#4a463f'}},
-    series:[{type:'treemap',roam:false,breadcrumb:{show:false},label:{fontSize:13,color:'#fff',formatter:'{b}\n{c}'},
-      itemStyle:{borderColor:'#f7f3ea',borderWidth:2,gapWidth:2},data:JICANG_CLASSES.map(c=>({name:c.name,value:c.total,itemStyle:{color:c.color}}))}]});
-})();
-
-// 关系轴
-(function(){
-  const t=$('#relBody');
-  const AC={A1:'#8B2500',A2:'#B8860B',A3:'#2f6b5f',A4:'#6b3fa0'};
-  JICANG_RELATIONS.forEach(r=>{
-    t.appendChild(el(`<tr class="border-t border-ink/8">
-      <td class="px-3 py-2"><span class="inline-flex items-center gap-1.5"><span class="w-[9px] h-[9px] rounded-full" style="background:${AC[r.axis]||'#7a736a'}"></span>${esc(r.name)}</span></td>
-      <td class="px-3 py-2 text-ink3">${esc(r.id)}</td>
-      <td class="px-3 py-2 text-ink2">${esc(r.domain)} → ${esc(r.range)}</td>
-      <td class="px-3 py-2 text-ink2">${esc(r.desc)}</td>
-      <td class="px-3 py-2 text-ink3">${esc(r.axis)}</td></tr>`));
-  });
-})();
-
-// 实例轴
-(function(){
-  const BOOKS=window.JICANG_BOOKS||[];
-  const booksArr=Array.isArray(BOOKS)?BOOKS:[];
-  const bookTitles=booksArr.slice(0,60).map(b=>b.title||b.id);
-  const groups=[
-    {name:'典籍',items:bookTitles},
-    {name:'文人',items:(JICANG_NETWORK.nodes||[]).map(n=>n.n)},
-    {name:'流派',items:(JICANG_NETWORK.schools||[]).map(s=>s.name)},
-    {name:'意象',items:(JICANG_NETWORK.imagery||[]).map(i=>i.name)},
-    {name:'文体',items:((JICANG_CLASSES&&JICANG_CLASSES[3]&&JICANG_CLASSES[3].members)||[])},
-    {name:'概念',items:((JICANG_CLASSES&&JICANG_CLASSES[1]&&JICANG_CLASSES[1].members)||[])}
-  ];
-  const tabs=$('#instTabs'),body=$('#instBody');
-  function render(g){
-    body.innerHTML=`<div class="flex flex-wrap gap-1.5">${g.items.map(x=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(x)}</span>`).join('')}</div>`;
-  }
-  function overview(){
-    body.innerHTML=`<p class="text-[13.5px] text-ink2 mb-2.5">点击上方类别，查看该类实例（示例）：</p>
-      <div class="flex flex-wrap gap-1.5">${groups.map(g=>`<span class="tag bg-paper2 text-ink2 border border-ink/10">${g.name} · ${g.items.length}</span>`).join('')}</div>`;
-  }
-  groups.forEach((g)=>{
-    const b=el(`<button class="px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar">${g.name}</button>`);
-    b.addEventListener('click',()=>{[...tabs.children].forEach(x=>x.className='px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar');b.className='px-3 py-1.5 rounded-md border bg-ink text-paper border-ink';render(g);});
-    tabs.appendChild(b);
-  });
-  overview();
-})();
-</script>
-<script type="module">
-import { mountOntology3D } from './vendor/ontology3d.js';
-function tryMountO(attempt = 0) {
-  const c = document.getElementById('ontology3d');
-  if (c && window.JiCangOntology3D && window.JICANG_TBOX && window.JICANG_ORTHO) {
-    if (window.__onto3d_o && window.__onto3d_o.dispose) window.__onto3d_o.dispose();
-    window.__onto3d_o = mountOntology3D('ontology3d');
-  } else if (attempt < 50) {
-    setTimeout(() => tryMountO(attempt + 1), 100);
-  } else {
-    if (c) c.innerHTML = '<div class="p-8 text-center text-gray-500">本体数据加载失败，请刷新页面重试</div>';
-  }
-}
-if (document.readyState === 'complete') tryMountO();
-else window.addEventListener('load', tryMountO);
+var CLASSES = [
+  {name:'Work（典籍作品）',cls:'L3',desc:'集部独立著作单元，如《李太白集》《红楼梦》。核心属性：title、dynasty、chars、category。'},
+  {name:'Person（著者人物）',cls:'L3',desc:'集部文献作者，含姓名、朝代、字号、所属流派等。'},
+  {name:'Chapter（卷篇）',cls:'L4',desc:'典籍内部卷、回、篇、章的结构单元，承载具体文本。'},
+  {name:'School（流派）',cls:'L5',desc:'文学流派，如建安七子、江西诗派、唐宋派、桐城派等。'},
+  {name:'Imagery（意象）',cls:'L6',desc:'文学意象——月、柳、梅、雁、酒、剑等承载文化情感的象征单元。'},
+  {name:'TheoryTerm（文论术语）',cls:'L5',desc:'文论范畴——气、风骨、神韵、格调、性灵、肌理等。'},
+  {name:'Emotion（情感）',cls:'L6',desc:'作品所抒发的主要情志类别：忧国、思归、别情、咏史、山水等。'},
+  {name:'Dynasty（朝代）',cls:'L7',desc:'时代语境，汉魏唐宋元明清民国等，作品与人物均依附于朝代。'},
+  {name:'CulturalContext（文化外延）',cls:'L7',desc:'历史事件、科举制度、宗教思潮、地理空间等外部语境。'}
+];
+document.getElementById('classGrid').innerHTML = CLASSES.map(function(c){
+  return '<div class="class-card"><h3>'+c.name+'</h3><div class="cls">'+c.cls+'</div><p>'+c.desc+'</p></div>';
+}).join('');
 </script>
 </body>
 </html>
