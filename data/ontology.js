@@ -306,3 +306,37 @@ const JICANG_TBOX = {
 };
 
 const JICANG_LAYERS = JICANG_TBOX.layers;
+
+// 向后兼容别名（供旧版页面使用）
+const JICANG_CLASSES = [
+  { name:'文道本体', icon:'道', color:'#8B2500', total:JICANG_TBOX.abox.wenDao.count,
+    desc:'中国文学最顶层的形而上学核心概念：道、气、理、文、言、意、象、情、性、才、学、识。',
+    members:['道','气','理','文','言','意','象','情','性','才'] },
+  { name:'文论范畴', icon:'论', color:'#B8860B', total:JICANG_TBOX.abox.wenLun.count,
+    desc:'文论核心范畴：风骨、神思、滋味、意境、格调、神韵、性灵、肌理、诗言志、文以载道。',
+    members:['风骨','神思','滋味','意境','格调','神韵','性灵','肌理','文以载道','诗言志'] },
+  { name:'流派体系', icon:'派', color:'#2F4F4F', total:JICANG_TBOX.abox.schools.count,
+    desc:'诸子百家、汉魏风骨、唐宋八家、江西诗派、桐城派、同光体等文学流派与体例。',
+    members:['诸子百家','汉魏风骨','唐宋八家','江西诗派','台阁体','唐宋派','公安派','竟陵派','桐城派','同光体'] },
+  { name:'文体体裁', icon:'体', color:'#5C4033', total:JICANG_TBOX.abox.forms.count,
+    desc:'诗/文/词/曲/小说/戏曲/话本/演义等文体与乐府/古体/近体等体例。',
+    members:['诗','文','词','曲','小说','戏曲','话本','演义','宝卷','笑话'] },
+  { name:'人物传承', icon:'人', color:'#2f6b5f', total:JICANG_TBOX.abox.persons.count,
+    desc:'圣王圣贤→宗师→大家→名家→评点家→学者，以及师徒/交游/姻亲/同社/同年/同僚。',
+    members:['宗师','大家','作家','评点家','注家','学者','民艺人物','师徒','交游','同社'] },
+  { name:'典籍文本', icon:'籍', color:'#6b3fa0', total:JICANG_TBOX.abox.books.count,
+    desc:'别集/总集/选集/诗文评/小说/话本/演义/宝卷/笑话/谜语等典籍及其卷篇回则。',
+    members:['别集','总集','选集','诗文评','小说','话本','演义','宝卷','笑话','谜语'] },
+  { name:'技法章法', icon:'法', color:'#b5651d', total:JICANG_TBOX.abox.techniques.count,
+    desc:'用字、造句、章法、韵律、对仗、用典、比兴、寄托等具体技法。',
+    members:['比兴','用典','对仗','声律','章法','炼字','寄托','讽喻','含蓄','铺陈'] },
+  { name:'意象典故', icon:'象', color:'#a9801f', total:JICANG_TBOX.abox.imageries.count,
+    desc:'月、柳、梅、雁、酒、剑、青山、浮云等文化意象及相关典故。',
+    members:['月','柳','梅','雁','酒','剑','青山','浮云','落花','流水'] },
+  { name:'文化外延', icon:'俗', color:'#7a736a', total:JICANG_TBOX.abox.folkWorks.count,
+    desc:'俗文学（说唱/弹词/戏曲/宝卷）、民俗意象、刻本出版、域外流传。',
+    members:['说唱','弹词','戏曲','宝卷','谶纬','刻本','书坊','域外','民俗','弹词'] }
+];
+const JICANG_RELATIONS = JICANG_TBOX.objectProperties;
+// JICANG_STATS 由各页面自行基于 JICANG_BOOKS 动态计算，保留空占位以免报错
+const JICANG_STATS = { cats:{}, dyn:{}, topAuthors:[] };

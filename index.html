@@ -311,60 +311,115 @@ $('#menuBtn').addEventListener('click',()=>$('#mobileMenu').classList.toggle('hi
 /* ---------- 七层本体 ---------- */
 (function(){
   const box = $('#layerList');
-  JICANG_LAYERS.forEach(L=>{
-    const tags = L.concepts.slice(0,8).map(c=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(c.name)}</span>`).join('');
+  const T = JICANG_TBOX;
+  // 每层从 classes 里挑属于该层的类作为标签
+  const byLayer = {};
+  T.classes.forEach(c=>{ const L=c.layer||'L0'; (byLayer[L]=byLayer[L]||[]).push(c); });
+  const layerColor = {'L0':'#6b5d4f','L1':'#8B2500','L2':'#B8860B','L3':'#2F4F4F','L4':'#5C4033','L5':'#2f6b5f','L6':'#7a736a'};
+  const layerCode  = {'L0':'Meta','L1':'Tao','L2':'Theory','L3':'School','L4':'Text','L5':'Figure','L6':'Folk'};
+  T.layers.forEach(L=>{
+    const members = (byLayer[L.id]||[]).slice(0,8);
+    const tags = members.map(c=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(c.label)}</span>`).join('');
+    const color = layerColor[L.id]||'#6b5d4f';
     box.appendChild(el(`
       <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4 overflow-hidden">
         <div class="flex items-center gap-2.5 mb-2">
-          <span class="w-[34px] h-[34px] rounded-lg flex items-center justify-center text-paper font-serif font-bold text-[13px] shrink-0" style="background:${L.color}">${L.id}</span>
+          <span class="w-[34px] h-[34px] rounded-lg flex items-center justify-center text-paper font-serif font-bold text-[13px] shrink-0" style="background:${color}">${L.id}</span>
           <div>
             <h3 class="font-serif font-bold text-[17px] text-ink leading-tight">${esc(L.name)}</h3>
-            <div class="text-[11px] tracking-wider text-ink3 uppercase">${esc(L.en)} · ${esc(L.code)}</div>
+            <div class="text-[11px] tracking-wider text-ink3 uppercase">${layerCode[L.id]} · ${L.cls} 类</div>
           </div>
         </div>
-        <p class="text-[13.5px] text-ink2 leading-relaxed">${esc(L.summary)}</p>
-        <div class="mt-3 flex flex-wrap gap-1.5">${tags}</div>
+        <p class="text-[13.5px] text-ink2 leading-relaxed">${esc(L.desc)}</p>
+        <div class="mt-3 flex flex-wrap gap-1.5">${tags||'<span class="text-[12px] text-ink3">元模型层，描述轴/层/类/属性/关系/实例</span>'}</div>
       </article>`));
   });
 })();
 
-/* ---------- 类体系 ---------- */
+/* ---------- 类体系（按轴聚合）---------- */
 (function(){
   const box = $('#classList');
-  JICANG_CLASSES.forEach(C=>{
-    const tags = C.members.slice(0,10).map(m=>`<span class="tag" style="background:${C.color}14;color:${C.color};border:1px solid ${C.color}33">${esc(m)}</span>`).join('');
+  const T = JICANG_TBOX;
+  const axisColor = {'A1':'#8B2500','A2':'#B8860B','A3':'#2F4F4F','A4':'#5C4033'};
+  const axisIcon  = {'A1':'文','A2':'意','A3':'人','A4':'时'};
+  T.axes.forEach(A=>{
+    const members = T.classes.filter(c=>(c.axes||[]).includes(A.id) && c.id!=='jc:Entity').slice(0,10);
+    const tags = members.map(c=>`<span class="tag" style="background:${A.color}14;color:${A.color};border:1px solid ${A.color}33">${esc(c.label)}</span>`).join('');
     box.appendChild(el(`
       <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4">
         <div class="flex items-center justify-between mb-1.5">
           <div class="flex items-center gap-2">
-            <span class="w-[30px] h-[30px] rounded-md flex items-center justify-center text-paper font-serif font-bold text-[14px] shrink-0" style="background:${C.color}">${esc(C.icon)}</span>
-            <h3 class="font-serif font-bold text-[16.5px] text-ink">${esc(C.name)}</h3>
+            <span class="w-[30px] h-[30px] rounded-md flex items-center justify-center text-paper font-serif font-bold text-[14px] shrink-0" style="background:${A.color}">${axisIcon[A.id]}</span>
+            <h3 class="font-serif font-bold text-[16.5px] text-ink">${esc(A.name)} <span class="text-ink3 text-[12px] font-normal tracking-wider">${A.id}</span></h3>
           </div>
-          <span class="text-[12px] text-ink3">${C.total} 项</span>
+          <span class="text-[12px] text-ink3">${A.cls} 类</span>
         </div>
-        <p class="text-[13px] text-ink2 leading-relaxed mb-2.5">${esc(C.desc)}</p>
+        <p class="text-[13px] text-ink2 leading-relaxed mb-2.5">${esc(A.desc)}</p>
         <div class="flex flex-wrap gap-1.5">${tags}</div>
       </article>`));
   });
+  // 追加关系谓词卡片
+  const relTags = T.objectProperties.slice(0,10).map(r=>`<span class="tag" style="background:#6b3fa014;color:#6b3fa0;border:1px solid #6b3fa033">${esc(r.name)}</span>`).join('');
+  box.appendChild(el(`
+    <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-[30px] h-[30px] rounded-md flex items-center justify-center text-paper font-serif font-bold text-[14px] shrink-0" style="background:#6b3fa0">系</span>
+          <h3 class="font-serif font-bold text-[16.5px] text-ink">关系谓词 <span class="text-ink3 text-[12px] font-normal tracking-wider">ObjectProperty</span></h3>
+        </div>
+        <span class="text-[12px] text-ink3">${T.objectProperties.length} 项</span>
+      </div>
+      <p class="text-[13px] text-ink2 leading-relaxed mb-2.5">实体之间的语义关系：师徒、唱和、创作于、刊刻、流传等。</p>
+      <div class="flex flex-wrap gap-1.5">${relTags}</div>
+    </article>`));
+  // 追加数据属性卡片
+  const dpTags = T.datatypeProperties.slice(0,10).map(d=>`<span class="tag" style="background:#2f6b5f14;color:#2f6b5f;border:1px solid #2f6b5f33">${esc(d.label)}</span>`).join('');
+  box.appendChild(el(`
+    <article class="card-hover fade-up rounded-xl bg-white/72 border border-ink/10 p-4">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-[30px] h-[30px] rounded-md flex items-center justify-center text-paper font-serif font-bold text-[14px] shrink-0" style="background:#2f6b5f">属</span>
+          <h3 class="font-serif font-bold text-[16.5px] text-ink">数据属性 <span class="text-ink3 text-[12px] font-normal tracking-wider">DatatypeProperty</span></h3>
+        </div>
+        <span class="text-[12px] text-ink3">${T.datatypeProperties.length} 项</span>
+      </div>
+      <p class="text-[13px] text-ink2 leading-relaxed mb-2.5">实体的数据字段：题名、著者、字、号、朝代、卷数、字数等。</p>
+      <div class="flex flex-wrap gap-1.5">${dpTags}</div>
+    </article>`));
 })();
 
-/* ---------- 典籍体系图表 ---------- */
+/* ---------- 典籍体系图表（从 JICANG_BOOKS 动态统计）---------- */
 (function(){
-  const stats = JICANG_STATS;
-  const cats = Object.keys(stats.cats);
-  const cnt = cats.map(c=>stats.cats[c].count);
-  const labels = cats.map(c=>stats.cats[c].label);
+  const cats = Object.keys(JICANG_BOOKS);
+  const cnt = cats.map(c=>JICANG_BOOKS[c].items.length);
+  const labels = cats.map(c=>JICANG_BOOKS[c].label);
+  // 按数量从大到小排序
+  const sorted = cats.map((c,i)=>({k:c,n:cnt[i],lab:labels[i]})).sort((a,b)=>b.n-a.n);
+  const cats_s = sorted.map(x=>x.k), cnt_s=sorted.map(x=>x.n), labels_s=sorted.map(x=>x.lab);
   const palette = ['#a8322d','#2f6b5f','#a9801f','#6b3fa0','#31427b','#b5651d','#4a8b7d','#c0524b','#7a736a'];
   const bar = echarts.init($('#catChart'));
   bar.setOption({
-    grid:{left:60,right:26,top:20,bottom:20},
+    grid:{left:80,right:36,top:20,bottom:20},
     tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
     xAxis:{type:'value',axisLabel:{color:'#7a736a',fontSize:11},splitLine:{lineStyle:{color:'#0000000f'}}},
-    yAxis:{type:'category',data:labels,axisLabel:{color:'#4a463f',fontSize:12.5},axisLine:{lineStyle:{color:'#00000022'}}},
-    series:[{type:'bar',data:cnt.map((v,i)=>({value:v,itemStyle:{color:palette[i%palette.length],borderRadius:[0,4,4,0]}})),
+    yAxis:{type:'category',data:labels_s,axisLabel:{color:'#4a463f',fontSize:12.5},axisLine:{lineStyle:{color:'#00000022'}}},
+    series:[{type:'bar',data:cnt_s.map((v,i)=>({value:v,itemStyle:{color:palette[i%palette.length],borderRadius:[0,4,4,0]}})),
       label:{show:true,position:'right',color:'#4a463f',fontSize:11.5},barWidth:'58%'}]
   });
-  const dynArr = Object.entries(stats.dyn).filter(d=>d[0]!=='不详');
+  // 朝代分布：从 ex 摘要里识别朝代关键词
+  const DYN_ORDER=['先秦','汉','魏晋','南北朝','唐','五代','宋','辽金','元','明','清','民国'];
+  const DYN_PAT=[/先秦/,/汉/,/(魏晋|三国)/,/南北/,/唐/,/五代/,/宋/,/(辽|金)/,/元/,/明/,/清|国朝/,/民国/];
+  const dynMap={};
+  let total=0;
+  cats.forEach(c=>JICANG_BOOKS[c].items.forEach(b=>{
+    total++;
+    const txt=(b.ex||'')+' '+(b.t||'');
+    let hit=false;
+    for(let i=0;i<DYN_ORDER.length;i++){ if(DYN_PAT[i].test(txt)){ dynMap[DYN_ORDER[i]]=(dynMap[DYN_ORDER[i]]||0)+1; hit=true; break; } }
+    if(!hit) dynMap['不详']=(dynMap['不详']||0)+1;
+  }));
+  const dynArr = DYN_ORDER.filter(d=>dynMap[d]).map(d=>[d,dynMap[d]]);
+  if(dynMap['不详']) dynArr.push(['不详',dynMap['不详']]);
   const pie = echarts.init($('#dynChart'));
   pie.setOption({
     tooltip:{trigger:'item',formatter:'{b}：{c} 部（{d}%）'},
@@ -374,10 +429,26 @@ $('#menuBtn').addEventListener('click',()=>$('#mobileMenu').classList.toggle('hi
       label:{fontSize:11,color:'#4a463f',formatter:'{b} {c}'},
       data:dynArr.map((d,i)=>({name:d[0],value:d[1],itemStyle:{color:palette[i%palette.length]}}))}]
   });
+  // 高频著者（从 ex 提取"【x】"或人名）——简化为 ABox 统计文字
   const au = $('#topAuthors');
-  stats.topAuthors.slice(0,24).forEach((a,i)=>{
-    au.appendChild(el(`<span class="tag bg-white/80 border border-ink/10 text-ink2">${esc(a.name)} <span class="text-cinnabar font-semibold">${a.n}</span></span>`));
-  });
+  const abox = JICANG_TBOX.abox;
+  const tags = [
+    ['典籍/作品', abox.books.count],
+    ['卷/回/篇/则', abox.juan.count],
+    ['人物', abox.persons.count],
+    ['文学流派', abox.schools.count],
+    ['文论概念', abox.wenLun.count],
+    ['文道概念', abox.wenDao.count],
+    ['意象', abox.imageries.count],
+    ['技法', abox.techniques.count],
+    ['体裁', abox.forms.count],
+    ['事件', abox.events.count],
+    ['版本/刻本', abox.editions.count],
+    ['俗文学作品', abox.folkWorks.count],
+    ['注/评/笺/疏', abox.commentaries.count],
+    ['选本', abox.anthologies.count]
+  ];
+  tags.forEach(t=> au.appendChild(el(`<span class="tag bg-white/80 border border-ink/10 text-ink2">${esc(t[0])} <span class="text-cinnabar font-semibold">${t[1]}</span></span>`)));
 })();
 
 /* ---------- 关系图谱 ---------- */
