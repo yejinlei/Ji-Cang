@@ -1,163 +1,279 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>全藏原典 · 集藏本体论</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<script src="vendor/tailwindcss-3.4.17.js"></script>
-<script>
-tailwind.config={theme:{extend:{
-  colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#1a1612',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',jade:'#2f6b5f',gold:'#b8860b',gold2:'#d4a017',bone:'#f2ecd9'},
-  fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','KaiTi','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}
-}}};
-</script>
-<style>
-body{background:#f7f3ea}
-.paper-bg{background-image:radial-gradient(circle at 12% 18%,rgba(168,50,45,.04) 0,transparent 42%),radial-gradient(circle at 88% 8%,rgba(47,107,95,.04) 0,transparent 40%)}
-.dark-bg{background:#14100c;background-image:radial-gradient(ellipse at top,#241d16 0,#14100c 60%)}
-.tag{display:inline-block;padding:.12rem .5rem;border-radius:.375rem;font-size:.72rem}
-.lk{color:#a8322d}.lk:hover{text-decoration:underline}
-.cat-card{cursor:pointer;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,border-color .25s}
-.cat-card:hover{transform:translateY(-3px);box-shadow:0 12px 26px -14px rgba(34,32,29,.35);border-color:#a8322d}
-.seal{display:inline-flex;align-items:center;justify-content:center;font-family:'Songti SC',serif;font-weight:700;color:#f7f3ea;background:#a8322d;border-radius:4px}
-</style>
+  <script src="js/theme-init.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>典籍阅读 · 集藏本体论</title>
+  <link rel="stylesheet" href="css/yijing.css">
+  <script src="js/echarts.min.js"></script>
+  <script src="data/books.js"></script>
+  <script src="data/individuals.js"></script>
+  <script src="js/shell.js"></script>
+  <style>
+    .page-hero{
+      text-align:center;padding:48px 20px 36px;
+      background:radial-gradient(ellipse 800px 400px at 50% 40%, rgba(40,70,130,.25) 0%, transparent 70%),
+                 linear-gradient(180deg,rgba(8,16,32,.4) 0%, transparent 100%);
+      border-bottom:1px solid var(--line);
+    }
+    .page-hero h1{font-size:38px;color:var(--ink);letter-spacing:8px;margin:0 0 6px;}
+    .page-hero h1 .accent{color:var(--zhu);}
+    .page-hero .sub{color:var(--gold);letter-spacing:4px;font-size:14px;}
+    .search-bar{
+      max-width:560px;margin:20px auto 0;position:relative;
+    }
+    .search-bar input{
+      width:100%;padding:10px 16px;border-radius:var(--radius);
+      background:rgba(255,255,255,.05);border:1px solid var(--line-strong);
+      color:var(--ink);font-family:var(--font-serif);font-size:15px;letter-spacing:2px;
+      outline:none;
+    }
+    .search-bar input::placeholder{color:var(--ink-3);letter-spacing:2px;}
+    .search-bar input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,176,121,.15);}
+
+    .filter-row{
+      display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:18px 0 20px;
+    }
+    .filter-row button{
+      background:rgba(255,255,255,.04);border:1px solid var(--line);
+      padding:6px 14px;border-radius:20px;cursor:pointer;font-family:var(--font-serif);
+      font-size:13px;letter-spacing:2px;color:var(--ink-2);transition:all .2s;
+    }
+    .filter-row button:hover{border-color:var(--gold);color:var(--gold-bright);}
+    .filter-row button.on{background:var(--zhu);color:#fff;border-color:var(--zhu);}
+
+    .book-grid{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;
+    }
+    .book-card{
+      background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);
+      padding:16px 18px;text-decoration:none;color:inherit;transition:all .25s;
+      backdrop-filter:blur(6px);display:flex;flex-direction:column;gap:6px;
+      border-left:3px solid var(--zhu);
+    }
+    .book-card:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:var(--shadow-lg);}
+    .book-card.zongji{border-left-color:var(--gold);}
+    .book-card.wenping{border-left-color:var(--jade);}
+    .book-card.xiaoshuo{border-left-color:var(--ice);}
+    .book-card.yanyi{border-left-color:var(--violet);}
+    .book-card.huaben{border-left-color:var(--amber);}
+    .book-card.baojuan{border-left-color:var(--silver);}
+    .book-card.xiaohua{border-left-color:var(--zhu-soft);}
+    .book-card.miyu{border-left-color:#8c6b2f;}
+    .book-card .title{font-size:16px;color:var(--ink);letter-spacing:2px;font-weight:600;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .book-card .meta{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink-3);letter-spacing:1px;}
+    .book-card .author{font-size:12px;color:var(--gold);letter-spacing:1px;}
+    .book-card .badge{
+      display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;letter-spacing:1px;
+      background:rgba(212,176,121,.1);border:1px solid rgba(212,176,121,.25);color:var(--gold);
+    }
+
+    .reader-panel{
+      display:none;margin-top:24px;
+    }
+    .reader-panel.active{display:block;}
+    .reader-header{
+      background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);
+      padding:22px 28px;margin-bottom:18px;backdrop-filter:blur(6px);
+      border-left:4px solid var(--zhu);
+    }
+    .reader-header h2{margin:0 0 6px;font-size:28px;color:var(--zhu);letter-spacing:6px;}
+    .reader-header .meta{color:var(--ink-3);font-size:13px;letter-spacing:2px;}
+    .reader-body{
+      background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);
+      padding:28px 36px;backdrop-filter:blur(6px);max-height:70vh;overflow-y:auto;
+      font-family:var(--font-kai);font-size:17px;line-height:2.2;color:var(--ink-2);
+      letter-spacing:1px;
+    }
+    .reader-body h3{color:var(--gold);font-size:18px;letter-spacing:3px;margin:18px 0 8px;border-bottom:1px dashed var(--line);padding-bottom:6px;}
+    .reader-body p{margin:0 0 4px;text-indent:2em;}
+    .back-btn{
+      display:inline-block;padding:6px 14px;border-radius:4px;background:rgba(212,176,121,.1);
+      border:1px solid var(--line-strong);color:var(--gold);font-size:13px;letter-spacing:2px;
+      cursor:pointer;margin-bottom:14px;text-decoration:none;
+    }
+    .back-btn:hover{background:rgba(212,176,121,.22);color:var(--gold-bright);}
+
+    .empty-hint{text-align:center;padding:40px;color:var(--ink-3);letter-spacing:2px;font-size:14px;}
+    @media (max-width:768px){
+      .page-hero h1{font-size:28px;letter-spacing:4px;}
+      .book-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+      .reader-body{padding:20px 18px;font-size:15px;}
+    }
+  </style>
 </head>
-<body class="font-sans text-ink paper-bg min-h-screen">
-<header class="sticky top-0 z-50">
-  <div class="bg-[#14100c] text-bone/75 border-b border-gold/20 text-[12.5px]">
-    <div class="max-w-6xl mx-auto px-4 py-1.5 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-2 hover:text-gold2 transition-colors">
-        <span class="seal w-[20px] h-[20px] text-[11px]">藏</span>
-        <span class="tracking-[.3em]">集藏本体论 · JI-CANG ONTOLOGY</span>
-      </a>
-      <nav class="hidden md:flex items-center gap-4">
-        <a href="index.html" class="hover:text-gold2">首页</a>
-        <a href="ontology.html" class="hover:text-gold2">本体</a>
-        <a href="books.html" class="text-gold2">全文库</a>
-        <a href="dict.html" class="hover:text-gold2">文论</a>
-        <a href="schools.html" class="hover:text-gold2">流派</a>
-        <a href="figures.html" class="hover:text-gold2">文人</a>
-      </nav>
-    </div>
-  </div>
-  <div class="bg-[#241d16]/95 backdrop-blur border-b border-gold/15">
-    <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
-      <a href="index.html" class="flex items-center gap-2">
-        <span class="seal w-[32px] h-[32px] text-[16px]">文</span>
-        <div class="leading-tight"><div class="font-serif font-bold text-bone text-[16px] tracking-wide">全藏原典</div><div class="text-[10px] tracking-widest text-gold2/80">QUAN-CANG · 全 部 典 籍</div></div>
-      </a>
-      <nav class="flex items-center gap-3 text-bone/90 text-[14px]">
-        <a href="index.html" class="hover:text-gold2 font-serif">☰ 总览</a>
-        <a href="ontology.html" class="hover:text-gold2 font-serif">⬡ 本体</a>
-        <a href="books.html" class="text-gold2 font-serif">書 全文库</a>
-      </nav>
-    </div>
-  </div>
-</header>
-<main class="max-w-6xl mx-auto px-4 py-8">
-  <div class="flex items-end justify-between flex-wrap gap-3">
-    <div>
-      <p class="text-cinnabar font-serif tracking-[.3em] text-[12px] mb-1">籍 QUAN-CANG · 原 典 全 文</p>
-      <h1 class="font-serif font-bold text-[28px] md:text-[34px] text-ink">集藏原典库</h1>
-      <p class="text-ink2 text-[14.5px] mt-2 max-w-2xl leading-relaxed">殆知阁集藏全部典籍，按九类编次。<span id="tot" class="text-cinnabar font-semibold"></span>全部典籍已嵌入本站，点击「📖 站内阅读」即可在线阅览。</p>
-    </div>
-    <input id="q" type="search" placeholder="检索书名 / 著者…" class="w-full sm:w-72 px-3 py-2 rounded-md border border-ink/20 bg-white/80 text-[14px] focus:outline-none focus:border-cinnabar">
-  </div>
-  <div id="tabs" class="flex flex-wrap gap-2 text-[13px] mt-4"></div>
-  <div id="meta" class="text-[13px] text-ink3 mt-3 mb-3"></div>
-  <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
-  <div id="backBtn" style="display:none" class="mt-4"><button id="back" class="px-4 py-1.5 rounded-md border border-ink/25 text-ink text-[13px] hover:border-cinnabar hover:text-cinnabar">← 返回分类总览</button></div>
-  <div id="moreWrap" class="text-center mt-6" style="display:none"><button id="more" class="px-6 py-2 rounded-md border border-ink/25 text-ink text-[14px] hover:border-cinnabar hover:text-cinnabar">加载更多</button></div>
-</main>
-<script src="data/books.js"></script>
-<script>
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
-const BOOKS=window.JICANG_BOOKS||[];
-const CAT_MAP={baojuan:'宝卷',huaben:'话本',miyu:'谜语',sikubieji:'四库别集',wenping:'诗文评',wenzongji:'文宗集',xiaohua:'笑话',xiaoshuo:'小说',yanyi:'演义'};
-const CAT_ORDER=['sikubieji','wenzongji','wenping','xiaoshuo','yanyi','huaben','baojuan','xiaohua','miyu'];
-const CAT_TRIGRAM={sikubieji:'別',wenzongji:'總',wenping:'評',xiaoshuo:'說',yanyi:'演',huaben:'話',baojuan:'卷',xiaohua:'笑',miyu:'謎'};
-const CAT_COLOR={sikubieji:'#a8322d',wenzongji:'#2f6b5f',wenping:'#b8860b',xiaoshuo:'#6b3fa0',yanyi:'#31427b',huaben:'#b5651d',baojuan:'#8b2f2f',xiaohua:'#8b6f47',miyu:'#7a736a'};
-const group={};
-BOOKS.forEach(b=>{const k=b.cat_key||'other';(group[k]=group[k]||[]).push(b);});
-const cats=CAT_ORDER.filter(k=>group[k]);
-const palette=['#a8322d','#2f6b5f','#b8860b','#6b3fa0','#31427b','#b5651d','#4a8b7d','#c0524b','#7a736a'];
-const tabs=document.querySelector('#tabs'),grid=document.querySelector('#grid'),meta=document.querySelector('#meta'),moreWrap=document.querySelector('#moreWrap');
-const backBtn=document.querySelector('#backBtn');
-let cur='__overview',kw='',shown=0,list=[];const PAGE=60;
-document.querySelector('#tot').textContent=`共 ${BOOKS.length} 部。`;
-function overview(){
-  grid.innerHTML='';moreWrap.style.display='none';backBtn.style.display='none';
-  meta.textContent='按类浏览：点击下方分类查看典籍清单。';
-  cats.forEach((c,i)=>{
-    const n=(group[c]||[]).length;
-    const samples=(group[c]||[]).slice(0,3).map(b=>esc(b.title||b.id)).join('、');
-    const card=el(`<div class="cat-card rounded-xl bg-white/72 border border-ink/10 p-4">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2.5">
-          <span class="font-serif font-bold text-[32px] leading-none" style="color:${CAT_COLOR[c]}">${CAT_TRIGRAM[c]||'書'}</span>
-          <div>
-            <h2 class="font-serif font-bold text-[17px] text-ink">${esc(CAT_MAP[c]||c)}</h2>
-            <div class="text-[11.5px] text-ink3 tracking-wider">${esc(c)}</div>
-          </div>
+<body>
+<div id="topbar-slot"></div>
+<div class="layout">
+  <div id="sidebar-slot"></div>
+  <main class="content" style="padding:0;">
+    <section class="page-hero">
+      <h1>典<span class="accent">籍</span>阅读</h1>
+      <div class="sub">JI-BU WENXIAN · 集 部 全 藏</div>
+      <div class="search-bar">
+        <input id="searchInput" type="text" placeholder="检索书名、著者、朝代…" />
+      </div>
+    </section>
+
+    <div style="padding:24px var(--gutter,40px) 60px;max-width:1200px;margin:0 auto;width:100%;">
+      <div class="filter-row" id="filterRow"></div>
+
+      <div id="readerPanel" class="reader-panel">
+        <a class="back-btn" href="javascript:closeReader()">← 返回典籍列表</a>
+        <div class="reader-header">
+          <h2 id="readerTitle"></h2>
+          <div class="meta" id="readerMeta"></div>
         </div>
-        <span class="text-[22px] font-serif font-bold" style="color:${palette[i]}">${n}</span>
+        <div class="reader-body" id="readerBody">正在加载…</div>
       </div>
-      <p class="text-[12.5px] text-ink3 mt-2 truncate">${samples}…</p>
-    </div>`);
-    card.addEventListener('click',()=>{selectCat(c);});
-    grid.appendChild(card);
-  });
-}
-function selectCat(c){
-  cur=c;build();render(true);
-  [...tabs.children].forEach(x=>{x.className='px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar';});
-  const btn=tabs.querySelector(`[data-cat="${c.replace(/"/g,'\\"')}"]`);
-  if(btn) btn.className='px-3 py-1.5 rounded-md border bg-ink text-bone border-ink';
-  backBtn.style.display='block';
-}
-function build(){
-  list=(group[cur]||[]).filter(b=>{
-    if(!kw)return true;
-    const au=(b.authors||[]).map(x=>x.name).join(',');
-    return (b.title||b.id||'').includes(kw)||au.includes(kw);
-  });
-}
-function render(reset){
-  if(reset){grid.innerHTML='';shown=0;}
-  list.slice(shown,shown+PAGE).forEach(b=>{
-    const f=b.file||`texts/${b.cat_key}/${b.id}.js`;
-    const href=`reader.html?f=${encodeURIComponent(f.replace(/^texts\//,''))}`;
-    const au=(b.authors||[]).map(a=>a.dynasty?'['+a.dynasty+'] '+a.name:a.name).join('、');
-    const src=`<a class="lk text-[12px]" href="${esc(href)}">📖 站内阅读</a>`;
-    grid.appendChild(el(`<article class="rounded-lg bg-white/72 border border-ink/10 p-3 hover:border-cinnabar transition-colors">
-      <div class="flex items-start justify-between gap-2">
-        <h2 class="font-serif font-semibold text-[15px] text-ink leading-snug">${esc(b.title||b.id)}</h2>
-        <span class="tag bg-paper3 text-ink3 shrink-0">${esc(b.dynasty||'')}</span>
+
+      <div id="listPanel">
+        <div class="book-grid" id="bookGrid"></div>
+        <div class="empty-hint" id="emptyHint" style="display:none;">未找到匹配典籍</div>
       </div>
-      <div class="text-[12px] text-ink3 mt-1 truncate">${au||'佚名 / 未详'}</div>
-      <div class="mt-1.5">${src}</div>
-    </article>`));
-  });
-  shown+=Math.min(list.length-shown,PAGE);
-  meta.textContent=`「${CAT_MAP[cur]||cur}」共 ${list.length} 部，已显示 ${shown} 部。`;
-  moreWrap.style.display=shown>=list.length?'none':'block';
+    </div>
+  </main>
+</div>
+<div id="footer-slot"></div>
+
+<script>
+document.getElementById('topbar-slot').innerHTML = JC_Link.topbar('books');
+document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('books');
+document.getElementById('footer-slot').innerHTML = JC_Link.footer();
+JC_Link.initMobile();
+
+var BOOKS = Array.isArray(window.JICANG_BOOKS) ? window.JICANG_BOOKS : [];
+var keyMap = {sikubieji:'bieji',bieji:'bieji',siku_zongji:'zongji',wenzongji:'zongji',zongji:'zongji',
+  siku_shiwenping:'wenping',wenping:'wenping',shiwenping:'wenping',
+  siku_xiaoshuo:'xiaoshuo',xiaoshuo:'xiaoshuo',yanyi:'yanyi',huaben:'huaben',
+  baojuan:'baojuan',xiaohua:'xiaohua',miyu:'miyu'};
+var catName = {bieji:'别集',zongji:'总集',wenping:'文评',xiaoshuo:'小说',yanyi:'演义',huaben:'话本',baojuan:'宝卷',xiaohua:'笑话',miyu:'谜语'};
+var catOrder = ['all','bieji','zongji','wenping','xiaoshuo','yanyi','huaben','baojuan','xiaohua','miyu'];
+var catLabel = {all:'全部',bieji:'别集',zongji:'总集',wenping:'文评',xiaoshuo:'小说',yanyi:'演义',huaben:'话本',baojuan:'宝卷',xiaohua:'笑话',miyu:'谜语'};
+var curCat = 'all';
+var curKw = '';
+
+// 分类过滤按钮
+var fr = document.getElementById('filterRow');
+fr.innerHTML = catOrder.map(function(c){
+  return '<button data-cat="'+c+'" class="'+(c==='all'?'on':'')+'">'+catLabel[c]+'</button>';
+}).join('');
+fr.addEventListener('click',function(e){
+  if(e.target.tagName!=='BUTTON') return;
+  fr.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});
+  e.target.classList.add('on');
+  curCat = e.target.dataset.cat;
+  renderList();
+});
+
+document.getElementById('searchInput').addEventListener('input',function(e){
+  curKw = e.target.value.trim().toLowerCase();
+  renderList();
+});
+
+function renderList(){
+  var grid = document.getElementById('bookGrid');
+  var hint = document.getElementById('emptyHint');
+  var list = BOOKS.filter(function(b){
+    var k = keyMap[b.cat_key||b.category];
+    if(curCat!=='all' && k!==curCat) return false;
+    if(curKw){
+      var s = (b.title+' '+(b.authors||[]).map(function(a){return a.name||a;}).join(' ')+' '+(b.dynasty||'')).toLowerCase();
+      if(s.indexOf(curKw)<0) return false;
+    }
+    return true;
+  }).slice(0,500); // 防止一次渲染太多
+  if(!list.length){ grid.innerHTML=''; hint.style.display='block'; return; }
+  hint.style.display='none';
+  grid.innerHTML = list.map(function(b){
+    var k = keyMap[b.cat_key||b.category]||'bieji';
+    var auth = b.authors && b.authors[0] ? (b.authors[0].name||b.authors[0]) : '佚名';
+    var dyn = b.dynasty || '';
+    return '<a href="javascript:openReader(\''+b.id.replace(/'/g,"\\'")+'\')" class="book-card '+k+'">'+
+      '<div class="title">'+b.title+'</div>'+
+      '<div class="author">'+(dyn?'['+dyn+'] ':'')+auth+'</div>'+
+      '<div class="meta"><span class="badge">'+(catName[k]||'典籍')+'</span>'+
+        '<span>'+Math.round((b.chars||b.size||0)/10000)/10+'万字</span></div>'+
+    '</a>';
+  }).join('');
 }
-cats.forEach(c=>{
-  const n=(group[c]||[]).length;
-  const b=el(`<button data-cat="${esc(c)}" class="px-3 py-1.5 rounded-md border border-ink/25 text-ink hover:border-cinnabar hover:text-cinnabar">${esc(CAT_MAP[c]||c)} <span class="opacity-70">${n}</span></button>`);
-  b.addEventListener('click',()=>selectCat(c));
-  tabs.appendChild(b);
-});
-document.querySelector('#q').addEventListener('input',e=>{
-  kw=e.target.value.trim();
-  if(kw&&cur==='__overview') selectCat(cats[0]);
-  build();render(true);
-});
-document.querySelector('#more').addEventListener('click',()=>render(false));
-document.querySelector('#back').addEventListener('click',overview);
-overview();
+renderList();
+
+// === 阅读面板 ===
+var loadedTexts = {};
+function openReader(bid){
+  var book = BOOKS.find(function(b){return b.id===bid;});
+  if(!book) return;
+  document.getElementById('listPanel').style.display='none';
+  var rp = document.getElementById('readerPanel');
+  rp.classList.add('active');
+  document.getElementById('readerTitle').textContent = book.title;
+  var auth = book.authors && book.authors[0] ? (book.authors[0].name||book.authors[0]) : '佚名';
+  document.getElementById('readerMeta').textContent = (book.dynasty?book.dynasty+' · ':'') + auth + ' · ' + (catName[keyMap[book.cat_key||book.category]]||'典籍');
+  document.getElementById('readerBody').innerHTML = '正在加载原文…';
+  loadAndRender(book);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeReader(){
+  document.getElementById('readerPanel').classList.remove('active');
+  document.getElementById('listPanel').style.display='';
+}
+function loadAndRender(book){
+  var key = book.file;
+  if(loadedTexts[key]){ renderBook(book, loadedTexts[key]); return; }
+  var s=document.createElement('script');
+  s.src = key;
+  s.onload = function(){
+    // 约定：text 文件定义 window.JICANG_TEXT
+    var txt = window.JICANG_TEXT || window.TEXT || window.CURRENT_TEXT || '';
+    loadedTexts[key] = txt;
+    renderBook(book, txt);
+  };
+  s.onerror = function(){
+    document.getElementById('readerBody').innerHTML = '<p style="color:var(--zhu);">原文加载失败：'+key+'</p>';
+  };
+  document.head.appendChild(s);
+}
+function renderBook(book, txt){
+  if(!txt){ document.getElementById('readerBody').innerHTML = '<p>暂无原文。</p>'; return; }
+  // txt 可能是字符串或对象 {title, content/juan/...}
+  var html = '';
+  if(typeof txt === 'string'){
+    html = txt.split(/\n/).map(function(l){return l.trim()?'<p>'+escapeHtml(l)+'</p>':'';}).join('');
+  } else {
+    if(txt.title) html += '<h3>'+escapeHtml(txt.title)+'</h3>';
+    var c = txt.content || txt.text || txt.body;
+    if(c){
+      if(Array.isArray(c)){
+        c.forEach(function(j){
+          if(typeof j==='string'){html += '<p>'+escapeHtml(j)+'</p>';}
+          else {
+            if(j.title) html += '<h3>'+escapeHtml(j.title)+'</h3>';
+            var jc = j.content||j.text||'';
+            if(Array.isArray(jc)) jc=jc.join('\n');
+            html += (jc||'').split(/\n/).map(function(l){return l.trim()?'<p>'+escapeHtml(l)+'</p>':'';}).join('');
+          }
+        });
+      } else {
+        html += String(c).split(/\n/).map(function(l){return l.trim()?'<p>'+escapeHtml(l)+'</p>':'';}).join('');
+      }
+    }
+  }
+  document.getElementById('readerBody').innerHTML = html || '<p style="color:var(--ink-3);">原文数据格式暂不支持渲染。</p>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+
+// 支持 hash 直接定位分类
+if(location.hash){
+  var h = location.hash.slice(1);
+  if(catName[h]){
+    curCat = h;
+    fr.querySelectorAll('button').forEach(function(b){b.classList.toggle('on', b.dataset.cat===h);});
+    renderList();
+  }
+}
 </script>
 </body>
 </html>
