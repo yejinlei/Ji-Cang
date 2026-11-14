@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>本体总纲 · 四轴 × 七层 - 集藏本体论</title>
-<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
-<script src="https://aisearch-task.bj.bcebos.com/static/echarts-5.6.0.min.js"></script>
+<script src="vendor/tailwindcss-3.4.17.js"></script>
+<script src="vendor/echarts-5.6.0.min.js"></script>
 <script>
 tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:'#e6dcc8',ink:'#22201d',ink2:'#4a463f',ink3:'#7a736a',cinnabar:'#a8322d',seal:'#8b2f2f',jade:'#2f6b5f',gold:'#a9801f',violet:'#6b3fa0'},fontFamily:{serif:['Songti SC','STSong','SimSun','serif'],kai:['Kaiti SC','STKaiti','serif'],sans:['PingFang SC','HarmonyOS Sans SC','Microsoft YaHei','sans-serif']}}}};
 </script>
@@ -45,9 +45,9 @@ tailwind.config={theme:{extend:{colors:{paper:'#f7f3ea',paper2:'#efe7d8',paper3:
     <div class="overflow-x-auto rounded-xl border border-ink/10 bg-white/70">
       <table class="w-full text-[13.5px]">
         <thead class="bg-paper2 text-ink2"><tr>
-          <th class="text-left px-3 py-2">关系</th><th class="text-left px-3 py-2">英文</th>
+          <th class="text-left px-3 py-2">关系</th><th class="text-left px-3 py-2">标识</th>
           <th class="text-left px-3 py-2">域 → 值域</th><th class="text-left px-3 py-2">含义</th>
-          <th class="text-right px-3 py-2">实例</th></tr></thead>
+          <th class="text-left px-3 py-2">轴线</th></tr></thead>
         <tbody id="relBody"></tbody>
       </table>
     </div>
@@ -71,13 +71,15 @@ const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d
 // 层级轴
 (function(){
   const box=$('#layers');
+  const LC={L0:'#7a736a',L1:'#8B2500',L2:'#B8860B',L3:'#2F4F4F',L4:'#6b3fa0',L5:'#2f6b5f',L6:'#b5651d'};
   JICANG_LAYERS.forEach(L=>{
-    const tags=L.concepts.map(c=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(c.name)}</span>`).join('');
+    const members=JICANG_TBOX.classes.filter(c=>c.layer===L.id);
+    const tags=members.slice(0,10).map(c=>`<span class="tag bg-paper3 text-ink2 border border-ink/10">${esc(c.label)}</span>`).join('');
     box.appendChild(el(`<article class="rounded-xl bg-white/72 border border-ink/10 p-4">
       <div class="flex items-center gap-3">
-        <span class="w-[36px] h-[36px] rounded-lg flex items-center justify-center text-paper font-serif font-bold text-[13px] shrink-0" style="background:${L.color}">${L.id}</span>
+        <span class="w-[36px] h-[36px] rounded-lg flex items-center justify-center text-paper font-serif font-bold text-[13px] shrink-0" style="background:${LC[L.id]||'#4a463f'}">${L.id}</span>
         <div><h3 class="font-serif font-bold text-[17px] text-ink">${esc(L.name)}</h3>
-        <div class="text-[11px] tracking-wider text-ink3 uppercase">${esc(L.en)}</div></div>
+        <div class="text-[11px] tracking-wider text-ink3">${L.cls} 个类</div></div>
       </div>
       <p class="text-[13.5px] text-ink2 leading-relaxed mt-2">${esc(L.desc)}</p>
       <div class="mt-2.5 flex flex-wrap gap-1.5">${tags}</div></article>`));
@@ -96,13 +98,14 @@ const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d
 // 关系轴
 (function(){
   const t=$('#relBody');
+  const AC={A1:'#8B2500',A2:'#B8860B',A3:'#2f6b5f',A4:'#6b3fa0'};
   JICANG_RELATIONS.forEach(r=>{
     t.appendChild(el(`<tr class="border-t border-ink/8">
-      <td class="px-3 py-2"><span class="inline-flex items-center gap-1.5"><span class="w-[9px] h-[9px] rounded-full" style="background:${r.color}"></span>${esc(r.name)}</span></td>
-      <td class="px-3 py-2 text-ink3">${esc(r.en)}</td>
-      <td class="px-3 py-2 text-ink2">${esc(r.from)} → ${esc(r.to)}</td>
+      <td class="px-3 py-2"><span class="inline-flex items-center gap-1.5"><span class="w-[9px] h-[9px] rounded-full" style="background:${AC[r.axis]||'#7a736a'}"></span>${esc(r.name)}</span></td>
+      <td class="px-3 py-2 text-ink3">${esc(r.id)}</td>
+      <td class="px-3 py-2 text-ink2">${esc(r.domain)} → ${esc(r.range)}</td>
       <td class="px-3 py-2 text-ink2">${esc(r.desc)}</td>
-      <td class="px-3 py-2 text-right font-semibold text-cinnabar">${r.count}</td></tr>`));
+      <td class="px-3 py-2 text-ink3">${esc(r.axis)}</td></tr>`));
   });
 })();
 
@@ -113,8 +116,8 @@ const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d
     {name:'文人',items:JICANG_NETWORK.nodes.map(n=>n.n)},
     {name:'流派',items:JICANG_NETWORK.schools.map(s=>s.name)},
     {name:'意象',items:JICANG_NETWORK.imagery.map(i=>i.name)},
-    {name:'文体',items:JICANG_CLASSES[0].members},
-    {name:'概念',items:JICANG_CLASSES[4].members}
+    {name:'文体',items:JICANG_CLASSES[3].members},
+    {name:'概念',items:JICANG_CLASSES[1].members}
   ];
   const tabs=$('#instTabs'),body=$('#instBody');
   function render(g){

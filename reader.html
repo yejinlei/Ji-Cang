@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>典籍阅览 · 集藏本体论</title>
-<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<script src="vendor/tailwindcss-3.4.17.js"></script>
 <style>
 :root{--bg:#f5efe0;--paper:#fdf8ec;--ink:#2a1f14;--ink2:#5a4a32;--accent:#8b1a1a;--line:#c9b99a;--gold:#a67c2e;}
 html{scroll-behavior:smooth;}
@@ -132,9 +132,15 @@ async function loadBook() {
   }
   const {meta} = found;
   try {
-    const resp = await fetch(meta.f, {cache:'no-cache'});
-    if (!resp.ok) throw new Error('HTTP '+resp.status);
-    bookData = await resp.json();
+    bookData = await new Promise((resolve,reject)=>{
+      window.__JC_TEXT__ = null;
+      const s = document.createElement('script');
+      s.src = meta.f;
+      s.onload = ()=> resolve(window.__JC_TEXT__);
+      s.onerror = ()=> reject(new Error('无法加载 '+meta.f));
+      document.head.appendChild(s);
+    });
+    if (!bookData) throw new Error('正文为空');
     document.title = `${bookData.title} · 集藏本体论`;
     document.getElementById('book-title').textContent = bookData.title + (bookData.authors && bookData.authors[0] ? ` · ${bookData.authors.map(a=>(a.dynasty?`[${a.dynasty}]`:'')+a.name).join('、')}` : '');
     document.getElementById('vol-count').textContent = `共 ${bookData.volumes.length} 卷`;
