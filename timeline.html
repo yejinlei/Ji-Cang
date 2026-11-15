@@ -7,46 +7,260 @@
   <title>时序脉络 · 集藏本体论</title>
   <link rel="stylesheet" href="css/yijing.css">
   <script src="js/echarts.min.js"></script>
+  <script src="js/compass.js"></script>
+  <script src="js/theme-switch.js"></script>
+  <script src="data/ontology.js"></script>
   <script src="data/books.js"></script>
   <script src="data/individuals.js"></script>
+  <script src="data/network.js"></script>
+  <script src="data/theory.js"></script>
   <script src="js/shell.js"></script>
+  <style>
+    .page-hero{text-align:center;padding:56px 20px 40px;position:relative;overflow:hidden;
+      background:radial-gradient(ellipse 800px 400px at 50% 40%, rgba(40,70,130,.25) 0%, transparent 70%);border-bottom:1px solid var(--line);}
+    .page-hero .hero-sym{font-size:72px;color:var(--zhu);margin-bottom:8px;font-family:'STKaiti',KaiTi,serif;font-weight:700;text-shadow:0 0 28px rgba(217,74,74,.5);line-height:1;}
+    .page-hero h1{font-size:42px;letter-spacing:8px;margin:0 0 8px;color:var(--ink);}
+    .page-hero h1 .accent{color:var(--zhu);}
+    .page-hero .sub{color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);}
+    .page-hero .desc{max-width:720px;margin:16px auto 0;color:var(--ink-2);font-size:14px;line-height:1.9;}
+    .page-body{padding:32px 40px 60px;max-width:1280px;margin:0 auto;width:100%;}
+    .section{margin-bottom:44px;}
+    .section-title{font-size:22px;color:var(--gold-bright);letter-spacing:4px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-family:var(--font-serif);}
+    .section-title .icon{color:var(--zhu);margin-right:10px;font-family:'STKaiti',serif;font-size:24px;}
+    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+    .stat-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px;text-align:center;border-top:2px solid var(--zhu);}
+    .stat-box .n{font-size:26px;color:var(--gold-bright);font-weight:700;letter-spacing:2px;font-family:var(--font-serif);}
+    .stat-box .l{color:var(--ink-2);font-size:12px;letter-spacing:2px;margin-top:4px;}
+    .chart-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;min-height:420px;}
+    .chart-tall{min-height:620px;}
+
+    .dynasty-flow{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:24px;}
+    .dy-block{padding:14px 8px;text-align:center;background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-md);border-top:3px solid var(--zhu);transition:all .25s;cursor:pointer;position:relative;}
+    .dy-block:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 4px 16px rgba(212,176,121,.15);}
+    .dy-block .dy-name{font-size:20px;color:var(--gold-bright);letter-spacing:3px;font-family:'STKaiti',serif;font-weight:700;}
+    .dy-block .dy-years{font-size:10px;color:var(--ink-3);letter-spacing:1px;margin-top:3px;}
+    .dy-block .dy-count{font-size:18px;color:var(--zhu);font-weight:700;margin-top:8px;font-family:var(--font-serif);}
+    .dy-block .dy-sub{font-size:10px;color:var(--ink-3);letter-spacing:1px;}
+    .dy-block.active{border-color:var(--gold);background:rgba(212,176,121,.1);}
+
+    .dy-detail{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:24px;}
+    .dy-detail h3{margin:0 0 6px;color:var(--gold-bright);font-size:26px;letter-spacing:4px;font-family:'STKaiti',serif;}
+    .dy-detail .dy-era{color:var(--zhu);font-size:13px;letter-spacing:2px;margin-bottom:14px;}
+    .dy-detail p{color:var(--ink-2);font-size:14px;line-height:1.9;margin:0 0 14px;}
+    .dy-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}
+    .dy-st{background:rgba(212,176,121,.05);border:1px solid var(--line);border-radius:var(--radius-md);padding:12px;text-align:center;}
+    .dy-st .n{font-size:22px;color:var(--gold-bright);font-weight:700;font-family:var(--font-serif);letter-spacing:1px;}
+    .dy-st .l{color:var(--ink-3);font-size:11px;letter-spacing:1px;margin-top:3px;}
+    .dy-books{margin-top:14px;}
+    .dy-books h4{color:var(--gold);font-size:15px;letter-spacing:2px;margin:12px 0 8px;}
+    .dy-book-list{display:flex;flex-wrap:wrap;gap:6px;}
+    .dy-book-tag{padding:4px 10px;background:rgba(217,74,74,.08);border:1px solid rgba(217,74,74,.2);border-radius:3px;color:var(--ink);font-size:12px;cursor:pointer;transition:all .2s;font-family:var(--font-kai);}
+    .dy-book-tag:hover{background:rgba(212,176,121,.15);border-color:var(--gold);color:var(--gold-bright);}
+    .dy-authors{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+    .dy-auth{padding:3px 10px;background:rgba(212,176,121,.08);border:1px solid var(--line);border-radius:12px;color:var(--gold);font-size:12px;}
+    .dy-schools{margin-top:14px;}
+    .dy-schools h4{color:var(--zhu);font-size:15px;letter-spacing:2px;margin:12px 0 8px;}
+    .dy-school-list{display:flex;flex-wrap:wrap;gap:6px;}
+    .dy-school-tag{padding:4px 10px;background:rgba(217,74,74,.08);border:1px solid rgba(217,74,74,.2);border-radius:3px;color:var(--zhu);font-size:12px;letter-spacing:1px;}
+    .dy-theory{margin-top:10px;padding:10px 14px;background:rgba(217,74,74,.05);border-left:3px solid var(--zhu);border-radius:0 var(--radius-md) var(--radius-md) 0;color:var(--ink-2);font-size:13px;line-height:1.8;font-family:var(--font-kai);}
+
+    @media(max-width:900px){.dynasty-flow{grid-template-columns:repeat(4,1fr);}.dy-stats{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:640px){.dynasty-flow{grid-template-columns:repeat(2,1fr);}.page-body{padding:24px 16px 40px;}.page-hero h1{font-size:28px;}}
+  </style>
 </head>
 <body>
+<script>window.__JC_PAGE__='timeline';</script>
 <div id="topbar-slot"></div>
 <div class="layout">
   <div id="sidebar-slot"></div>
   <main class="content" style="padding:0;">
-    <section class="hero" style="min-height:50vh;padding:80px 20px 40px;">
-      <div style="font-size:48px;color:var(--zhu);margin-bottom:10px;font-family:'STKaiti',KaiTi,serif;">�</div>
-      <h1 style="font-size:44px;letter-spacing:8px;margin:0 0 6px;color:var(--ink);">时序脉络</h1>
-      <div class="subtitle" style="color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);">TIMELINE</div>
+    <section class="page-hero">
+      <div class="hero-sym">史</div>
+      <h1>时<span class="accent">序</span>脉络</h1>
+      <div class="sub">TIMELINE · 朝 代 · 文 运 · 典 籍</div>
+      <p class="desc">文变染乎世情，兴废系乎时序。本页以朝代为经、典籍为纬，呈现集部文献自先秦至民国的创作分布、代表人物、主导流派与文论思潮，直览中国古典文学三千年的文运起伏。</p>
     </section>
-    <div style="padding:24px var(--gutter,40px) 60px;max-width:1200px;margin:0 auto;width:100%;">
+    <div class="page-body">
+
+      <div class="stat-row" id="statRow"></div>
+
+      <!-- 历朝文运柱状图 -->
       <section class="section">
-        <div class="section-title"><span class="icon">○</span>模块建设中</div>
-        <p style="color:var(--ink-2);line-height:2;font-size:15px;">
-          本板块正在基于入库的 1669 部典籍、1363 位著者数据进行本体化建模，将按四步方案推进：
-        </p>
-        <ul style="color:var(--ink-3);line-height:2;">
-          <li>单书本体实例化（ABox：作品-作者-朝代-文体-意象）</li>
-          <li>单书下钻页（本体详情页，列示属性、关系、原文）</li>
-          <li>本页面（时序脉络）由全量实例自动汇总生成</li>
-          <li>跨页实体联动、关系图谱可视化</li>
-        </ul>
-        <div style="margin-top:20px;">
-          <a href="books.html" class="btn btn-primary">籍 进入典籍库</a>
-          <a href="index.html" class="btn" style="margin-left:8px;">← 返回总览</a>
-        </div>
+        <div class="section-title"><span class="icon">運</span>历朝文运 · 典籍创作量</div>
+        <div class="chart-box" id="eraChart" style="min-height:380px;"></div>
       </section>
+
+      <!-- 历朝典籍分布 + 九类堆叠 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">部</span>历朝九类典籍分布</div>
+        <div class="chart-box chart-tall" id="stackChart"></div>
+      </section>
+
+      <!-- 朝代流 + 详情 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">世</span>朝代详情</div>
+        <div class="dynasty-flow" id="dynastyFlow"></div>
+        <div class="dy-detail" id="dyDetail"></div>
+      </section>
+
     </div>
   </main>
 </div>
 <div id="footer-slot"></div>
 <script>
 document.getElementById('topbar-slot').innerHTML = JC_Link.topbar('timeline');
-document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('');
+document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('timeline');
 document.getElementById('footer-slot').innerHTML = JC_Link.footer();
 JC_Link.initMobile();
+
+var BOOKS = window.JICANG_BOOKS || [];
+var NET = window.JICANG_NETWORK || {nodes:[],links:[],schools:[],imagery:[]};
+var THR = window.JICANG_THEORY || {concepts:[]};
+
+var DY_ORDER = [
+  {k:'先秦',years:'远古—前221',color:'#8B2500',feature:'风骚源头，诸子散文，楚辞烂漫。'},
+  {k:'秦',years:'前221—前206',color:'#5C4033',feature:'书同文，焚书坑儒，文学寥落。'},
+  {k:'汉',years:'前202—220',color:'#B8860B',feature:'汉赋铺陈，乐府民歌，《史记》雄文。'},
+  {k:'三国',years:'220—280',color:'#2F4F4F',feature:'建安风骨，三曹七子，慷慨悲凉。'},
+  {k:'晋',years:'265—420',color:'#6a93b8',feature:'正始之音，左思风力，陶渊明开田园。'},
+  {k:'南北朝',years:'420—589',color:'#9c7ab8',feature:'山水诗兴，永明声律，《文心雕龙》体大思精。'},
+  {k:'唐',years:'618—907',color:'#d94a4a',feature:'诗国高潮，李杜韩白，古文运动，传奇始盛。'},
+  {k:'五代',years:'907—960',color:'#b88a6a',feature:'花间词派，南唐二主，词体定型。'},
+  {k:'宋',years:'960—1279',color:'#d4b079',feature:'散文八家，江西诗派，苏辛豪放词，理学兴。'},
+  {k:'金',years:'1115—1234',color:'#7fb87a',feature:'元好问丧乱诗，借才异代。'},
+  {k:'元',years:'1271—1368',color:'#b86a6a',feature:'元曲四大家，杂剧南戏，话本演义兴起。'},
+  {k:'明',years:'1368—1644',color:'#6a93b8',feature:'前后七子，公安竟陵，三言二拍，四大奇书。'},
+  {k:'清',years:'1644—1912',color:'#9c7ab8',feature:'桐城古文，神韵格调性灵肌理，红楼聊斋儒林。'},
+  {k:'民国',years:'1912—1949',color:'#7fb87a',feature:'西学东渐，王国维境界说，小说革命。'}
+];
+
+// 聚合
+var dyData = {};
+DY_ORDER.forEach(function(d){dyData[d.k]={books:[],authors:{},schools:[],concepts:[]};});
+BOOKS.forEach(function(b){
+  var dy = b.dynasty;
+  if(!dy||!dyData[dy])dy='不详';
+  if(!dyData[dy]){dyData[dy]={books:[],authors:{},schools:[],concepts:[]};}
+  dyData[dy].books.push(b);
+  (b.authors||[]).forEach(function(a){dyData[dy].authors[a.name||a]=1;});
+});
+NET.schools.forEach(function(s){
+  var era = s.era;
+  DY_ORDER.forEach(function(d){
+    if(era.indexOf(d.k)>=0||(d.k==='唐'&&(era.indexOf('盛唐')>=0||era.indexOf('中唐')>=0||era.indexOf('晚唐')>=0))||
+       (d.k==='宋'&&(era==='北宋'||era==='南宋'||era==='两宋'))||
+       (d.k==='三国'&&era==='汉末魏初'||era==='魏正始')){
+      if(dyData[d.k])dyData[d.k].schools.push(s);
+    }
+  });
+});
+THR.concepts.forEach(function(c){
+  if(dyData[c.d])dyData[c.d].concepts.push(c);
+});
+
+var nDyn = DY_ORDER.filter(function(d){return dyData[d.k].books.length>0;}).length;
+var maxD = DY_ORDER.reduce(function(m,d){return Math.max(m,dyData[d.k].books.length);},0);
+document.getElementById('statRow').innerHTML = [
+  {n:BOOKS.length,l:'入库典籍'},
+  {n:nDyn,l:'覆盖朝代'},
+  {n:NET.schools.length,l:'文学流派'},
+  {n:THR.concepts.length,l:'文论概念'}
+].map(function(s){return '<div class="stat-box"><div class="n">'+s.n+'</div><div class="l">'+s.l+'</div></div>';}).join('');
+
+// 柱状图
+var dys = DY_ORDER.map(function(d){return d.k;});
+var dyCounts = DY_ORDER.map(function(d){return dyData[d.k].books.length;});
+echarts.init(document.getElementById('eraChart')).setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis',formatter:function(p){return p[0].name+'<br/>入库典籍：<b>'+p[0].value+'</b> 部';}},
+  grid:{left:50,right:30,top:30,bottom:40},
+  xAxis:{type:'category',data:dys,axisLabel:{color:'#d4d0c8'},axisLine:{lineStyle:{color:'rgba(212,176,121,.3)'}}},
+  yAxis:{type:'value',axisLabel:{color:'#a8a098'},splitLine:{lineStyle:{color:'rgba(212,176,121,.1)'}}},
+  series:[{type:'bar',data:dyCounts.map(function(v,i){return {value:v,itemStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:DY_ORDER[i].color},{offset:1,color:'rgba(217,74,74,.15)'}]},borderRadius:[4,4,0,0]}};}),barWidth:'55%'}]
+});
+
+// 九类堆叠图
+var cats = [
+  {k:'sikubieji',n:'别集'},
+  {k:'zongji',n:'总集'},
+  {k:'wenping',n:'文评'},
+  {k:'xiaoshuo',n:'小说'},
+  {k:'yanyi',n:'演义'},
+  {k:'huaben',n:'话本'},
+  {k:'baojuan',n:'宝卷'},
+  {k:'xiaohua',n:'笑话'},
+  {k:'miyu',n:'谜语'}
+];
+var catColors = ['#d94a4a','#d4b079','#6a93b8','#7fb87a','#9c7ab8','#b88a6a','#b86a6a','#b8b06a','#6ab8a8'];
+var stackSeries = cats.map(function(c,ci){
+  return {name:c.n,type:'bar',stack:'total',
+    data:DY_ORDER.map(function(d){
+      return dyData[d.k].books.filter(function(b){return b.cat_key===c.k;}).length;
+    }),
+    itemStyle:{color:catColors[ci]},
+    emphasis:{focus:'series'}
+  };
+});
+echarts.init(document.getElementById('stackChart')).setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
+  legend:{data:cats.map(function(c){return c.n;}),textStyle:{color:'#a8a098'},top:0},
+  grid:{left:50,right:30,top:40,bottom:40},
+  xAxis:{type:'category',data:dys,axisLabel:{color:'#d4d0c8'},axisLine:{lineStyle:{color:'rgba(212,176,121,.3)'}}},
+  yAxis:{type:'value',axisLabel:{color:'#a8a098'},splitLine:{lineStyle:{color:'rgba(212,176,121,.1)'}}},
+  series:stackSeries
+});
+
+// 朝代详情
+var curDy = DY_ORDER.reduce(function(a,b){return (dyData[b.k].books.length>dyData[a.k].books.length)?b:a;},DY_ORDER[0]);
+document.getElementById('dynastyFlow').innerHTML = DY_ORDER.map(function(d){
+  var cnt = dyData[d.k].books.length;
+  var auN = Object.keys(dyData[d.k].authors).length;
+  return '<div class="dy-block '+(d.k===curDy.k?'active':'')+'" data-dy="'+d.k+'">'+
+    '<div class="dy-name">'+d.k+'</div>'+
+    '<div class="dy-years">'+d.years+'</div>'+
+    '<div class="dy-count">'+cnt+'</div>'+
+    '<div class="dy-sub">'+auN+'人</div>'+
+    '</div>';
+}).join('');
+
+function renderDy(dy){
+  var d = DY_ORDER.find(function(x){return x.k===dy;});
+  var dat = dyData[dy];
+  var nB = dat.books.length;
+  var nA = Object.keys(dat.authors).length;
+  var nS = dat.schools.length;
+  var nC = dat.concepts.length;
+  var topBooks = dat.books.slice().sort(function(a,b){return (b.chars||0)-(a.chars||0);}).slice(0,18);
+  var topAuthors = Object.keys(dat.authors).slice(0,20);
+  var schoolsHtml = nS?'<div class="dy-schools"><h4>● 主要流派/时代文风</h4><div class="dy-school-list">'+
+    dat.schools.map(function(s){return '<span class="dy-school-tag">'+s.name+'</span>';}).join('')+'</div></div>':'';
+  var theoryHtml = nC?'<div class="dy-theory"><b style="color:var(--zhu);">文论思潮：</b>'+
+    dat.concepts.map(function(c){return '「'+c.name+'」——'+c.note;}).join('； ')+'</div>':'';
+  document.getElementById('dyDetail').innerHTML =
+    '<h3>'+dy+' <span style="color:var(--zhu);font-size:16px;letter-spacing:2px;">· '+d.years+'</span></h3>'+
+    '<div class="dy-era">'+d.feature+'</div>'+
+    '<div class="dy-stats">'+
+      '<div class="dy-st"><div class="n">'+nB+'</div><div class="l">入库典籍</div></div>'+
+      '<div class="dy-st"><div class="n">'+nA+'</div><div class="l">可考著者</div></div>'+
+      '<div class="dy-st"><div class="n">'+nS+'</div><div class="l">主导流派</div></div>'+
+      '<div class="dy-st"><div class="n">'+nC+'</div><div class="l">文论概念</div></div>'+
+    '</div>'+
+    '<div class="dy-books"><h4>● 代表典籍（按篇幅）</h4><div class="dy-book-list">'+
+      topBooks.map(function(b){return '<span class="dy-book-tag" onclick="location.href=\'books.html#%21/read/'+encodeURIComponent(b.id)+'\'">'+b.title+'</span>';}).join('')+
+    '</div></div>'+
+    (topAuthors.length?'<div class="dy-books"><h4>● 主要著者</h4><div class="dy-authors">'+
+      topAuthors.map(function(a){return '<span class="dy-auth">'+a+'</span>';}).join('')+'</div></div>':'')+
+    schoolsHtml+theoryHtml;
+}
+renderDy(curDy.k);
+document.querySelectorAll('.dy-block').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.dy-block').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    renderDy(b.getAttribute('data-dy'));
+  });
+});
 </script>
 </body>
 </html>
