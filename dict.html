@@ -4,40 +4,104 @@
   <script src="js/theme-init.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>文论体系 · 集藏本体论</title>
+  <title>文论词典 · 集藏本体论</title>
   <link rel="stylesheet" href="css/yijing.css">
   <script src="js/echarts.min.js"></script>
+  <script src="js/compass.js"></script>
+  <script src="js/theme-switch.js"></script>
+  <script src="data/ontology.js"></script>
   <script src="data/books.js"></script>
   <script src="data/individuals.js"></script>
+  <script src="data/network.js"></script>
+  <script src="data/theory.js"></script>
   <script src="js/shell.js"></script>
+  <style>
+    .page-hero{text-align:center;padding:56px 20px 40px;position:relative;overflow:hidden;
+      background:radial-gradient(ellipse 800px 400px at 50% 40%, rgba(40,70,130,.25) 0%, transparent 70%);border-bottom:1px solid var(--line);}
+    .page-hero .hero-sym{font-size:72px;color:var(--zhu);margin-bottom:8px;font-family:'STKaiti',KaiTi,serif;font-weight:700;text-shadow:0 0 28px rgba(217,74,74,.5);line-height:1;}
+    .page-hero h1{font-size:42px;letter-spacing:8px;margin:0 0 8px;color:var(--ink);}
+    .page-hero h1 .accent{color:var(--zhu);}
+    .page-hero .sub{color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);}
+    .page-hero .desc{max-width:720px;margin:16px auto 0;color:var(--ink-2);font-size:14px;line-height:1.9;}
+    .page-body{padding:32px 40px 60px;max-width:1280px;margin:0 auto;width:100%;}
+    .section{margin-bottom:44px;}
+    .section-title{font-size:22px;color:var(--gold-bright);letter-spacing:4px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-family:var(--font-serif);}
+    .section-title .icon{color:var(--zhu);margin-right:10px;font-family:'STKaiti',serif;font-size:24px;}
+    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+    .stat-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px;text-align:center;border-top:2px solid var(--zhu);}
+    .stat-box .n{font-size:26px;color:var(--gold-bright);font-weight:700;letter-spacing:2px;font-family:var(--font-serif);}
+    .stat-box .l{color:var(--ink-2);font-size:12px;letter-spacing:2px;margin-top:4px;}
+
+    .search-box{margin-bottom:20px;position:relative;}
+    .search-box input{width:100%;padding:12px 18px 12px 46px;background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);color:var(--ink);font-size:15px;letter-spacing:2px;font-family:var(--font-kai);outline:none;transition:all .2s;}
+    .search-box input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,176,121,.12);}
+    .search-box::before{content:"🔍";position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:16px;opacity:.5;}
+
+    .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+    .filter-chip{padding:6px 14px;border:1px solid var(--line);border-radius:20px;color:var(--ink-2);cursor:pointer;font-size:13px;letter-spacing:1px;background:transparent;transition:all .2s;}
+    .filter-chip:hover,.filter-chip.on{background:rgba(212,176,121,.12);color:var(--gold-bright);border-color:var(--gold);}
+
+    .concept-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+    .concept-card{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px 22px;border-left:3px solid var(--zhu);transition:all .25s;}
+    .concept-card:hover{border-color:var(--gold);box-shadow:0 4px 20px rgba(212,176,121,.12);transform:translateY(-2px);}
+    .cc-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+    .cc-head h3{margin:0;color:var(--gold-bright);letter-spacing:3px;font-size:20px;font-family:'STKaiti',serif;}
+    .cc-head .cc-dy{color:var(--zhu);font-size:12px;letter-spacing:2px;font-family:var(--font-kai);padding:2px 8px;border-radius:10px;background:rgba(217,74,74,.1);}
+    .cc-head .cc-src{color:var(--ink-3);font-size:11px;letter-spacing:1px;}
+    .cc-quote{background:rgba(217,74,74,.06);border-left:2px solid var(--zhu);padding:10px 14px;border-radius:0 var(--radius-md) var(--radius-md) 0;color:var(--ink);font-family:var(--font-kai);font-size:15px;line-height:1.9;margin:10px 0;}
+    .cc-quote .cc-src{display:block;text-align:right;color:var(--ink-3);font-size:11px;margin-top:4px;letter-spacing:1px;font-family:var(--font-sans);}
+    .cc-note{color:var(--ink-2);font-size:13px;line-height:1.85;margin:0;}
+
+    /* 名句长廊 */
+    .quotes-wall{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+    .qw-card{background:linear-gradient(135deg,rgba(217,74,74,.04),rgba(212,176,121,.04));border:1px solid var(--line);border-radius:var(--radius-lg);padding:24px;position:relative;border-left:3px solid var(--gold);}
+    .qw-card::before{content:"「";position:absolute;left:8px;top:4px;font-size:40px;color:var(--gold);opacity:.3;font-family:serif;line-height:1;}
+    .qw-card .qw-text{color:var(--ink);font-family:'STKaiti',KaiTi,serif;font-size:20px;line-height:1.9;letter-spacing:2px;margin:0 0 12px;padding-left:20px;}
+    .qw-card .qw-meta{text-align:right;color:var(--ink-3);font-size:12px;letter-spacing:2px;}
+    .qw-card .qw-meta b{color:var(--zhu);font-weight:500;font-family:'STKaiti',serif;font-size:14px;}
+
+    .chart-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;min-height:420px;}
+
+    @media(max-width:900px){.concept-list,.quotes-wall{grid-template-columns:1fr;}}
+    @media(max-width:640px){.page-body{padding:24px 16px 40px;}.page-hero h1{font-size:28px;}}
+  </style>
 </head>
 <body>
+<script>window.__JC_PAGE__='dict';</script>
 <div id="topbar-slot"></div>
 <div class="layout">
   <div id="sidebar-slot"></div>
   <main class="content" style="padding:0;">
-    <section class="hero" style="min-height:50vh;padding:80px 20px 40px;">
-      <div style="font-size:48px;color:var(--zhu);margin-bottom:10px;font-family:'STKaiti',KaiTi,serif;">�</div>
-      <h1 style="font-size:44px;letter-spacing:8px;margin:0 0 6px;color:var(--ink);">文论体系</h1>
-      <div class="subtitle" style="color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);">DISCOURSE</div>
+    <section class="page-hero">
+      <div class="hero-sym">論</div>
+      <h1>文<span class="accent">论</span>词典</h1>
+      <div class="sub">POETICS · 范 畴 · 名 句 · 思 潮</div>
+      <p class="desc">从"诗言志"到"境界说"，两千余年中国文论开出数十个核心范畴：气、风骨、神思、滋味、意境、妙悟、神韵、格调、性灵、肌理……每一个概念都凝聚着一代文学精神，本页收录三十六条文论核心概念及历代名句。</p>
     </section>
-    <div style="padding:24px var(--gutter,40px) 60px;max-width:1200px;margin:0 auto;width:100%;">
+    <div class="page-body">
+
+      <div class="stat-row" id="statRow"></div>
+
+      <!-- 朝代分布 -->
       <section class="section">
-        <div class="section-title"><span class="icon">○</span>模块建设中</div>
-        <p style="color:var(--ink-2);line-height:2;font-size:15px;">
-          本板块正在基于入库的 1669 部典籍、1363 位著者数据进行本体化建模，将按四步方案推进：
-        </p>
-        <ul style="color:var(--ink-3);line-height:2;">
-          <li>单书本体实例化（ABox：作品-作者-朝代-文体-意象）</li>
-          <li>单书下钻页（本体详情页，列示属性、关系、原文）</li>
-          <li>本页面（文论体系）由全量实例自动汇总生成</li>
-          <li>跨页实体联动、关系图谱可视化</li>
-        </ul>
-        <div style="margin-top:20px;">
-          <a href="books.html" class="btn btn-primary">籍 进入典籍库</a>
-          <a href="index.html" class="btn" style="margin-left:8px;">← 返回总览</a>
-        </div>
+        <div class="section-title"><span class="icon">變</span>文论思潮演变</div>
+        <div class="chart-box" id="evoChart"></div>
       </section>
+
+      <!-- 名句长廊 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">章</span>历代名句长廊</div>
+        <div class="quotes-wall" id="quotesWall"></div>
+      </section>
+
+      <!-- 文论概念词典 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">典</span>文论概念词典</div>
+        <div class="search-box"><input type="text" id="ccSearch" placeholder="检索概念、原文、出处……"></div>
+        <div class="filter-bar" id="dyFilter"></div>
+        <div class="concept-list" id="conceptList"></div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -47,6 +111,83 @@ document.getElementById('topbar-slot').innerHTML = JC_Link.topbar('dict');
 document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('theory');
 document.getElementById('footer-slot').innerHTML = JC_Link.footer();
 JC_Link.initMobile();
+
+var THR = window.JICANG_THEORY || {concepts:[],quotes:[]};
+var concepts = THR.concepts || [];
+var quotes = THR.quotes || [];
+
+var dys = [];
+concepts.forEach(function(c){if(dys.indexOf(c.d)<0)dys.push(c.d);});
+var DY_ORDER = ['先秦','汉','魏','西晋','南朝齐','南朝梁','唐','北宋','南宋','明','清','近代'];
+dys.sort(function(a,b){return DY_ORDER.indexOf(a)-DY_ORDER.indexOf(b);});
+
+document.getElementById('statRow').innerHTML = [
+  {n:concepts.length,l:'文论概念'},
+  {n:quotes.length,l:'名句选录'},
+  {n:dys.length,l:'覆盖朝代'},
+  {n:'2000+',l:'年跨度'}
+].map(function(s){return '<div class="stat-box"><div class="n">'+s.n+'</div><div class="l">'+s.l+'</div></div>';}).join('');
+
+// 思潮演变（按朝代概念数）
+var dyCount = {};
+concepts.forEach(function(c){dyCount[c.d]=(dyCount[c.d]||0)+1;});
+var orderedDys = DY_ORDER.filter(function(d){return dyCount[d];});
+echarts.init(document.getElementById('evoChart')).setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis'},
+  grid:{left:60,right:30,top:30,bottom:50},
+  xAxis:{type:'category',data:orderedDys,axisLabel:{color:'#d4d0c8',rotate:30},axisLine:{lineStyle:{color:'rgba(212,176,121,.3)'}}},
+  yAxis:{type:'value',name:'概念数',nameTextStyle:{color:'#a8a098'},axisLabel:{color:'#a8a098'},splitLine:{lineStyle:{color:'rgba(212,176,121,.1)'}}},
+  series:[{
+    type:'line',data:orderedDys.map(function(d){return dyCount[d];}),smooth:true,symbol:'circle',symbolSize:10,
+    lineStyle:{color:'#d94a4a',width:3,shadowColor:'rgba(217,74,74,.3)',shadowBlur:10},
+    itemStyle:{color:'#d4b079',borderColor:'#d94a4a',borderWidth:2},
+    areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(217,74,74,.35)'},{offset:1,color:'rgba(217,74,74,0)'}]}},
+    label:{show:true,color:'#d4b079',fontWeight:700}
+  }]
+});
+
+// 名句长廊
+document.getElementById('quotesWall').innerHTML = quotes.map(function(q){
+  return '<div class="qw-card"><p class="qw-text">'+q.text+'</p>'+
+    '<div class="qw-meta">—— <b>'+q.author+'</b>《'+q.work+'》<span style="margin-left:8px;">'+q.d+'</span></div></div>';
+}).join('');
+
+// 概念词典
+var curDy = 'all';
+var curKw = '';
+document.getElementById('dyFilter').innerHTML =
+  '<button class="filter-chip on" data-dy="all">全部</button>'+
+  dys.map(function(d){return '<button class="filter-chip" data-dy="'+d+'">'+d+'</button>';}).join('');
+
+function renderConcepts(){
+  var list = concepts.filter(function(c){
+    if(curDy!=='all' && c.d!==curDy)return false;
+    if(curKw){
+      var kw = curKw.toLowerCase();
+      return (c.name+c.d+c.src+c.quote+c.note).toLowerCase().indexOf(kw)>=0;
+    }
+    return true;
+  });
+  document.getElementById('conceptList').innerHTML = list.length?list.map(function(c){
+    return '<div class="concept-card">'+
+      '<div class="cc-head"><h3>'+c.name+'</h3><span class="cc-dy">'+c.d+'</span></div>'+
+      '<div class="cc-head"><span class="cc-src">'+c.src+'</span></div>'+
+      '<div class="cc-quote">"'+c.quote+'"<span class="cc-src">—— '+c.src+'</span></div>'+
+      '<p class="cc-note">'+c.note+'</p>'+
+      '</div>';
+  }).join(''):'<p style="color:var(--ink-3);grid-column:1/-1;text-align:center;padding:40px;">未找到匹配概念</p>';
+}
+renderConcepts();
+
+document.getElementById('ccSearch').addEventListener('input',function(e){curKw=e.target.value;renderConcepts();});
+document.querySelectorAll('#dyFilter .filter-chip').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#dyFilter .filter-chip').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    curDy=b.getAttribute('data-dy');renderConcepts();
+  });
+});
 </script>
 </body>
 </html>
