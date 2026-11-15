@@ -7,37 +7,86 @@
   <title>文学意象 · 集藏本体论</title>
   <link rel="stylesheet" href="css/yijing.css">
   <script src="js/echarts.min.js"></script>
+  <script src="js/compass.js"></script>
+  <script src="js/theme-switch.js"></script>
+  <script src="data/ontology.js"></script>
   <script src="data/books.js"></script>
   <script src="data/individuals.js"></script>
+  <script src="data/network.js"></script>
+  <script src="data/theory.js"></script>
   <script src="js/shell.js"></script>
+  <style>
+    .page-hero{text-align:center;padding:56px 20px 40px;position:relative;overflow:hidden;
+      background:radial-gradient(ellipse 800px 400px at 50% 40%, rgba(40,70,130,.25) 0%, transparent 70%);border-bottom:1px solid var(--line);}
+    .page-hero .hero-sym{font-size:72px;color:var(--zhu);margin-bottom:8px;font-family:'STKaiti',KaiTi,serif;font-weight:700;text-shadow:0 0 28px rgba(217,74,74,.5);line-height:1;}
+    .page-hero h1{font-size:42px;letter-spacing:8px;margin:0 0 8px;color:var(--ink);}
+    .page-hero h1 .accent{color:var(--zhu);}
+    .page-hero .sub{color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);}
+    .page-hero .desc{max-width:720px;margin:16px auto 0;color:var(--ink-2);font-size:14px;line-height:1.9;}
+    .page-body{padding:32px 40px 60px;max-width:1280px;margin:0 auto;width:100%;}
+    .section{margin-bottom:44px;}
+    .section-title{font-size:22px;color:var(--gold-bright);letter-spacing:4px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-family:var(--font-serif);}
+    .section-title .icon{color:var(--zhu);margin-right:10px;font-family:'STKaiti',serif;font-size:24px;}
+    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+    .stat-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px;text-align:center;border-top:2px solid var(--zhu);}
+    .stat-box .n{font-size:26px;color:var(--gold-bright);font-weight:700;letter-spacing:2px;font-family:var(--font-serif);}
+    .stat-box .l{color:var(--ink-2);font-size:12px;letter-spacing:2px;margin-top:4px;}
+
+    .imagery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+    .img-card{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;border-top:3px solid var(--zhu);transition:all .3s;position:relative;overflow:hidden;cursor:pointer;}
+    .img-card::before{content:"";position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(217,74,74,.15),transparent 70%);pointer-events:none;}
+    .img-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 8px 24px rgba(212,176,121,.18);}
+    .img-card .img-sym{font-size:46px;color:var(--gold);font-family:'STKaiti',serif;font-weight:700;margin-bottom:8px;text-shadow:0 0 20px rgba(212,176,121,.3);line-height:1;position:relative;z-index:1;}
+    .img-card h3{margin:0 0 6px;color:var(--gold-bright);letter-spacing:4px;font-size:22px;font-family:'STKaiti',serif;position:relative;z-index:1;}
+    .img-card .img-mean{color:var(--zhu);font-size:13px;letter-spacing:2px;font-family:var(--font-kai);margin-bottom:12px;position:relative;z-index:1;}
+    .img-card .img-poets{color:var(--ink-3);font-size:11px;letter-spacing:1px;margin-bottom:10px;position:relative;z-index:1;}
+    .img-card .img-poets b{color:var(--gold);font-weight:500;}
+    .img-card .quote{background:rgba(217,74,74,.06);border-left:2px solid var(--zhu);padding:8px 12px;border-radius:0 var(--radius-md) var(--radius-md) 0;color:var(--ink);font-family:var(--font-kai);font-size:14px;line-height:1.8;position:relative;z-index:1;}
+    .img-card .quote .a{display:block;text-align:right;color:var(--ink-3);font-size:11px;margin-top:4px;letter-spacing:1px;}
+
+    .chart-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;min-height:480px;}
+    .chart-tall{min-height:620px;}
+
+    .cat-cloud{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0;padding:24px;background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);}
+    .cloud-item{padding:8px 16px;border-radius:4px;color:var(--ink-2);font-family:'STKaiti',serif;cursor:pointer;transition:all .3s;border:1px solid transparent;}
+    .cloud-item:hover{color:var(--gold-bright);text-shadow:0 0 12px rgba(212,176,121,.5);border-color:var(--gold);background:rgba(212,176,121,.08);}
+
+    @media(max-width:1024px){.imagery-grid{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:768px){.imagery-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:560px){.imagery-grid{grid-template-columns:1fr;}.page-body{padding:24px 16px 40px;}.page-hero h1{font-size:28px;}}
+  </style>
 </head>
 <body>
+<script>window.__JC_PAGE__='imagery';</script>
 <div id="topbar-slot"></div>
 <div class="layout">
   <div id="sidebar-slot"></div>
   <main class="content" style="padding:0;">
-    <section class="hero" style="min-height:50vh;padding:80px 20px 40px;">
-      <div style="font-size:48px;color:var(--zhu);margin-bottom:10px;font-family:'STKaiti',KaiTi,serif;">�</div>
-      <h1 style="font-size:44px;letter-spacing:8px;margin:0 0 6px;color:var(--ink);">文学意象</h1>
-      <div class="subtitle" style="color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);">IMAGERY</div>
+    <section class="page-hero">
+      <div class="hero-sym">象</div>
+      <h1>意<span class="accent">象</span>谱系</h1>
+      <div class="sub">IMAGERY · 意 与 象 合 · 情 景 相 生</div>
+      <p class="desc">独照之匠，窥意象而运斤。意象是中国诗学的核心单元——以具象之物寄抽象之情，一草一木、一酒一月皆承载千年文化情感。本页呈现十六种核心文学意象、其典型诗句与代表诗人。</p>
     </section>
-    <div style="padding:24px var(--gutter,40px) 60px;max-width:1200px;margin:0 auto;width:100%;">
+    <div class="page-body">
+
+      <div class="stat-row" id="statRow"></div>
+
+      <!-- 意象字云（关系图） -->
       <section class="section">
-        <div class="section-title"><span class="icon">○</span>模块建设中</div>
-        <p style="color:var(--ink-2);line-height:2;font-size:15px;">
-          本板块正在基于入库的 1669 部典籍、1363 位著者数据进行本体化建模，将按四步方案推进：
+        <div class="section-title"><span class="icon">雲</span>意象·诗人关系网</div>
+        <p style="color:var(--ink-2);font-size:14px;line-height:1.9;margin-bottom:12px;">
+          <span style="color:var(--gold);">金色节点</span>为文学意象，<span style="color:var(--zhu);">朱砂节点</span>为代表诗人，连线表示该诗人典型使用此意象。
         </p>
-        <ul style="color:var(--ink-3);line-height:2;">
-          <li>单书本体实例化（ABox：作品-作者-朝代-文体-意象）</li>
-          <li>单书下钻页（本体详情页，列示属性、关系、原文）</li>
-          <li>本页面（文学意象）由全量实例自动汇总生成</li>
-          <li>跨页实体联动、关系图谱可视化</li>
-        </ul>
-        <div style="margin-top:20px;">
-          <a href="books.html" class="btn btn-primary">籍 进入典籍库</a>
-          <a href="index.html" class="btn" style="margin-left:8px;">← 返回总览</a>
-        </div>
+        <div class="chart-box chart-tall" id="graphChart"></div>
       </section>
+
+      <!-- 意象卡片 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">品</span>十六意象详览</div>
+        <div class="imagery-grid" id="imgGrid"></div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -47,6 +96,66 @@ document.getElementById('topbar-slot').innerHTML = JC_Link.topbar('imagery');
 document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('images');
 document.getElementById('footer-slot').innerHTML = JC_Link.footer();
 JC_Link.initMobile();
+
+var NET = window.JICANG_NETWORK || {nodes:[],links:[],schools:[],imagery:[]};
+var THR = window.JICANG_THEORY || {quotes:[]};
+var imgs = NET.imagery || [];
+
+var allPoets = {};
+imgs.forEach(function(im){(im.poets||[]).forEach(function(p){allPoets[p]=1;});});
+var nQuotes = imgs.reduce(function(s,i){return s+(i.quotes?i.quotes.length:0);},0);
+
+document.getElementById('statRow').innerHTML = [
+  {n:imgs.length,l:'核心意象'},
+  {n:Object.keys(allPoets).length,l:'代表诗人'},
+  {n:nQuotes,l:'典型名句'},
+  {n:'5',l:'意象大类'}
+].map(function(s){return '<div class="stat-box"><div class="n">'+s.n+'</div><div class="l">'+s.l+'</div></div>';}).join('');
+
+// 关系图
+var nodes = [];
+var links = [];
+var poetColor = '#d94a4a';
+var imgColor = '#d4b079';
+imgs.forEach(function(im){
+  nodes.push({name:im.name,symbolSize:40,category:'意象',itemStyle:{color:imgColor},label:{show:true,fontSize:16,color:'#d4b079',fontWeight:700,fontFamily:'STKaiti,KaiTi,serif'}});
+  (im.poets||[]).forEach(function(p){
+    if(!allPoets['__'+p]){allPoets['__'+p]=1;nodes.push({name:p,symbolSize:18,category:'诗人',itemStyle:{color:poetColor},label:{show:true,fontSize:11,color:'#d4d0c8'}});}
+    links.push({source:p,target:im.name,lineStyle:{color:'rgba(212,176,121,.2)',width:1}});
+  });
+});
+var graphChart = echarts.init(document.getElementById('graphChart'));
+graphChart.setOption({
+  backgroundColor:'transparent',
+  tooltip:{},
+  legend:[{data:['意象','诗人'],textStyle:{color:'#a8a098'},top:10,left:'center'}],
+  series:[{
+    type:'graph',layout:'force',roam:true,draggable:true,
+    data:nodes,links:links,
+    categories:[{name:'意象',itemStyle:{color:imgColor}},{name:'诗人',itemStyle:{color:poetColor}}],
+    force:{repulsion:380,edgeLength:[60,100],gravity:0.1},
+    label:{position:'right'},
+    lineStyle:{opacity:0.5,curveness:0.1},
+    emphasis:{focus:'adjacency'}
+  }]
+});
+
+// 意象卡片
+var SYM_MAP = {'明月':'月','杨柳':'柳','梅花':'梅','菊':'菊','兰':'蘭','竹':'竹','鸿雁':'雁','扁舟':'舟','流水':'水','夕阳':'日','梧桐':'桐','杜鹃':'鹃','酒':'酒','笛':'笛','落叶':'葉','萍':'萍'};
+document.getElementById('imgGrid').innerHTML = imgs.map(function(im){
+  var quotes = (im.quotes||[]).slice(0,2).map(function(q){
+    return '<div class="quote">"'+q.t+'"<span class="a">—— '+q.a+'</span></div>';
+  }).join('');
+  return '<div class="img-card">'+
+    '<div class="img-sym">'+(SYM_MAP[im.name]||im.name.charAt(0))+'</div>'+
+    '<h3>'+im.name+'</h3>'+
+    '<div class="img-mean">'+im.sym+'</div>'+
+    '<div class="img-poets"><b>代表诗人：</b>'+(im.poets||[]).join('、')+'</div>'+
+    quotes+
+    '</div>';
+}).join('');
+
+window.addEventListener('resize',function(){graphChart.resize();});
 </script>
 </body>
 </html>
