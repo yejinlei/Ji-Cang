@@ -7,37 +7,105 @@
   <title>文学流派 · 集藏本体论</title>
   <link rel="stylesheet" href="css/yijing.css">
   <script src="js/echarts.min.js"></script>
+  <script src="js/compass.js"></script>
+  <script src="js/theme-switch.js"></script>
+  <script src="data/ontology.js"></script>
   <script src="data/books.js"></script>
   <script src="data/individuals.js"></script>
+  <script src="data/network.js"></script>
+  <script src="data/theory.js"></script>
   <script src="js/shell.js"></script>
+  <style>
+    .page-hero{text-align:center;padding:56px 20px 40px;position:relative;overflow:hidden;
+      background:radial-gradient(ellipse 800px 400px at 50% 40%, rgba(40,70,130,.25) 0%, transparent 70%);border-bottom:1px solid var(--line);}
+    .page-hero .hero-sym{font-size:72px;color:var(--zhu);margin-bottom:8px;font-family:'STKaiti',KaiTi,serif;font-weight:700;text-shadow:0 0 28px rgba(217,74,74,.5);line-height:1;}
+    .page-hero h1{font-size:42px;letter-spacing:8px;margin:0 0 8px;color:var(--ink);}
+    .page-hero h1 .accent{color:var(--zhu);}
+    .page-hero .sub{color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);}
+    .page-hero .desc{max-width:720px;margin:16px auto 0;color:var(--ink-2);font-size:14px;line-height:1.9;}
+    .page-body{padding:32px 40px 60px;max-width:1280px;margin:0 auto;width:100%;}
+    .section{margin-bottom:44px;}
+    .section-title{font-size:22px;color:var(--gold-bright);letter-spacing:4px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-family:var(--font-serif);}
+    .section-title .icon{color:var(--zhu);margin-right:10px;font-family:'STKaiti',serif;font-size:24px;}
+    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+    .stat-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px;text-align:center;border-top:2px solid var(--zhu);}
+    .stat-box .n{font-size:26px;color:var(--gold-bright);font-weight:700;letter-spacing:2px;font-family:var(--font-serif);}
+    .stat-box .l{color:var(--ink-2);font-size:12px;letter-spacing:2px;margin-top:4px;}
+    .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+    .filter-chip{padding:6px 14px;border:1px solid var(--line);border-radius:20px;color:var(--ink-2);cursor:pointer;font-size:13px;letter-spacing:1px;background:transparent;transition:all .2s;}
+    .filter-chip:hover,.filter-chip.on{background:rgba(212,176,121,.12);color:var(--gold-bright);border-color:var(--gold);}
+    .chart-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;min-height:420px;}
+    .chart-tall{min-height:600px;}
+
+    .school-timeline{position:relative;padding-left:40px;}
+    .school-timeline::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--zhu),var(--gold),rgba(212,176,121,.1));}
+    .tl-node{position:relative;margin-bottom:24px;}
+    .tl-node::before{content:"";position:absolute;left:-32px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--zhu);border:3px solid var(--space-deep);box-shadow:0 0 10px rgba(217,74,74,.5);}
+    .tl-card{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px 22px;border-left:3px solid var(--zhu);transition:all .25s;}
+    .tl-card:hover{border-color:var(--gold);box-shadow:0 4px 20px rgba(212,176,121,.12);}
+    .tl-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+    .tl-head h3{margin:0;color:var(--gold-bright);letter-spacing:3px;font-size:22px;font-family:'STKaiti',serif;}
+    .tl-head .era{color:var(--zhu);font-size:13px;letter-spacing:2px;font-family:var(--font-kai);}
+    .tl-head .kind{display:inline-block;padding:2px 10px;border-radius:10px;background:rgba(212,176,121,.12);color:var(--gold);font-size:11px;letter-spacing:2px;}
+    .tl-sub{color:var(--ink-3);font-size:12px;letter-spacing:1px;margin-bottom:10px;}
+    .tl-sub b{color:var(--gold);font-weight:500;}
+    .tl-card p{color:var(--ink-2);font-size:13px;line-height:1.85;margin:0 0 10px;}
+    .tl-style{background:rgba(217,74,74,.06);border-left:2px solid var(--zhu);padding:8px 14px;border-radius:0 var(--radius-md) var(--radius-md) 0;color:var(--gold-bright);font-family:var(--font-kai);font-size:14px;letter-spacing:2px;}
+    .tl-members{margin-top:10px;color:var(--ink-2);font-size:12px;letter-spacing:1px;}
+    .tl-members b{color:var(--zhu);font-weight:500;}
+    .tl-members .m{display:inline-block;padding:2px 8px;margin:2px;border-radius:3px;background:rgba(212,176,121,.06);color:var(--gold);font-size:12px;}
+
+    .kind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+    .kind-card{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;text-align:center;border-top:2px solid var(--zhu);}
+    .kind-card .n{font-size:28px;color:var(--gold-bright);font-weight:700;font-family:var(--font-serif);letter-spacing:2px;}
+    .kind-card .l{color:var(--ink-2);font-size:13px;letter-spacing:3px;margin-top:6px;}
+    .kind-card .sub{color:var(--ink-3);font-size:11px;letter-spacing:1px;margin-top:4px;}
+
+    @media(max-width:900px){.kind-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:640px){.kind-grid{grid-template-columns:1fr;}.page-body{padding:24px 16px 40px;}.page-hero h1{font-size:28px;}.school-timeline{padding-left:28px;}.tl-node::before{left:-22px;}}
+  </style>
 </head>
 <body>
+<script>window.__JC_PAGE__='schools';</script>
 <div id="topbar-slot"></div>
 <div class="layout">
   <div id="sidebar-slot"></div>
   <main class="content" style="padding:0;">
-    <section class="hero" style="min-height:50vh;padding:80px 20px 40px;">
-      <div style="font-size:48px;color:var(--zhu);margin-bottom:10px;font-family:'STKaiti',KaiTi,serif;">�</div>
-      <h1 style="font-size:44px;letter-spacing:8px;margin:0 0 6px;color:var(--ink);">文学流派</h1>
-      <div class="subtitle" style="color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);">SCHOOLS</div>
+    <section class="page-hero">
+      <div class="hero-sym">派</div>
+      <h1>流<span class="accent">派</span>传承</h1>
+      <div class="sub">SCHOOLS · 文 统 · 宗 风 · 演 变</div>
+      <p class="desc">三千年中国文学史，是一部流派代兴的历史。从风骚、汉魏风骨，到唐宋八家、江西诗派，再到明清的复古、性灵、桐城、同光——每一流派皆以宗风立派，以文统传承，终成文学史上的群星之河。</p>
     </section>
-    <div style="padding:24px var(--gutter,40px) 60px;max-width:1200px;margin:0 auto;width:100%;">
+    <div class="page-body">
+
+      <div class="stat-row" id="statRow"></div>
+
+      <!-- 文体分布 -->
       <section class="section">
-        <div class="section-title"><span class="icon">○</span>模块建设中</div>
-        <p style="color:var(--ink-2);line-height:2;font-size:15px;">
-          本板块正在基于入库的 1669 部典籍、1363 位著者数据进行本体化建模，将按四步方案推进：
-        </p>
-        <ul style="color:var(--ink-3);line-height:2;">
-          <li>单书本体实例化（ABox：作品-作者-朝代-文体-意象）</li>
-          <li>单书下钻页（本体详情页，列示属性、关系、原文）</li>
-          <li>本页面（文学流派）由全量实例自动汇总生成</li>
-          <li>跨页实体联动、关系图谱可视化</li>
-        </ul>
-        <div style="margin-top:20px;">
-          <a href="books.html" class="btn btn-primary">籍 进入典籍库</a>
-          <a href="index.html" class="btn" style="margin-left:8px;">← 返回总览</a>
-        </div>
+        <div class="section-title"><span class="icon">體</span>流派文体分布</div>
+        <div class="kind-grid" id="kindGrid"></div>
       </section>
+
+      <!-- 流派演变时间轴 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">史</span>流派演变时间轴</div>
+        <div class="filter-bar" id="kindFilter">
+          <button class="filter-chip on" data-kind="all">全部</button>
+          <button class="filter-chip" data-kind="诗">诗</button>
+          <button class="filter-chip" data-kind="词">词</button>
+          <button class="filter-chip" data-kind="文">文</button>
+          <button class="filter-chip" data-kind="曲">曲</button>
+        </div>
+        <div class="school-timeline" id="timeline"></div>
+      </section>
+
+      <!-- 流派关系桑基图（按时代流脉） -->
+      <section class="section">
+        <div class="section-title"><span class="icon">脈</span>流派源流图</div>
+        <div class="chart-box chart-tall" id="riverChart"></div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -47,6 +115,110 @@ document.getElementById('topbar-slot').innerHTML = JC_Link.topbar('schools');
 document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('schools');
 document.getElementById('footer-slot').innerHTML = JC_Link.footer();
 JC_Link.initMobile();
+
+var NET = window.JICANG_NETWORK || {nodes:[],links:[],schools:[],imagery:[]};
+var schools = NET.schools || [];
+
+// 时代顺序
+var ERA_ORDER = {'先秦':10,'汉':20,'汉末魏初':25,'魏正始':28,'魏晋':30,'东晋至唐':40,'南北朝':45,'唐':50,'盛唐':55,'中唐':60,'晚唐五代':70,'北宋':80,'两宋':85,'南宋':90,'金元':95,'元':100,'明':110,'明末':115,'明末清初':118,'清':120,'清末':130,'近代':140};
+function eraKey(e){
+  for(var k in ERA_ORDER){if(e.indexOf(k)>=0)return ERA_ORDER[k];}return 99;
+}
+schools.sort(function(a,b){return eraKey(a.era)-eraKey(b.era);});
+
+// 文体统计
+var kindMap = {};
+schools.forEach(function(s){kindMap[s.kind]=(kindMap[s.kind]||0)+1;});
+var nTotal = schools.length;
+document.getElementById('statRow').innerHTML = [
+  {n:nTotal,l:'流派总数'},
+  {n:Object.keys(kindMap).length,l:'文体类型'},
+  {n:schools.reduce(function(a,b){return a+(b.members?b.members.length:0);},0),l:'核心成员'},
+  {n:schools.reduce(function(a,b){return a+(b.works?b.works.length:0);},0),l:'代表作品'}
+].map(function(s){return '<div class="stat-box"><div class="n">'+s.n+'</div><div class="l">'+s.l+'</div></div>';}).join('');
+
+document.getElementById('kindGrid').innerHTML = Object.keys(kindMap).map(function(k){
+  var n = kindMap[k], total = nTotal;
+  return '<div class="kind-card"><div class="n">'+n+'</div><div class="l">'+k+'流派</div><div class="sub">占比'+Math.round(n/total*100)+'%</div></div>';
+}).join('');
+
+// 时间轴
+function renderTL(kind){
+  var list = kind==='all'?schools:schools.filter(function(s){return s.kind===kind;});
+  document.getElementById('timeline').innerHTML = list.map(function(s){
+    var mems = (s.members||[]).map(function(m){return '<span class="m">'+m+'</span>';}).join('');
+    var works = (s.works||[]).map(function(w){return '《'+w+'》';}).join('、');
+    return '<div class="tl-node"><div class="tl-card">'+
+      '<div class="tl-head"><h3>'+s.name+'</h3><span class="era">'+s.era+'</span><span class="kind">'+s.kind+'</span></div>'+
+      '<div class="tl-sub">宗主：<b>'+(s.advocate||'—')+'</b></div>'+
+      '<p>'+s.desc+'</p>'+
+      '<div class="tl-style">'+(s.style||'')+'</div>'+
+      (mems?'<div class="tl-members"><b>核心成员：</b>'+mems+'</div>':'')+
+      (works?'<div class="tl-members" style="margin-top:6px;"><b>代表作品：</b>'+works+'</div>':'')+
+      '</div></div>';
+  }).join('');
+}
+renderTL('all');
+document.querySelectorAll('#kindFilter .filter-chip').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#kindFilter .filter-chip').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    renderTL(b.getAttribute('data-kind'));
+  });
+});
+
+// 流派源流桑基图（简化：按时代-文体-流派三级）
+var eraKOrder = ['汉末魏初','魏正始','东晋至唐','盛唐','中唐','晚唐五代','北宋','两宋','南宋','元','明','清','清末'];
+var eraK = {};
+schools.forEach(function(s){
+  var e = s.era;
+  for(var i=0;i<eraKOrder.length;i++){if(e.indexOf(eraKOrder[i])>=0){e=eraKOrder[i];break;}}
+  if(!eraK[e])eraK[e]=[];
+  eraK[e].push(s);
+});
+var nodes = [{name:'先秦风骚',itemStyle:{color:'#d94a4a'}}];
+var links = [];
+eraKOrder.forEach(function(e,idx){
+  if(!eraK[e])return;
+  var kindsSeen = {};
+  eraK[e].forEach(function(s){
+    var kName = e+'·'+s.kind;
+    if(!kindsSeen[kName]){
+      nodes.push({name:kName,itemStyle:{color:'#d4b079'}});
+      kindsSeen[kName]=1;
+    }
+    nodes.push({name:s.name,itemStyle:{color:'#6a93b8'}});
+    links.push({source:kName,target:s.name,value:1});
+  });
+  if(idx===0){
+    Object.keys(kindsSeen).forEach(function(k){links.push({source:'先秦风骚',target:k,value:2});});
+  } else {
+    // 连接上一时代主要 kind
+    var prevEra = null;
+    for(var j=idx-1;j>=0;j--){if(eraK[eraKOrder[j]]){prevEra=eraKOrder[j];break;}}
+    if(prevEra){
+      var prevKinds = {};
+      eraK[prevEra].forEach(function(s){prevKinds[prevEra+'·'+s.kind]=1;});
+      Object.keys(kindsSeen).forEach(function(kn){
+        var kType = kn.split('·')[1];
+        var prevKn = prevEra+'·'+kType;
+        if(prevKinds[prevKn])links.push({source:prevKn,target:kn,value:1});
+      });
+    }
+  }
+});
+echarts.init(document.getElementById('riverChart')).setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'item'},
+  series:[{
+    type:'sankey',data:nodes,links:links,
+    left:40,right:140,top:20,bottom:20,
+    nodeWidth:14,nodeGap:8,
+    label:{color:'#d4d0c8',fontSize:11},
+    lineStyle:{color:'gradient',curveness:0.5,opacity:0.4},
+    emphasis:{focus:'adjacency'}
+  }]
+});
 </script>
 </body>
 </html>
