@@ -4,40 +4,116 @@
   <script src="js/theme-init.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>文人谱系 · 集藏本体论</title>
+  <title>文人谱传 · 集藏本体论</title>
   <link rel="stylesheet" href="css/yijing.css">
   <script src="js/echarts.min.js"></script>
+  <script src="js/compass.js"></script>
+  <script src="js/theme-switch.js"></script>
+  <script src="data/ontology.js"></script>
   <script src="data/books.js"></script>
   <script src="data/individuals.js"></script>
+  <script src="data/network.js"></script>
+  <script src="data/theory.js"></script>
   <script src="js/shell.js"></script>
+  <style>
+    .page-hero{text-align:center;padding:56px 20px 40px;position:relative;overflow:hidden;
+      background:radial-gradient(ellipse 800px 400px at 50% 40%, rgba(40,70,130,.25) 0%, transparent 70%);border-bottom:1px solid var(--line);}
+    .page-hero .hero-sym{font-size:72px;color:var(--zhu);margin-bottom:8px;font-family:'STKaiti',KaiTi,serif;font-weight:700;text-shadow:0 0 28px rgba(217,74,74,.5);line-height:1;}
+    .page-hero h1{font-size:42px;letter-spacing:8px;margin:0 0 8px;color:var(--ink);}
+    .page-hero h1 .accent{color:var(--zhu);}
+    .page-hero .sub{color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);}
+    .page-hero .desc{max-width:720px;margin:16px auto 0;color:var(--ink-2);font-size:14px;line-height:1.9;}
+    .page-body{padding:32px 40px 60px;max-width:1280px;margin:0 auto;width:100%;}
+    .section{margin-bottom:44px;}
+    .section-title{font-size:22px;color:var(--gold-bright);letter-spacing:4px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-family:var(--font-serif);}
+    .section-title .icon{color:var(--zhu);margin-right:10px;font-family:'STKaiti',serif;font-size:24px;}
+
+    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+    .stat-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px;text-align:center;border-top:2px solid var(--zhu);}
+    .stat-box .n{font-size:26px;color:var(--gold-bright);font-weight:700;letter-spacing:2px;font-family:var(--font-serif);}
+    .stat-box .l{color:var(--ink-2);font-size:12px;letter-spacing:2px;margin-top:4px;}
+
+    .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+    .filter-chip{padding:6px 14px;border:1px solid var(--line);border-radius:20px;color:var(--ink-2);cursor:pointer;font-size:13px;letter-spacing:1px;background:transparent;transition:all .2s;}
+    .filter-chip:hover,.filter-chip.on{background:rgba(212,176,121,.12);color:var(--gold-bright);border-color:var(--gold);}
+
+    .chart-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;min-height:480px;}
+    .chart-tall{min-height:620px;}
+
+    .figures-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+    .fig-card{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;border-left:3px solid var(--zhu);transition:all .25s;cursor:pointer;position:relative;}
+    .fig-card:hover{border-color:var(--gold);box-shadow:0 4px 20px rgba(212,176,121,.12);transform:translateY(-2px);}
+    .fig-card .fig-head{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+    .fig-card h3{margin:0;color:var(--gold-bright);letter-spacing:3px;font-size:20px;font-family:'STKaiti',serif;}
+    .fig-card .fig-hao{color:var(--gold);font-size:13px;letter-spacing:2px;font-family:var(--font-kai);}
+    .fig-card .fig-meta{color:var(--ink-3);font-size:11px;letter-spacing:1px;margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;}
+    .fig-card .fig-meta .d{color:var(--zhu);}
+    .fig-card .fig-cat{display:inline-block;padding:2px 8px;border-radius:10px;background:rgba(212,176,121,.12);color:var(--gold);font-size:11px;letter-spacing:1px;}
+    .fig-card p{color:var(--ink-2);font-size:13px;line-height:1.85;margin:0 0 8px;}
+    .fig-card .fig-works{color:var(--ink-3);font-size:11px;letter-spacing:1px;margin-top:6px;border-top:1px dashed var(--line);padding-top:8px;}
+    .fig-card .fig-works b{color:var(--gold);font-weight:500;}
+
+    .dynasty-bar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:18px;}
+    .dynasty-btn{padding:8px 14px;border:1px solid var(--line);border-radius:4px;color:var(--ink-2);cursor:pointer;font-size:13px;background:var(--space-card);transition:all .2s;position:relative;min-width:80px;text-align:center;}
+    .dynasty-btn .cnt{position:absolute;top:-8px;right:-8px;background:var(--zhu);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;}
+    .dynasty-btn.on,.dynasty-btn:hover{background:rgba(212,176,121,.14);border-color:var(--gold);color:var(--gold-bright);}
+
+    .topk-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+    .topk-item{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-md);padding:12px 14px;display:flex;align-items:center;gap:12px;}
+    .topk-item .rk{width:28px;height:28px;border-radius:50%;background:var(--zhu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+    .topk-item .rk.g{background:var(--gold);color:#0a1628;}
+    .topk-item .nm{color:var(--gold-bright);font-size:16px;letter-spacing:2px;font-family:'STKaiti',serif;flex:1;}
+    .topk-item .dy{color:var(--ink-3);font-size:11px;letter-spacing:1px;}
+    .topk-item .wc{color:var(--zhu);font-size:13px;letter-spacing:1px;}
+
+    @media(max-width:900px){.figures-grid{grid-template-columns:repeat(2,1fr);}.topk-list{grid-template-columns:1fr;}}
+    @media(max-width:640px){.figures-grid{grid-template-columns:1fr;}.page-body{padding:24px 16px 40px;}.page-hero h1{font-size:28px;}}
+  </style>
 </head>
 <body>
+<script>window.__JC_PAGE__='figures';</script>
 <div id="topbar-slot"></div>
 <div class="layout">
   <div id="sidebar-slot"></div>
   <main class="content" style="padding:0;">
-    <section class="hero" style="min-height:50vh;padding:80px 20px 40px;">
-      <div style="font-size:48px;color:var(--zhu);margin-bottom:10px;font-family:'STKaiti',KaiTi,serif;">�</div>
-      <h1 style="font-size:44px;letter-spacing:8px;margin:0 0 6px;color:var(--ink);">文人谱系</h1>
-      <div class="subtitle" style="color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);">AUTHORS</div>
+    <section class="page-hero">
+      <div class="hero-sym">人</div>
+      <h1>文<span class="accent">人</span>谱传</h1>
+      <div class="sub">FIGURES · 作 者 · 传 承 · 交 游</div>
+      <p class="desc">集部文献的背后是两千余年间的文人世界——他们或开宗立派、或闲吟咏叹、或发愤著书、或评点注疏。本页基于入库的 1669 部典籍自动聚合，呈现 1363 位著者的朝代分布、创作量与交游网络。</p>
     </section>
-    <div style="padding:24px var(--gutter,40px) 60px;max-width:1200px;margin:0 auto;width:100%;">
+    <div class="page-body">
+
+      <div class="stat-row" id="statRow"></div>
+
+      <!-- 朝代分布 -->
       <section class="section">
-        <div class="section-title"><span class="icon">○</span>模块建设中</div>
-        <p style="color:var(--ink-2);line-height:2;font-size:15px;">
-          本板块正在基于入库的 1669 部典籍、1363 位著者数据进行本体化建模，将按四步方案推进：
-        </p>
-        <ul style="color:var(--ink-3);line-height:2;">
-          <li>单书本体实例化（ABox：作品-作者-朝代-文体-意象）</li>
-          <li>单书下钻页（本体详情页，列示属性、关系、原文）</li>
-          <li>本页面（文人谱系）由全量实例自动汇总生成</li>
-          <li>跨页实体联动、关系图谱可视化</li>
-        </ul>
-        <div style="margin-top:20px;">
-          <a href="books.html" class="btn btn-primary">籍 进入典籍库</a>
-          <a href="index.html" class="btn" style="margin-left:8px;">← 返回总览</a>
-        </div>
+        <div class="section-title"><span class="icon">世</span>朝代分布 · 按创作量</div>
+        <div class="chart-box" id="dynastyChart" style="min-height:380px;"></div>
       </section>
+
+      <!-- 文人交游网络图（核心59人） -->
+      <section class="section">
+        <div class="section-title"><span class="icon">緣</span>核心文人交游网络</div>
+        <p style="color:var(--ink-2);font-size:14px;line-height:1.9;margin-bottom:12px;">
+          以历代文论家、诗派代表、小说戏曲大家为核心，标注其 <span style="color:var(--zhu);">影响</span>、<span style="color:var(--gold);">师承</span>、<span style="color:#6a93b8;">唱和</span>、<span style="color:#9c7ab8;">并称</span>、<span style="color:#7fb87a;">同派</span> 关系。
+        </p>
+        <div class="chart-box chart-tall" id="networkChart"></div>
+      </section>
+
+      <!-- TOP 作者（作品数最多） -->
+      <section class="section">
+        <div class="section-title"><span class="icon">家</span>著述大家 · 入库作品数 TOP</div>
+        <div class="topk-list" id="topkList"></div>
+      </section>
+
+      <!-- 核心文人卡片 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">賢</span>核心文人群像</div>
+        <div class="dynasty-bar" id="dynastyBar"></div>
+        <div class="figures-grid" id="figuresGrid"></div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -47,6 +123,153 @@ document.getElementById('topbar-slot').innerHTML = JC_Link.topbar('figures');
 document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('authors');
 document.getElementById('footer-slot').innerHTML = JC_Link.footer();
 JC_Link.initMobile();
+
+var IND = window.JICANG_INDIVIDUALS || {works:[],persons:[],relations:[]};
+var BOOKS = window.JICANG_BOOKS || [];
+var NET = window.JICANG_NETWORK || {nodes:[],links:[],schools:[],imagery:[]};
+
+// 从 works 聚合作者
+var authorMap = {};
+BOOKS.forEach(function(b){
+  (b.authors||[]).forEach(function(a){
+    var name = a.name || a;
+    var dy = a.dynasty || b.dynasty || '';
+    if(!authorMap[name])authorMap[name]={name:name,dynasty:dy,works:[],chars:0};
+    if(authorMap[name].dynasty==='' || authorMap[name].dynasty==='不详')authorMap[name].dynasty=dy;
+    authorMap[name].works.push(b.title);
+    authorMap[name].chars += (b.chars||0);
+  });
+});
+var allAuthors = Object.values(authorMap);
+
+// 朝代排序
+var DY_ORDER = ['先秦','秦','汉','三国','晋','南北朝','隋','唐','五代','宋','金','元','明','清','民国','近现代','不详'];
+var dyStats = {};
+allAuthors.forEach(function(a){if(a.dynasty){dyStats[a.dynasty]=(dyStats[a.dynasty]||0)+1;}});
+var bookDyStats = {};
+BOOKS.forEach(function(b){if(b.dynasty){bookDyStats[b.dynasty]=(bookDyStats[b.dynasty]||0)+1;}});
+
+var nAuthors = allAuthors.length;
+var nCore = NET.nodes.length;
+var nRels = NET.links.length;
+var nWorks = BOOKS.length;
+var nSchools = NET.schools.length;
+
+document.getElementById('statRow').innerHTML = [
+  {n:nAuthors,l:'入库著者'},
+  {n:nCore,l:'核心人物'},
+  {n:nRels,l:'交游关系'},
+  {n:nWorks,l:'典籍作品'},
+  {n:Object.keys(dyStats).length,l:'朝代跨度'},
+  {n:nSchools,l:'文学流派'}
+].map(function(s){return '<div class="stat-box"><div class="n">'+s.n+'</div><div class="l">'+s.l+'</div></div>';}).join('');
+
+// 朝代图
+var dys = Object.keys(bookDyStats).sort(function(a,b){return DY_ORDER.indexOf(a)-DY_ORDER.indexOf(b);});
+echarts.init(document.getElementById('dynastyChart')).setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis'},
+  legend:{data:['典籍作品数','著者人数'],textStyle:{color:'#a8a098'}},
+  grid:{left:50,right:30,top:40,bottom:40},
+  xAxis:{type:'category',data:dys,axisLabel:{color:'#d4d0c8',rotate:30},axisLine:{lineStyle:{color:'rgba(212,176,121,.3)'}}},
+  yAxis:{type:'value',axisLabel:{color:'#a8a098'},splitLine:{lineStyle:{color:'rgba(212,176,121,.1)'}}},
+  series:[
+    {name:'典籍作品数',type:'bar',data:dys.map(function(d){return bookDyStats[d]||0;}),
+      itemStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#d94a4a'},{offset:1,color:'rgba(217,74,74,.2)'}]},borderRadius:[4,4,0,0]}},
+    {name:'著者人数',type:'bar',data:dys.map(function(d){return dyStats[d]||0;}),
+      itemStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#d4b079'},{offset:1,color:'rgba(212,176,121,.2)'}]},borderRadius:[4,4,0,0]}}
+  ]
+});
+
+// 交游网络（力导向）
+var coreNames = NET.nodes.map(function(n){return n.n;});
+var catColor = {'诗人':'#6a93b8','词人':'#9c7ab8','文家':'#d4b079','文论家':'#d94a4a','小说家':'#7fb87a','曲家':'#b88a6a'};
+var relColor = {'影响':'#d94a4a','师承':'#d4b079','唱和':'#6a93b8','并称':'#9c7ab8','同派':'#7fb87a'};
+var nodes = NET.nodes.map(function(n){
+  var isAuth = authorMap[n.n]?1:0;
+  return {name:n.n,category:n.cat||'文人',
+    symbolSize:Math.max(22,isAuth?22+Math.min(20,(authorMap[n.n].works.length||1)*3):22),
+    itemStyle:{color:catColor[n.cat]||'#d4b079'},
+    value:authorMap[n.n]?(authorMap[n.n].works.length||1):1,
+    label:{show:true,color:'#d4d0c8',fontSize:11}
+  };
+});
+var links = NET.links.map(function(l){
+  return {source:l.s,target:l.t,
+    lineStyle:{color:relColor[l.r]||'rgba(212,176,121,.3)',width:l.r==='影响'?1.8:1,curveness:0.08},
+    label:{show:false},
+    _rel:l.r
+  };
+});
+var netChart = echarts.init(document.getElementById('networkChart'));
+netChart.setOption({
+  backgroundColor:'transparent',
+  tooltip:{formatter:function(p){
+    if(p.dataType==='node'){return '<b>'+p.name+'</b><br/>入库作品：'+(p.value||1)+'部';}
+    if(p.dataType==='edge'){return p.data.source+' — '+p.data._rel+' — '+p.data.target;}
+  }},
+  legend:[{data:Object.keys(catColor),textStyle:{color:'#a8a098'},top:10,left:'center'}],
+  series:[{
+    type:'graph',layout:'force',roam:true,draggable:true,
+    data:nodes,links:links,
+    categories:Object.keys(catColor).map(function(c){return {name:c,itemStyle:{color:catColor[c]}};}),
+    label:{position:'right',color:'#d4d0c8',fontSize:11},
+    force:{repulsion:420,edgeLength:[60,120],gravity:0.08},
+    lineStyle:{opacity:0.6},
+    emphasis:{focus:'adjacency',lineStyle:{width:3}},
+    edgeSymbol:['none','arrow'],edgeSymbolSize:6
+  }]
+});
+
+// TOP 作者
+var topAuthors = allAuthors.slice().sort(function(a,b){return b.works.length-a.works.length;}).slice(0,16);
+document.getElementById('topkList').innerHTML = topAuthors.map(function(a,i){
+  return '<div class="topk-item">'+
+    '<div class="rk '+(i<3?'g':'')+'">'+(i+1)+'</div>'+
+    '<div class="nm">'+a.name+'</div>'+
+    '<div class="dy">'+(a.dynasty||'—')+'</div>'+
+    '<div class="wc">'+a.works.length+'部</div>'+
+    '</div>';
+}).join('');
+
+// 核心文人卡片（按朝代筛选）
+var coreDys = [];
+NET.nodes.forEach(function(n){if(n.d&&coreDys.indexOf(n.d)<0)coreDys.push(n.d);});
+coreDys.sort(function(a,b){return DY_ORDER.indexOf(a)-DY_ORDER.indexOf(b);});
+var curDy = '全部';
+document.getElementById('dynastyBar').innerHTML =
+  '<button class="dynasty-btn on" data-dy="全部">全部<span class="cnt">'+NET.nodes.length+'</span></button>'+
+  coreDys.map(function(d){
+    var c = NET.nodes.filter(function(n){return n.d===d;}).length;
+    return '<button class="dynasty-btn" data-dy="'+d+'">'+d+'<span class="cnt">'+c+'</span></button>';
+  }).join('');
+
+function renderFigures(dy){
+  var list = dy==='全部'?NET.nodes:NET.nodes.filter(function(n){return n.d===dy;});
+  document.getElementById('figuresGrid').innerHTML = list.map(function(n){
+    var am = authorMap[n.n];
+    var workList = am ? am.works.slice(0,4).join('、') + (am.works.length>4?'…':'') : (n.h?'':'（详见"典籍库"）');
+    var worksHtml = am ? '<div class="fig-works">入库著作 <b>'+am.works.length+'</b> 部：'+workList+'</div>' : '';
+    return '<div class="fig-card">'+
+      '<div class="fig-head"><h3>'+n.n+'</h3>'+(n.h?'<span class="fig-hao">'+(n.h?('号 '+n.h):'')+'</span>':'')+(n.z?'<span class="fig-hao" style="color:var(--ink-3);">字 '+n.z+'</span>':'')+'</div>'+
+      '<div class="fig-meta"><span class="d">'+(n.d||'—')+'</span><span class="fig-cat">'+(n.cat||'文人')+'</span>'+(n.by?'<span>'+n.by+'—'+(n.dy||'')+'</span>':'')+'</div>'+
+      '<p>'+(n.bio||'')+'</p>'+
+      worksHtml+'</div>';
+  }).join('');
+}
+renderFigures('全部');
+document.querySelectorAll('.dynasty-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.dynasty-btn').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    renderFigures(b.getAttribute('data-dy'));
+  });
+});
+
+window.addEventListener('resize',function(){
+  netChart.resize();
+  echarts.getInstanceByDom(document.getElementById('dynastyChart')).resize();
+});
 </script>
 </body>
 </html>
