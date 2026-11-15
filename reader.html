@@ -6,47 +6,179 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>原典阅读 · 集藏本体论</title>
   <link rel="stylesheet" href="css/yijing.css">
-  <script src="js/echarts.min.js"></script>
   <script src="data/books.js"></script>
   <script src="data/individuals.js"></script>
   <script src="js/shell.js"></script>
+  <style>
+    .reader-wrap{padding:24px var(--gutter,40px) 60px;max-width:1100px;margin:0 auto;width:100%;}
+    .reader-header{
+      background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);
+      padding:22px 28px;margin-bottom:14px;backdrop-filter:blur(6px);border-left:4px solid var(--zhu);
+      display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;
+    }
+    .reader-header h2{margin:0 0 6px;font-size:28px;color:var(--zhu);letter-spacing:6px;}
+    .reader-header .meta{color:var(--ink-3);font-size:13px;letter-spacing:2px;}
+    .reader-header .actions a{
+      display:inline-block;padding:6px 12px;border-radius:4px;background:rgba(212,176,121,.1);
+      border:1px solid var(--line-strong);color:var(--gold);font-size:13px;letter-spacing:2px;
+      text-decoration:none;margin-left:8px;
+    }
+    .reader-header .actions a:hover{background:rgba(212,176,121,.22);color:var(--gold-bright);}
+    .vol-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+    .vol-nav button{
+      background:rgba(255,255,255,.04);border:1px solid var(--line);padding:4px 12px;border-radius:14px;
+      cursor:pointer;font-family:var(--font-serif);font-size:12px;color:var(--ink-2);letter-spacing:2px;
+    }
+    .vol-nav button.on{background:var(--zhu);color:#fff;border-color:var(--zhu);}
+    .reader-body{
+      background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);
+      padding:32px 40px;backdrop-filter:blur(6px);max-height:calc(100vh - 300px);overflow-y:auto;
+      font-family:'STKaiti','KaiTi',serif;font-size:17px;line-height:2;color:var(--ink-2);letter-spacing:1px;
+    }
+    .reader-body p{margin:0 0 2px;text-indent:2em;}
+    .reader-body h3{color:var(--gold);font-size:18px;letter-spacing:3px;margin:18px 0 10px;
+      border-bottom:1px dashed var(--line);padding-bottom:6px;}
+    .nav-ribbon{
+      display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;
+    }
+    .nav-ribbon a{color:var(--gold);font-size:13px;text-decoration:none;letter-spacing:2px;
+      padding:4px 10px;border:1px solid var(--line);border-radius:4px;
+    }
+    .nav-ribbon a:hover{border-color:var(--gold-bright);color:var(--gold-bright);}
+    @media (max-width:768px){
+      .reader-body{padding:20px 18px;font-size:15px;}
+      .reader-header h2{font-size:22px;letter-spacing:4px;}
+    }
+  </style>
 </head>
 <body>
 <div id="topbar-slot"></div>
 <div class="layout">
   <div id="sidebar-slot"></div>
   <main class="content" style="padding:0;">
-    <section class="hero" style="min-height:50vh;padding:80px 20px 40px;">
-      <div style="font-size:48px;color:var(--zhu);margin-bottom:10px;font-family:'STKaiti',KaiTi,serif;">�</div>
-      <h1 style="font-size:44px;letter-spacing:8px;margin:0 0 6px;color:var(--ink);">原典阅读</h1>
-      <div class="subtitle" style="color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);">READER</div>
+    <section class="hero" style="min-height:30vh;padding:60px 20px 30px;">
+      <div style="font-size:40px;color:var(--zhu);margin-bottom:8px;font-family:'STKaiti',KaiTi,serif;">讀</div>
+      <h1 style="font-size:34px;letter-spacing:8px;margin:0 0 6px;color:var(--ink);">原 典 閱 讀</h1>
+      <div class="subtitle" style="color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);">READER · 集部典籍全文</div>
     </section>
-    <div style="padding:24px var(--gutter,40px) 60px;max-width:1200px;margin:0 auto;width:100%;">
-      <section class="section">
-        <div class="section-title"><span class="icon">○</span>模块建设中</div>
-        <p style="color:var(--ink-2);line-height:2;font-size:15px;">
-          本板块正在基于入库的 1669 部典籍、1363 位著者数据进行本体化建模，将按四步方案推进：
-        </p>
-        <ul style="color:var(--ink-3);line-height:2;">
-          <li>单书本体实例化（ABox：作品-作者-朝代-文体-意象）</li>
-          <li>单书下钻页（本体详情页，列示属性、关系、原文）</li>
-          <li>本页面（原典阅读）由全量实例自动汇总生成</li>
-          <li>跨页实体联动、关系图谱可视化</li>
-        </ul>
-        <div style="margin-top:20px;">
-          <a href="books.html" class="btn btn-primary">籍 进入典籍库</a>
-          <a href="index.html" class="btn" style="margin-left:8px;">← 返回总览</a>
+
+    <div class="reader-wrap">
+      <div class="nav-ribbon" id="navRibbon"></div>
+      <div class="reader-header">
+        <div>
+          <h2 id="rTitle">加载中…</h2>
+          <div class="meta" id="rMeta"></div>
         </div>
-      </section>
+        <div class="actions">
+          <a href="books.html">← 返回典籍库</a>
+        </div>
+      </div>
+      <div class="vol-nav" id="volNav"></div>
+      <div class="reader-body" id="rBody">正在加载原文…</div>
     </div>
   </main>
 </div>
 <div id="footer-slot"></div>
+
 <script>
 document.getElementById('topbar-slot').innerHTML = JC_Link.topbar('books');
 document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('books');
 document.getElementById('footer-slot').innerHTML = JC_Link.footer();
 JC_Link.initMobile();
+
+var BOOKS = Array.isArray(window.JICANG_BOOKS) ? window.JICANG_BOOKS : [];
+var keyMap = {sikubieji:'bieji',bieji:'bieji',wenzongji:'zongji',zongji:'zongji',wenping:'wenping',
+  xiaoshuo:'xiaoshuo',yanyi:'yanyi',huaben:'huaben',baojuan:'baojuan',xiaohua:'xiaohua',miyu:'miyu'};
+var catName = {bieji:'别集',zongji:'总集',wenping:'文评',xiaoshuo:'小说',yanyi:'演义',huaben:'话本',baojuan:'宝卷',xiaohua:'笑话',miyu:'谜语'};
+
+function qs(name){
+  var m = location.search.match(new RegExp('[?&]'+name+'=([^&]+)'));
+  return m ? decodeURIComponent(m[1]) : null;
+}
+function parseIdFromHash(){
+  var h = location.hash;
+  if(h.indexOf('#/')===0) return decodeURIComponent(h.slice(2));
+  if(h.indexOf('#!/')===0) return decodeURIComponent(h.slice(3));
+  return null;
+}
+
+var bid = qs('id') || parseIdFromHash();
+if(!bid && BOOKS.length) bid = BOOKS[0].id;
+if(!bid){
+  document.getElementById('rBody').innerHTML = '<p style="color:var(--zhu);">未指定典籍 ID，请从典籍库进入。</p>'+
+    '<p style="margin-top:10px;"><a href="books.html" style="color:var(--gold);">← 返回典籍库</a></p>';
+} else {
+  openBook(bid);
+}
+
+function openBook(bid){
+  var book = BOOKS.find(function(b){return b.id===bid;});
+  if(!book){
+    document.getElementById('rTitle').textContent = '未找到';
+    document.getElementById('rMeta').textContent = '典籍 ID：'+bid;
+    document.getElementById('rBody').innerHTML = '<p style="color:var(--zhu);">未找到该典籍。<a href="books.html" style="color:var(--gold);margin-left:8px;">返回典籍库</a></p>';
+    return;
+  }
+  document.title = book.title + ' · 原典阅读 · 集藏本体论';
+  document.getElementById('rTitle').textContent = book.title;
+  var auth = book.authors && book.authors[0] ? (book.authors[0].name||book.authors[0]) : '佚名';
+  var dyn = book.authors && book.authors[0] && book.authors[0].dynasty ? book.authors[0].dynasty : (book.dynasty||'');
+  var k = keyMap[book.cat_key||book.category];
+  document.getElementById('rMeta').textContent = (dyn?dyn+' · ':'')+auth+' · '+(catName[k]||'典籍')+' · '+
+    Math.round((book.chars||book.size||0)/10000)/10+'万字';
+  // 上下导航
+  var idx = BOOKS.indexOf(book);
+  var ribbon = '';
+  if(idx>0) ribbon += '<a href="reader.html?id='+encodeURIComponent(BOOKS[idx-1].id)+'">← '+BOOKS[idx-1].title+'</a>';
+  ribbon += '<a href="books.html">典籍库</a>';
+  if(idx<BOOKS.length-1) ribbon += '<a href="reader.html?id='+encodeURIComponent(BOOKS[idx+1].id)+'">'+BOOKS[idx+1].title+' →</a>';
+  document.getElementById('navRibbon').innerHTML = ribbon;
+
+  var key = book.file || ('texts/'+(book.cat_key||'sikubieji')+'/'+book.id+'.js');
+  var s = document.createElement('script');
+  s.src = key + '?v=1';
+  var ok = false;
+  var timer = setTimeout(function(){
+    if(!ok){
+      document.getElementById('rBody').innerHTML = '<p style="color:var(--zhu);">原文加载超时：<code>'+key+'</code></p>'+
+        '<p style="color:var(--ink-3);font-size:13px;margin-top:10px;">该文本文件可能尚未同步到线上。</p>';
+    }
+  }, 10000);
+  s.onload = function(){
+    ok=true; clearTimeout(timer);
+    var txt = window.__JC_TEXT__;
+    if(!txt){document.getElementById('rBody').innerHTML='<p style="color:var(--zhu);">数据格式不匹配。</p>';return;}
+    renderTxt(txt);
+  };
+  s.onerror = function(){
+    ok=true; clearTimeout(timer);
+    document.getElementById('rBody').innerHTML='<p style="color:var(--zhu);">原文加载失败：<code>'+key+'</code></p>'+
+      '<p style="color:var(--ink-3);font-size:13px;margin-top:10px;">该文本文件尚未上传到线上，正在补传。</p>';
+  };
+  document.head.appendChild(s);
+}
+
+var curVolIdx = 0;
+function renderTxt(txt){
+  var body = document.getElementById('rBody');
+  var nav = document.getElementById('volNav');
+  var vols = txt.volumes || [];
+  if(!vols.length && (txt.html||txt.content)) vols = [{title:'正文',html:txt.html||txt.content}];
+  if(!vols.length){body.innerHTML='<p style="color:var(--ink-3);">暂无正文内容。</p>';return;}
+  if(vols.length>1){
+    nav.innerHTML = vols.map(function(v,i){
+      return '<button data-i="'+i+'" class="'+(i===curVolIdx?'on':'')+'">'+(v.title||('卷'+(i+1)))+'</button>';
+    }).join('');
+    nav.onclick = function(e){
+      if(e.target.tagName!=='BUTTON') return;
+      curVolIdx = parseInt(e.target.dataset.i,10);
+      nav.querySelectorAll('button').forEach(function(b){b.classList.toggle('on', parseInt(b.dataset.i,10)===curVolIdx);});
+      body.innerHTML = vols[curVolIdx].html || '<p style="color:var(--ink-3);">本卷暂无内容。</p>';
+      body.scrollTop=0;
+    };
+  }
+  body.innerHTML = vols[curVolIdx].html || '<p style="color:var(--ink-3);">本卷暂无内容。</p>';
+}
 </script>
 </body>
 </html>
