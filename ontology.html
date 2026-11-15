@@ -28,15 +28,14 @@
     .section-title{font-size:22px;color:var(--gold-bright);letter-spacing:4px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-family:var(--font-serif);}
     .section-title .icon{color:var(--zhu);margin-right:10px;font-family:'STKaiti',serif;font-size:24px;}
 
-    /* 七层宝塔 */
-    .pyramid{display:flex;flex-direction:column;align-items:center;gap:6px;margin:24px 0;}
-    .pyr-lv{width:100%;max-width:900px;padding:16px 24px;border:1px solid var(--line);border-radius:6px;display:flex;align-items:center;gap:20px;cursor:pointer;transition:all .25s;background:var(--space-card);position:relative;}
-    .pyr-lv:hover{border-color:var(--gold);box-shadow:0 2px 16px rgba(212,176,121,.15);}
-    .pyr-lv .lv-no{font-family:var(--font-serif);font-size:22px;color:var(--zhu);min-width:60px;font-weight:700;letter-spacing:1px;}
-    .pyr-lv .lv-name{font-size:20px;color:var(--gold-bright);min-width:140px;letter-spacing:3px;font-family:var(--font-serif);}
-    .pyr-lv .lv-axes{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
-    .pyr-lv .ax-chip{padding:2px 10px;border-radius:10px;font-size:11px;letter-spacing:1px;border:1px solid var(--line);color:var(--ink-2);}
-    .pyr-lv .lv-desc{color:var(--ink-2);font-size:13px;line-height:1.7;flex:2;min-width:200px;}
+    /* 七层浮屠 3D */
+    #tower3d{width:100%;min-height:520px;margin:20px 0 10px;border-radius:12px;position:relative;background:
+      radial-gradient(ellipse at 50% 60%, rgba(212,176,121,.08), transparent 60%),
+      linear-gradient(180deg, rgba(10,22,40,.2), rgba(10,22,40,.55));
+      border:1px solid var(--line);overflow:hidden;}
+    .tower-hint{position:absolute;top:14px;right:16px;color:var(--ink-3);font-size:12px;letter-spacing:1px;
+      background:rgba(10,22,40,.6);padding:4px 10px;border-radius:4px;border:1px solid rgba(212,176,121,.2);pointer-events:none;z-index:3;}
+    .tower-hint b{color:var(--gold);font-weight:500;}
 
     /* 四轴卡片 */
     .axis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
@@ -107,10 +106,12 @@
       <!-- 七层 -->
       <section class="section">
         <div class="section-title"><span class="icon">層</span>七层（Layers）· 上下贯通</div>
-        <p style="color:var(--ink-2);font-size:14px;line-height:1.9;margin-bottom:10px;">
-          自最抽象的"文道"以至最具体的"文化外延"，本体共分七层，上层统摄下层，下层承载上层，层层映射、下学上达。点击任一层可展开查看该层的核心概念标签。
+        <p style="color:var(--ink-2);font-size:14px;line-height:1.9;margin-bottom:6px;">
+          自最抽象的"文道"以至最具体的"文化外延"，本体共分七层，上层统摄下层，下层承载上层，层层映射、下学上达。<b style="color:var(--gold);">拖拽旋转 · 滚轮缩放</b>，悬停圆盘可查看该层详情。
         </p>
-        <div class="pyramid" id="pyramid"></div>
+        <div id="tower3d">
+          <div class="tower-hint">🖱 <b>拖拽</b>旋转 · <b>滚轮</b>缩放 · 悬停圆环查看层级</div>
+        </div>
       </section>
 
       <!-- 四轴×七层正交矩阵 -->
@@ -205,28 +206,7 @@ document.getElementById('axisGrid').innerHTML = TBOX.axes.map(function(a){
     '</div>';
 }).join('');
 
-// ===== 七层宝塔（L0→L6）=====
-var LAYERS_ORDERED = [
-  {id:'L0',name:'元模型层',no:'L0',axes:['A1','A2','A3','A4'],desc:'描述本体本身的元语言——轴、层、类、属性、关系、个体。'},
-  {id:'L1',name:'文道本体层',no:'L1',axes:['A2'],desc:'中国文学顶层形上概念：道、气、理、文、言、意、象、情、性、才、学、识。'},
-  {id:'L2',name:'文论范畴层',no:'L2',axes:['A2'],desc:'文论核心范畴：风骨、神思、滋味、意境、格调、神韵、性灵、肌理。'},
-  {id:'L3',name:'流派体系层',no:'L3',axes:['A1','A2','A3','A4'],desc:'诸子百家、文学流派、文社、文体体例、题材母题、文法技法、意象典故。'},
-  {id:'L4',name:'文本载体层',no:'L4',axes:['A1','A2','A3','A4'],desc:'九类典籍及其卷篇章节字韵结构，版本注疏。'},
-  {id:'L5',name:'人物传承层',no:'L5',axes:['A3','A4'],desc:'圣王圣贤、宗师、大家、名家、评点家、注家、学者——师徒/交游/姻亲/同社。'},
-  {id:'L6',name:'文化外延层',no:'L6',axes:['A1','A2','A3','A4'],desc:'俗文学（宝卷/说唱/笑话/谜语）、民俗意象、刻本出版、域外流传。'}
-];
-document.getElementById('pyramid').innerHTML = LAYERS_ORDERED.map(function(l){
-  var chips = l.axes.map(function(a){
-    var ax = (TBOX.axes||[]).find(function(x){return x.id===a;}) || {name:a};
-    return '<span class="ax-chip" style="border-color:'+AXIS_COLORS[a]+';color:'+AXIS_COLORS[a]+';">'+ax.name+'</span>';
-  }).join('');
-  return '<div class="pyr-lv">'+
-    '<div class="lv-no">'+l.no+'</div>'+
-    '<div class="lv-name">'+l.name+'</div>'+
-    '<div class="lv-desc">'+l.desc+'</div>'+
-    '<div class="lv-axes">'+chips+'</div>'+
-    '</div>';
-}).join('');
+// ===== 七层浮屠由 js/ontology_tower.js（Three.js）渲染 =====
 
 // ===== 正交矩阵 =====
 var LABS = TBOX.layerAxisLabels || {};
@@ -364,7 +344,14 @@ pchart.setOption({
 window.addEventListener('resize',function(){
   pchart.resize();
   echarts.getInstanceByDom(document.getElementById('classChart')).resize();
+  if(window._tower) window._tower.resize();
 });
+</script>
+
+<!-- 七层浮屠 3D（Three.js）-->
+<script type="module">
+import { mountTower } from './js/ontology_tower.js';
+window._tower = mountTower(document.getElementById('tower3d'));
 </script>
 </body>
 </html>
