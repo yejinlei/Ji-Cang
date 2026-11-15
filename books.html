@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>典籍阅读 · 集藏本体论</title>
   <link rel="stylesheet" href="css/yijing.css">
-  <script src="js/echarts.min.js"></script>
   <script src="data/books.js"></script>
   <script src="data/individuals.js"></script>
   <script src="js/shell.js"></script>
@@ -20,21 +19,15 @@
     .page-hero h1{font-size:38px;color:var(--ink);letter-spacing:8px;margin:0 0 6px;}
     .page-hero h1 .accent{color:var(--zhu);}
     .page-hero .sub{color:var(--gold);letter-spacing:4px;font-size:14px;}
-    .search-bar{
-      max-width:560px;margin:20px auto 0;position:relative;
-    }
+    .search-bar{max-width:560px;margin:20px auto 0;position:relative;}
     .search-bar input{
       width:100%;padding:10px 16px;border-radius:var(--radius);
       background:rgba(255,255,255,.05);border:1px solid var(--line-strong);
-      color:var(--ink);font-family:var(--font-serif);font-size:15px;letter-spacing:2px;
-      outline:none;
+      color:var(--ink);font-family:var(--font-serif);font-size:15px;letter-spacing:2px;outline:none;
     }
     .search-bar input::placeholder{color:var(--ink-3);letter-spacing:2px;}
     .search-bar input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,176,121,.15);}
-
-    .filter-row{
-      display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:18px 0 20px;
-    }
+    .filter-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:18px 0 20px;}
     .filter-row button{
       background:rgba(255,255,255,.04);border:1px solid var(--line);
       padding:6px 14px;border-radius:20px;cursor:pointer;font-family:var(--font-serif);
@@ -42,14 +35,11 @@
     }
     .filter-row button:hover{border-color:var(--gold);color:var(--gold-bright);}
     .filter-row button.on{background:var(--zhu);color:#fff;border-color:var(--zhu);}
-
-    .book-grid{
-      display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;
-    }
+    .book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
     .book-card{
       background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);
       padding:16px 18px;text-decoration:none;color:inherit;transition:all .25s;
-      backdrop-filter:blur(6px);display:flex;flex-direction:column;gap:6px;
+      backdrop-filter:blur(6px);display:flex;flex-direction:column;gap:6px;cursor:pointer;
       border-left:3px solid var(--zhu);
     }
     .book-card:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:var(--shadow-lg);}
@@ -69,33 +59,36 @@
       display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;letter-spacing:1px;
       background:rgba(212,176,121,.1);border:1px solid rgba(212,176,121,.25);color:var(--gold);
     }
-
-    .reader-panel{
-      display:none;margin-top:24px;
-    }
+    .reader-panel{display:none;margin-top:24px;}
     .reader-panel.active{display:block;}
     .reader-header{
       background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);
-      padding:22px 28px;margin-bottom:18px;backdrop-filter:blur(6px);
+      padding:22px 28px;margin-bottom:14px;backdrop-filter:blur(6px);
       border-left:4px solid var(--zhu);
     }
     .reader-header h2{margin:0 0 6px;font-size:28px;color:var(--zhu);letter-spacing:6px;}
     .reader-header .meta{color:var(--ink-3);font-size:13px;letter-spacing:2px;}
+    .vol-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+    .vol-nav button{
+      background:rgba(255,255,255,.04);border:1px solid var(--line);
+      padding:4px 12px;border-radius:14px;cursor:pointer;font-family:var(--font-serif);
+      font-size:12px;color:var(--ink-2);letter-spacing:2px;
+    }
+    .vol-nav button.on{background:var(--zhu);color:#fff;border-color:var(--zhu);}
     .reader-body{
       background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);
-      padding:28px 36px;backdrop-filter:blur(6px);max-height:70vh;overflow-y:auto;
-      font-family:var(--font-kai);font-size:17px;line-height:2.2;color:var(--ink-2);
+      padding:28px 36px;backdrop-filter:blur(6px);max-height:75vh;overflow-y:auto;
+      font-family:'STKaiti','KaiTi',serif;font-size:17px;line-height:2;color:var(--ink-2);
       letter-spacing:1px;
     }
-    .reader-body h3{color:var(--gold);font-size:18px;letter-spacing:3px;margin:18px 0 8px;border-bottom:1px dashed var(--line);padding-bottom:6px;}
-    .reader-body p{margin:0 0 4px;text-indent:2em;}
+    .reader-body p{margin:0 0 2px;text-indent:2em;}
+    .reader-body h3{color:var(--gold);font-size:18px;letter-spacing:3px;margin:18px 0 10px;border-bottom:1px dashed var(--line);padding-bottom:6px;}
     .back-btn{
       display:inline-block;padding:6px 14px;border-radius:4px;background:rgba(212,176,121,.1);
       border:1px solid var(--line-strong);color:var(--gold);font-size:13px;letter-spacing:2px;
       cursor:pointer;margin-bottom:14px;text-decoration:none;
     }
     .back-btn:hover{background:rgba(212,176,121,.22);color:var(--gold-bright);}
-
     .empty-hint{text-align:center;padding:40px;color:var(--ink-3);letter-spacing:2px;font-size:14px;}
     @media (max-width:768px){
       .page-hero h1{font-size:28px;letter-spacing:4px;}
@@ -126,6 +119,7 @@
           <h2 id="readerTitle"></h2>
           <div class="meta" id="readerMeta"></div>
         </div>
+        <div class="vol-nav" id="volNav"></div>
         <div class="reader-body" id="readerBody">正在加载…</div>
       </div>
 
@@ -152,13 +146,12 @@ var keyMap = {sikubieji:'bieji',bieji:'bieji',siku_zongji:'zongji',wenzongji:'zo
 var catName = {bieji:'别集',zongji:'总集',wenping:'文评',xiaoshuo:'小说',yanyi:'演义',huaben:'话本',baojuan:'宝卷',xiaohua:'笑话',miyu:'谜语'};
 var catOrder = ['all','bieji','zongji','wenping','xiaoshuo','yanyi','huaben','baojuan','xiaohua','miyu'];
 var catLabel = {all:'全部',bieji:'别集',zongji:'总集',wenping:'文评',xiaoshuo:'小说',yanyi:'演义',huaben:'话本',baojuan:'宝卷',xiaohua:'笑话',miyu:'谜语'};
-var curCat = 'all';
-var curKw = '';
+var curCat = 'all', curKw = '';
 
-// 分类过滤按钮
 var fr = document.getElementById('filterRow');
 fr.innerHTML = catOrder.map(function(c){
-  return '<button data-cat="'+c+'" class="'+(c==='all'?'on':'')+'">'+catLabel[c]+'</button>';
+  var count = c==='all' ? BOOKS.length : BOOKS.filter(function(b){return keyMap[b.cat_key||b.category]===c;}).length;
+  return '<button data-cat="'+c+'" class="'+(c==='all'?'on':'')+'">'+catLabel[c]+' <span style="opacity:.6;font-size:11px;">'+count+'</span></button>';
 }).join('');
 fr.addEventListener('click',function(e){
   if(e.target.tagName!=='BUTTON') return;
@@ -180,100 +173,142 @@ function renderList(){
     var k = keyMap[b.cat_key||b.category];
     if(curCat!=='all' && k!==curCat) return false;
     if(curKw){
-      var s = (b.title+' '+(b.authors||[]).map(function(a){return a.name||a;}).join(' ')+' '+(b.dynasty||'')).toLowerCase();
+      var auths = (b.authors||[]).map(function(a){return a.name||a;}).join(' ');
+      var s = (b.title+' '+auths+' '+(b.dynasty||'')).toLowerCase();
       if(s.indexOf(curKw)<0) return false;
     }
     return true;
-  }).slice(0,500); // 防止一次渲染太多
+  });
   if(!list.length){ grid.innerHTML=''; hint.style.display='block'; return; }
   hint.style.display='none';
-  grid.innerHTML = list.map(function(b){
+  var show = list.slice(0,800);
+  grid.innerHTML = show.map(function(b){
     var k = keyMap[b.cat_key||b.category]||'bieji';
     var auth = b.authors && b.authors[0] ? (b.authors[0].name||b.authors[0]) : '佚名';
-    var dyn = b.dynasty || '';
-    return '<a href="javascript:openReader(\''+b.id.replace(/'/g,"\\'")+'\')" class="book-card '+k+'">'+
+    var dyn = b.authors && b.authors[0] && b.authors[0].dynasty ? b.authors[0].dynasty : (b.dynasty||'');
+    var wc = Math.round((b.chars||b.size||0)/10000)/10;
+    return '<div class="book-card '+k+'" onclick="openReader(\''+String(b.id).replace(/'/g,"\\'")+'\')">'+
       '<div class="title">'+b.title+'</div>'+
       '<div class="author">'+(dyn?'['+dyn+'] ':'')+auth+'</div>'+
       '<div class="meta"><span class="badge">'+(catName[k]||'典籍')+'</span>'+
-        '<span>'+Math.round((b.chars||b.size||0)/10000)/10+'万字</span></div>'+
-    '</a>';
+        '<span>'+wc+'万字</span></div>'+
+    '</div>';
   }).join('');
 }
 renderList();
 
 // === 阅读面板 ===
 var loadedTexts = {};
+var curVolIdx = 0;
+var curBook = null;
+
 function openReader(bid){
   var book = BOOKS.find(function(b){return b.id===bid;});
   if(!book) return;
+  curBook = book; curVolIdx = 0;
   document.getElementById('listPanel').style.display='none';
   var rp = document.getElementById('readerPanel');
   rp.classList.add('active');
   document.getElementById('readerTitle').textContent = book.title;
   var auth = book.authors && book.authors[0] ? (book.authors[0].name||book.authors[0]) : '佚名';
-  document.getElementById('readerMeta').textContent = (book.dynasty?book.dynasty+' · ':'') + auth + ' · ' + (catName[keyMap[book.cat_key||book.category]]||'典籍');
+  var dyn = book.authors && book.authors[0] && book.authors[0].dynasty ? book.authors[0].dynasty : (book.dynasty||'');
+  document.getElementById('readerMeta').textContent = (dyn?dyn+' · ':'') + auth + ' · ' + (catName[keyMap[book.cat_key||book.category]]||'典籍') + ' · ' + Math.round((book.chars||book.size||0)/10000)/10 + '万字';
   document.getElementById('readerBody').innerHTML = '正在加载原文…';
+  document.getElementById('volNav').innerHTML = '';
+  location.hash = '#!/read/' + encodeURIComponent(bid);
   loadAndRender(book);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function closeReader(){
   document.getElementById('readerPanel').classList.remove('active');
   document.getElementById('listPanel').style.display='';
+  if(location.hash.indexOf('#!/read/')===0) history.replaceState(null,'',location.pathname+'#'+curCat);
 }
+
 function loadAndRender(book){
+  window.__JC_TEXT__ = null;
   var key = book.file;
+  if(!key) key = 'texts/'+(book.cat_key||'sikubieji')+'/'+book.id+'.js';
   if(loadedTexts[key]){ renderBook(book, loadedTexts[key]); return; }
-  var s=document.createElement('script');
-  s.src = key;
+  var old = document.getElementById('__jc_text_loader__');
+  if(old) old.remove();
+  var s = document.createElement('script');
+  s.id = '__jc_text_loader__';
+  s.src = key + '?v=1';
+  var ok = false;
+  var timer = setTimeout(function(){
+    if(!ok){
+      document.getElementById('readerBody').innerHTML = '<p style="color:var(--zhu);">原文加载超时：<code style="font-size:12px;">'+key+'</code></p>'+
+        '<p style="color:var(--ink-3);font-size:13px;margin-top:10px;">该文本文件可能尚未上传到线上。共 1669 部典籍正分批同步，部分典籍稍后可访问。</p>';
+    }
+  }, 10000);
   s.onload = function(){
-    // 约定：text 文件定义 window.JICANG_TEXT
-    var txt = window.JICANG_TEXT || window.TEXT || window.CURRENT_TEXT || '';
+    ok = true;
+    clearTimeout(timer);
+    var txt = window.__JC_TEXT__;
+    if(!txt){
+      document.getElementById('readerBody').innerHTML = '<p style="color:var(--zhu);">数据格式不匹配：'+key+'</p>';
+      return;
+    }
     loadedTexts[key] = txt;
     renderBook(book, txt);
   };
   s.onerror = function(){
-    document.getElementById('readerBody').innerHTML = '<p style="color:var(--zhu);">原文加载失败：'+key+'</p>';
+    ok = true;
+    clearTimeout(timer);
+    document.getElementById('readerBody').innerHTML = '<p style="color:var(--zhu);">原文加载失败：<code style="font-size:12px;">'+key+'</code></p>'+
+      '<p style="color:var(--ink-3);font-size:13px;margin-top:10px;">该文本文件尚未上传到线上，正在补传。</p>';
   };
   document.head.appendChild(s);
 }
-function renderBook(book, txt){
-  if(!txt){ document.getElementById('readerBody').innerHTML = '<p>暂无原文。</p>'; return; }
-  // txt 可能是字符串或对象 {title, content/juan/...}
-  var html = '';
-  if(typeof txt === 'string'){
-    html = txt.split(/\n/).map(function(l){return l.trim()?'<p>'+escapeHtml(l)+'</p>':'';}).join('');
-  } else {
-    if(txt.title) html += '<h3>'+escapeHtml(txt.title)+'</h3>';
-    var c = txt.content || txt.text || txt.body;
-    if(c){
-      if(Array.isArray(c)){
-        c.forEach(function(j){
-          if(typeof j==='string'){html += '<p>'+escapeHtml(j)+'</p>';}
-          else {
-            if(j.title) html += '<h3>'+escapeHtml(j.title)+'</h3>';
-            var jc = j.content||j.text||'';
-            if(Array.isArray(jc)) jc=jc.join('\n');
-            html += (jc||'').split(/\n/).map(function(l){return l.trim()?'<p>'+escapeHtml(l)+'</p>':'';}).join('');
-          }
-        });
-      } else {
-        html += String(c).split(/\n/).map(function(l){return l.trim()?'<p>'+escapeHtml(l)+'</p>':'';}).join('');
-      }
-    }
-  }
-  document.getElementById('readerBody').innerHTML = html || '<p style="color:var(--ink-3);">原文数据格式暂不支持渲染。</p>';
-}
-function escapeHtml(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
 
-// 支持 hash 直接定位分类
-if(location.hash){
-  var h = location.hash.slice(1);
-  if(catName[h]){
-    curCat = h;
-    fr.querySelectorAll('button').forEach(function(b){b.classList.toggle('on', b.dataset.cat===h);});
+function renderBook(book, txt){
+  var body = document.getElementById('readerBody');
+  var nav = document.getElementById('volNav');
+  var vols = txt.volumes || [];
+  if(!vols.length && (txt.html || txt.content)){
+    vols = [{title:'正文', html: txt.html || txt.content}];
+  }
+  if(!vols.length){
+    body.innerHTML = '<p style="color:var(--ink-3);">暂无正文内容。</p>';
+    nav.innerHTML='';
+    return;
+  }
+  if(vols.length>1){
+    nav.innerHTML = vols.map(function(v,i){
+      return '<button data-i="'+i+'" class="'+(i===curVolIdx?'on':'')+'">'+(v.title||('卷'+(i+1)))+'</button>';
+    }).join('');
+    nav.onclick = function(e){
+      if(e.target.tagName!=='BUTTON') return;
+      curVolIdx = parseInt(e.target.dataset.i,10);
+      nav.querySelectorAll('button').forEach(function(b){b.classList.toggle('on', parseInt(b.dataset.i,10)===curVolIdx);});
+      body.innerHTML = vols[curVolIdx].html || '<p style="color:var(--ink-3);">本卷暂无内容。</p>';
+      body.scrollTop = 0;
+    };
+  } else {
+    nav.innerHTML='';
+  }
+  body.innerHTML = vols[curVolIdx].html || '<p style="color:var(--ink-3);">本卷暂无内容。</p>';
+}
+
+// hash 路由
+function parseHash(){
+  var h = location.hash || '';
+  if(h.indexOf('#!/read/')===0){
+    var bid = decodeURIComponent(h.slice(8));
+    var b = BOOKS.find(function(x){return x.id===bid;});
+    if(b){ openReader(bid); return; }
+  }
+  var cat = h.replace(/^#/,'');
+  if(catName[cat]){
+    curCat = cat;
+    fr.querySelectorAll('button').forEach(function(b){b.classList.toggle('on', b.dataset.cat===cat);});
     renderList();
   }
 }
+if(BOOKS.length){ parseHash(); }
+else { window.addEventListener('load', parseHash); }
+window.addEventListener('hashchange', parseHash);
 </script>
 </body>
 </html>
