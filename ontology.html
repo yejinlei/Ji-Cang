@@ -7,57 +7,152 @@
   <title>本体总纲 · 集藏本体论</title>
   <link rel="stylesheet" href="css/yijing.css">
   <script src="js/echarts.min.js"></script>
+  <script src="js/compass.js"></script>
+  <script src="js/theme-switch.js"></script>
   <script src="data/ontology.js"></script>
   <script src="data/books.js"></script>
+  <script src="data/individuals.js"></script>
+  <script src="data/network.js"></script>
+  <script src="data/theory.js"></script>
   <script src="js/shell.js"></script>
   <style>
-    .page-hero{text-align:center;padding:48px 20px 36px;border-bottom:1px solid var(--line);
-      background:radial-gradient(ellipse 800px 400px at 50% 40%, rgba(40,70,130,.25) 0%, transparent 70%);}
-    .page-hero h1{font-size:38px;color:var(--ink);letter-spacing:8px;margin:0 0 6px;}
+    .page-hero{text-align:center;padding:56px 20px 40px;position:relative;overflow:hidden;
+      background:radial-gradient(ellipse 800px 400px at 50% 40%, rgba(40,70,130,.25) 0%, transparent 70%);border-bottom:1px solid var(--line);}
+    .page-hero .hero-sym{font-size:72px;color:var(--zhu);margin-bottom:8px;font-family:'STKaiti',KaiTi,serif;font-weight:700;text-shadow:0 0 28px rgba(217,74,74,.5);line-height:1;}
+    .page-hero h1{font-size:42px;letter-spacing:8px;margin:0 0 8px;color:var(--ink);}
     .page-hero h1 .accent{color:var(--zhu);}
-    .page-hero .sub{color:var(--gold);letter-spacing:4px;font-size:14px;}
-    .class-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-    .class-card{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;border-left:3px solid var(--zhu);}
-    .class-card h3{margin:0 0 6px;color:var(--gold-bright);letter-spacing:3px;font-size:18px;}
-    .class-card .cls{color:var(--ink-3);font-size:12px;letter-spacing:1px;font-family:var(--font-sans);margin-bottom:10px;}
-    .class-card p{color:var(--ink-2);font-size:13px;line-height:1.8;margin:0;}
-    @media(max-width:768px){.class-grid{grid-template-columns:1fr;}.page-hero h1{font-size:28px;}}
+    .page-hero .sub{color:var(--gold);letter-spacing:6px;font-size:14px;font-family:var(--font-kai);}
+    .page-hero .desc{max-width:760px;margin:16px auto 0;color:var(--ink-2);font-size:14px;line-height:1.9;}
+    .page-body{padding:32px 40px 60px;max-width:1280px;margin:0 auto;width:100%;}
+    .section{margin-bottom:44px;}
+    .section-title{font-size:22px;color:var(--gold-bright);letter-spacing:4px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-family:var(--font-serif);}
+    .section-title .icon{color:var(--zhu);margin-right:10px;font-family:'STKaiti',serif;font-size:24px;}
+
+    /* 七层宝塔 */
+    .pyramid{display:flex;flex-direction:column;align-items:center;gap:6px;margin:24px 0;}
+    .pyr-lv{width:100%;max-width:900px;padding:16px 24px;border:1px solid var(--line);border-radius:6px;display:flex;align-items:center;gap:20px;cursor:pointer;transition:all .25s;background:var(--space-card);position:relative;}
+    .pyr-lv:hover{border-color:var(--gold);box-shadow:0 2px 16px rgba(212,176,121,.15);}
+    .pyr-lv .lv-no{font-family:var(--font-serif);font-size:22px;color:var(--zhu);min-width:60px;font-weight:700;letter-spacing:1px;}
+    .pyr-lv .lv-name{font-size:20px;color:var(--gold-bright);min-width:140px;letter-spacing:3px;font-family:var(--font-serif);}
+    .pyr-lv .lv-axes{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
+    .pyr-lv .ax-chip{padding:2px 10px;border-radius:10px;font-size:11px;letter-spacing:1px;border:1px solid var(--line);color:var(--ink-2);}
+    .pyr-lv .lv-desc{color:var(--ink-2);font-size:13px;line-height:1.7;flex:2;min-width:200px;}
+
+    /* 四轴卡片 */
+    .axis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+    .axis-card{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;border-top:3px solid var(--zhu);}
+    .axis-card .ax-id{font-size:11px;color:var(--ink-3);letter-spacing:2px;margin-bottom:6px;}
+    .axis-card h3{margin:0 0 8px;color:var(--gold-bright);letter-spacing:3px;font-size:18px;}
+    .axis-card .ax-en{color:var(--ink-3);font-size:11px;letter-spacing:1px;margin-bottom:10px;font-family:var(--font-sans);}
+    .axis-card p{color:var(--ink-2);font-size:13px;line-height:1.85;margin:0;}
+    .axis-card .ax-count{margin-top:10px;color:var(--gold);font-size:12px;letter-spacing:2px;}
+
+    /* 类体系矩阵 */
+    .ortho-wrap{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;overflow-x:auto;}
+    .ortho-table{width:100%;border-collapse:collapse;min-width:700px;}
+    .ortho-table th,.ortho-table td{border:1px solid var(--line);padding:8px 12px;text-align:center;font-size:12px;letter-spacing:1px;}
+    .ortho-table th{background:rgba(212,176,121,.08);color:var(--gold-bright);font-family:var(--font-serif);}
+    .ortho-table td.ax-name{text-align:left;color:var(--gold);font-weight:600;}
+    .ortho-table td.on{background:rgba(217,74,74,.12);color:var(--zhu);font-weight:600;}
+    .ortho-table td.off{color:var(--ink-3);opacity:.35;}
+
+    .class-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    .class-card{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;border-left:3px solid var(--zhu);}
+    .class-card h4{margin:0 0 4px;color:var(--gold-bright);letter-spacing:2px;font-size:15px;}
+    .class-card .cls-meta{color:var(--ink-3);font-size:11px;letter-spacing:1px;margin-bottom:8px;font-family:var(--font-sans);}
+    .class-card p{color:var(--ink-2);font-size:12px;line-height:1.75;margin:0;}
+
+    .rel-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+    .rel-item{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-md);padding:12px 16px;display:flex;align-items:center;gap:12px;}
+    .rel-item .rel-name{color:var(--zhu);font-weight:700;min-width:80px;letter-spacing:2px;font-size:14px;}
+    .rel-item .rel-en{color:var(--ink-3);font-size:11px;min-width:100px;font-family:var(--font-sans);}
+    .rel-item .rel-desc{color:var(--ink-2);font-size:12px;line-height:1.6;flex:1;}
+
+    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+    .stat-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px;text-align:center;border-top:2px solid var(--zhu);}
+    .stat-box .n{font-size:26px;color:var(--gold-bright);font-weight:700;letter-spacing:2px;font-family:var(--font-serif);}
+    .stat-box .l{color:var(--ink-2);font-size:12px;letter-spacing:2px;margin-top:4px;}
+
+    .quote{background:rgba(217,74,74,.06);border-left:3px solid var(--zhu);padding:14px 20px;margin-top:14px;border-radius:0 var(--radius-md) var(--radius-md) 0;color:var(--ink);font-family:var(--font-kai);font-size:16px;line-height:1.9;}
+    .quote .src{display:block;text-align:right;color:var(--ink-3);font-size:12px;margin-top:6px;letter-spacing:2px;}
+
+    .chart-box{background:var(--space-card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;min-height:520px;}
+
+    @media(max-width:900px){.axis-grid,.class-grid{grid-template-columns:repeat(2,1fr);}.rel-list{grid-template-columns:1fr;}.pyr-lv{flex-wrap:wrap;}}
+    @media(max-width:640px){.axis-grid,.class-grid{grid-template-columns:1fr;}.page-body{padding:24px 16px 40px;}.page-hero h1{font-size:28px;}}
   </style>
 </head>
 <body>
+<script>window.__JC_PAGE__='ontology';</script>
 <div id="topbar-slot"></div>
 <div class="layout">
   <div id="sidebar-slot"></div>
   <main class="content" style="padding:0;">
     <section class="page-hero">
+      <div class="hero-sym">道</div>
       <h1>本<span class="accent">体</span>总纲</h1>
-      <div class="sub">ONTOLOGY · TBox 类 体 系 · 七 层 架 构</div>
+      <div class="sub">ONTOLOGY · TBOX · 四 轴 七 层 正 交 架 构</div>
+      <p class="desc">集藏本体论以中国古典文学集部为对象，依文道、文论、流派、文本、人物、文化外延七层架构，横贯文体典要、义理意象、人物传承、时代事件四轴，构建可推理、可下钻、可联动的数字人文知识体系。</p>
     </section>
-    <div style="padding:28px var(--gutter,40px) 60px;max-width:1200px;margin:0 auto;width:100%;">
+    <div class="page-body">
 
+      <div class="stat-row" id="statRow"></div>
+
+      <!-- 四轴 -->
       <section class="section">
-        <div class="section-title"><span class="icon">☰</span>本体层级（七层）</div>
-        <p style="color:var(--ink-2);line-height:1.9;font-size:14px;">集藏本体自元模型以至文化外延共分七层，层层细化，下学上达。</p>
-        <div class="ont-level" id="levelsBox" style="grid-template-columns:repeat(7,1fr);"></div>
+        <div class="section-title"><span class="icon">軸</span>四轴（Axes）· 本体坐标系</div>
+        <div class="axis-grid" id="axisGrid"></div>
       </section>
 
+      <!-- 七层 -->
       <section class="section">
-        <div class="section-title"><span class="icon">類</span>核心类（Classes）</div>
-        <div class="class-grid" id="classGrid"></div>
-      </section>
-
-      <section class="section">
-        <div class="section-title"><span class="icon">綱</span>关系与公理</div>
-        <p style="color:var(--ink-2);font-size:14px;line-height:2;">
-          核心对象属性：<span style="color:var(--gold);">著述(authorOf)</span>、<span style="color:var(--gold);">收于(partOf)</span>、
-          <span style="color:var(--gold);">属于流派(schoolOf)</span>、<span style="color:var(--gold);">使用意象(usesImagery)</span>、
-          <span style="color:var(--gold);">主情(expressesEmotion)</span>、<span style="color:var(--gold);">承继(inherits)</span>、
-          <span style="color:var(--gold);">作于(datedTo)</span>。
+        <div class="section-title"><span class="icon">層</span>七层（Layers）· 上下贯通</div>
+        <p style="color:var(--ink-2);font-size:14px;line-height:1.9;margin-bottom:10px;">
+          自最抽象的"文道"以至最具体的"文化外延"，本体共分七层，上层统摄下层，下层承载上层，层层映射、下学上达。点击任一层可展开查看该层的核心概念标签。
         </p>
+        <div class="pyramid" id="pyramid"></div>
+      </section>
+
+      <!-- 四轴×七层正交矩阵 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">方</span>四轴×七层正交矩阵</div>
+        <p style="color:var(--ink-2);font-size:14px;line-height:1.9;margin-bottom:12px;">
+          四轴与七层相交形成 28 个本体格子，每格标注该维度的主轴概念。深色格子表示该轴在该层的主承载位。
+        </p>
+        <div class="ortho-wrap"><table class="ortho-table" id="orthoTable"></table></div>
+      </section>
+
+      <!-- 类体系 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">類</span>类体系（Classes）</div>
+        <p style="color:var(--ink-2);font-size:14px;line-height:1.9;margin-bottom:14px;">
+          本体类（Class）分布于各层，构成集藏知识图谱的节点类型。以下为核心类一览。
+        </p>
+        <div class="class-grid" id="classGrid"></div>
+        <div class="chart-box" style="margin-top:20px;min-height:520px;" id="classChart"></div>
+      </section>
+
+      <!-- 关系与公理 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">綱</span>核心关系（Object Properties）</div>
+        <p style="color:var(--ink-2);font-size:14px;line-height:1.9;margin-bottom:14px;">
+          关系是本体推理的边。集藏本体定义九类核心对象属性，连接人物、作品、流派、意象、时代等节点。
+        </p>
+        <div class="rel-list" id="relList"></div>
+
         <div class="quote">
-          "诗者，志之所之也，在心为志，发言为诗。"
-          <span class="src">—— 《毛诗序》</span>
+          "文之为德也大矣，与天地并生者何哉？……心生而言立，言立而文明，自然之道也。"
+          <span class="src">—— 刘勰《文心雕龙·原道》</span>
         </div>
+      </section>
+
+      <!-- 九类分区在轴层上的投影 -->
+      <section class="section">
+        <div class="section-title"><span class="icon">部</span>九类分区 · 本体投影</div>
+        <p style="color:var(--ink-2);font-size:14px;line-height:1.9;margin-bottom:12px;">
+          九类典籍（别集/总集/文评/小说/演义/话本/宝卷/笑话/谜语）在四轴×七层矩阵上的投影各不相同，下图给出每一类在各层各轴上的覆盖情况。
+        </p>
+        <div class="chart-box chart-tall" id="partChart"></div>
       </section>
 
     </div>
@@ -70,33 +165,206 @@ document.getElementById('sidebar-slot').innerHTML = JC_Link.sidebar('layers');
 document.getElementById('footer-slot').innerHTML = JC_Link.footer();
 JC_Link.initMobile();
 
-var LAYERS = [
-  {no:'L1',name:'元模型',  desc:'文/道/气'},
-  {no:'L2',name:'域类',    desc:'集部九类'},
-  {no:'L3',name:'典籍',    desc:'具体文献'},
-  {no:'L4',name:'卷篇',    desc:'篇章结构'},
-  {no:'L5',name:'文论',    desc:'文论术语'},
-  {no:'L6',name:'文象',    desc:'意象情感'},
-  {no:'L7',name:'文化',    desc:'外延语境'}
-];
-document.getElementById('levelsBox').innerHTML = LAYERS.map(function(l){
-  return '<div class="ont-lvl"><div class="lv-num">'+l.no+'</div><div class="lv-name">'+l.name+'</div><div class="lv-desc">'+l.desc+'</div></div>';
+// ===== 数据汇总 =====
+var IND = window.JICANG_INDIVIDUALS || {works:[],persons:[],relations:[]};
+var BOOKS = window.JICANG_BOOKS || [];
+var TBOX = window.JICANG_TBOX || {};
+var NET = window.JICANG_NETWORK || {nodes:[],links:[],schools:[],imagery:[]};
+var THR = window.JICANG_THEORY || {concepts:[]};
+var PART = window.JICANG_PARTITIONS || [];
+
+// 统计
+var nWorks = IND.works.length || BOOKS.length;
+var nPersons = IND.persons ? IND.persons.length : (function(){var s={};BOOKS.forEach(function(b){(b.authors||[]).forEach(function(a){s[a.name||a]=1;});});return Object.keys(s).length;})();
+var nRels = IND.relations ? IND.relations.length : 0;
+var nSchools = NET.schools ? NET.schools.length : 0;
+var nImgs = NET.imagery ? NET.imagery.length : 0;
+var nThr = THR.concepts ? THR.concepts.length : 0;
+var nDyn = 0;var ds={};BOOKS.forEach(function(b){if(b.dynasty)ds[b.dynasty]=1;});nDyn=Object.keys(ds).length;
+
+document.getElementById('statRow').innerHTML = [
+  {n:nWorks,l:'典籍作品'},
+  {n:nPersons,l:'著者人物'},
+  {n:nSchools,l:'文学流派'},
+  {n:nImgs,l:'经典意象'},
+  {n:nThr,l:'文论概念'},
+  {n:'7',l:'本体层级'},
+  {n:'4',l:'本体轴'},
+  {n:nDyn,l:'朝代覆盖'}
+].map(function(s){return '<div class="stat-box"><div class="n">'+s.n+'</div><div class="l">'+s.l+'</div></div>';}).join('');
+
+// ===== 四轴 =====
+var AXIS_COLORS = {'A1':'#8B2500','A2':'#B8860B','A3':'#2F4F4F','A4':'#5C4033'};
+document.getElementById('axisGrid').innerHTML = TBOX.axes.map(function(a){
+  return '<div class="axis-card" style="border-top-color:'+AXIS_COLORS[a.id]+';">'+
+    '<div class="ax-id">'+a.id+' · '+a.en+'</div>'+
+    '<h3>'+a.name+'</h3>'+
+    '<div class="ax-en">'+a.en+'</div>'+
+    '<p>'+a.desc+'</p>'+
+    '<div class="ax-count">下属 '+a.cls+' 个核心类</div>'+
+    '</div>';
 }).join('');
 
-var CLASSES = [
-  {name:'Work（典籍作品）',cls:'L3',desc:'集部独立著作单元，如《李太白集》《红楼梦》。核心属性：title、dynasty、chars、category。'},
-  {name:'Person（著者人物）',cls:'L3',desc:'集部文献作者，含姓名、朝代、字号、所属流派等。'},
-  {name:'Chapter（卷篇）',cls:'L4',desc:'典籍内部卷、回、篇、章的结构单元，承载具体文本。'},
-  {name:'School（流派）',cls:'L5',desc:'文学流派，如建安七子、江西诗派、唐宋派、桐城派等。'},
-  {name:'Imagery（意象）',cls:'L6',desc:'文学意象——月、柳、梅、雁、酒、剑等承载文化情感的象征单元。'},
-  {name:'TheoryTerm（文论术语）',cls:'L5',desc:'文论范畴——气、风骨、神韵、格调、性灵、肌理等。'},
-  {name:'Emotion（情感）',cls:'L6',desc:'作品所抒发的主要情志类别：忧国、思归、别情、咏史、山水等。'},
-  {name:'Dynasty（朝代）',cls:'L7',desc:'时代语境，汉魏唐宋元明清民国等，作品与人物均依附于朝代。'},
-  {name:'CulturalContext（文化外延）',cls:'L7',desc:'历史事件、科举制度、宗教思潮、地理空间等外部语境。'}
+// ===== 七层宝塔（L0→L6）=====
+var LAYERS_ORDERED = [
+  {id:'L0',name:'元模型层',no:'L0',axes:['A1','A2','A3','A4'],desc:'描述本体本身的元语言——轴、层、类、属性、关系、个体。'},
+  {id:'L1',name:'文道本体层',no:'L1',axes:['A2'],desc:'中国文学顶层形上概念：道、气、理、文、言、意、象、情、性、才、学、识。'},
+  {id:'L2',name:'文论范畴层',no:'L2',axes:['A2'],desc:'文论核心范畴：风骨、神思、滋味、意境、格调、神韵、性灵、肌理。'},
+  {id:'L3',name:'流派体系层',no:'L3',axes:['A1','A2','A3','A4'],desc:'诸子百家、文学流派、文社、文体体例、题材母题、文法技法、意象典故。'},
+  {id:'L4',name:'文本载体层',no:'L4',axes:['A1','A2','A3','A4'],desc:'九类典籍及其卷篇章节字韵结构，版本注疏。'},
+  {id:'L5',name:'人物传承层',no:'L5',axes:['A3','A4'],desc:'圣王圣贤、宗师、大家、名家、评点家、注家、学者——师徒/交游/姻亲/同社。'},
+  {id:'L6',name:'文化外延层',no:'L6',axes:['A1','A2','A3','A4'],desc:'俗文学（宝卷/说唱/笑话/谜语）、民俗意象、刻本出版、域外流传。'}
 ];
-document.getElementById('classGrid').innerHTML = CLASSES.map(function(c){
-  return '<div class="class-card"><h3>'+c.name+'</h3><div class="cls">'+c.cls+'</div><p>'+c.desc+'</p></div>';
+document.getElementById('pyramid').innerHTML = LAYERS_ORDERED.map(function(l){
+  var chips = l.axes.map(function(a){
+    var ax = (TBOX.axes||[]).find(function(x){return x.id===a;}) || {name:a};
+    return '<span class="ax-chip" style="border-color:'+AXIS_COLORS[a]+';color:'+AXIS_COLORS[a]+';">'+ax.name+'</span>';
+  }).join('');
+  return '<div class="pyr-lv">'+
+    '<div class="lv-no">'+l.no+'</div>'+
+    '<div class="lv-name">'+l.name+'</div>'+
+    '<div class="lv-desc">'+l.desc+'</div>'+
+    '<div class="lv-axes">'+chips+'</div>'+
+    '</div>';
 }).join('');
+
+// ===== 正交矩阵 =====
+var LABS = TBOX.layerAxisLabels || {};
+var axisIds = ['A1','A2','A3','A4'];
+var layerIds = ['L0','L1','L2','L3','L4','L5','L6'];
+var layerNames = {'L0':'L0 元模型','L1':'L1 文道','L2':'L2 文论','L3':'L3 流派','L4':'L4 文本','L5':'L5 人物','L6':'L6 外延'};
+var axisNames = {'A1':'文体典要轴','A2':'义理意象轴','A3':'人物传承轴','A4':'时代事件轴'};
+var html = '<thead><tr><th>轴 \\ 层</th>' + layerIds.map(function(l){return '<th>'+layerNames[l]+'</th>';}).join('') + '</tr></thead><tbody>';
+axisIds.forEach(function(a){
+  html += '<tr><td class="ax-name">'+axisNames[a]+'</td>';
+  layerIds.forEach(function(l){
+    var lab = (LABS[l]&&LABS[l][a])||'—';
+    var main = (l==='L4'&&(a==='A1'||a==='A4')) || (l==='L5'&&a==='A3') || (l==='L2'&&a==='A2') || (l==='L3'&&(a==='A1'||a==='A2')) || (l==='L6'&&a==='A1');
+    html += '<td class="'+(lab==='—'?'off':'on')+'" style="'+(main?'background:rgba(217,74,74,.2);font-weight:700;':'')+'">'+lab+'</td>';
+  });
+  html += '</tr>';
+});
+html += '</tbody>';
+document.getElementById('orthoTable').innerHTML = html;
+
+// ===== 类体系 =====
+var CLASSES = (TBOX.classes||[]).filter(function(c){return c.parent && c.id!=='jc:Entity' && c.id.indexOf('SiKu')<0 && c.id!=='jc:JiBu';});
+// 补几个核心类描述（手动精选）
+var CORE_CLASSES = [
+  {id:'Work',name:'典籍作品',layer:'L4',parent:'载体',desc:'集部独立著作单元，如《李太白集》《红楼梦》。核心属性：title、dynasty、chars、category、authors。',count:nWorks},
+  {id:'Person',name:'著者人物',layer:'L5',parent:'人物',desc:'集部文献作者，含姓名、朝代、字号、所属流派、交游关系等。',count:nPersons},
+  {id:'School',name:'文学流派',layer:'L3',parent:'流派',desc:'如建安风骨、江西诗派、唐宋派、桐城派、豪放/婉约词派等。',count:nSchools},
+  {id:'Imagery',name:'文学意象',layer:'L3',parent:'意象',desc:'月、柳、梅、雁、酒、剑、流水、夕阳等承载文化情感的象征单元。',count:nImgs},
+  {id:'TheoryTerm',name:'文论术语',layer:'L2',parent:'文论',desc:'气、风骨、神韵、格调、性灵、肌理、妙悟、境界等文论核心范畴。',count:nThr},
+  {id:'Emotion',name:'情志',layer:'L6',parent:'文化',desc:'忧国、思归、别情、咏史、山水、隐逸、爱情等作品主情类别。'},
+  {id:'Dynasty',name:'朝代',layer:'L6',parent:'时代',desc:'汉魏唐宋元明清民国等时代语境，作品人物均依附于朝代。',count:nDyn},
+  {id:'Chapter',name:'卷篇章回',layer:'L4',parent:'载体',desc:'典籍内部的卷、篇、章、回、则结构单元，承载具体文本。'},
+  {id:'CulturalContext',name:'文化语境',layer:'L6',parent:'文化',desc:'历史事件、科举制度、宗教思潮、出版刻本、地理空间等外部语境。'},
+  {id:'WenDao',name:'文道概念',layer:'L1',parent:'文道',desc:'文、道、气、理、言、意、象、情、性、才、学、识等顶层形上概念。'},
+  {id:'Style',name:'文体体例',layer:'L3',parent:'流派',desc:'诗/文/词/曲/小说/诗话等文体与体例分类。'},
+  {id:'Form',name:'体裁/诗体',layer:'L3',parent:'流派',desc:'乐府、古体、近体、绝句、律诗、词牌、曲牌等具体体裁。'}
+];
+document.getElementById('classGrid').innerHTML = CORE_CLASSES.map(function(c){
+  return '<div class="class-card"><h4>'+c.name+'</h4>'+
+    '<div class="cls-meta">'+c.layer+' · '+c.parent+(c.count?' · '+c.count+'个实例':'')+'</div>'+
+    '<p>'+c.desc+'</p></div>';
+}).join('');
+
+// 类层次 ECharts（tree）
+var classTree = {
+  name:'本体元素 (Entity)',
+  itemStyle:{color:'#d94a4a'},
+  children:[
+    {name:'文道核心 (L1)',itemStyle:{color:'#d4b079'},children:[{name:'文·道·气·理·言·意·象·情·性·才·学·识'}]},
+    {name:'文论范畴 (L2)',itemStyle:{color:'#d4b079'},children:[{name:'风骨/神思/滋味/意境/格调/神韵/性灵/肌理'}]},
+    {name:'流派体系 (L3)',itemStyle:{color:'#d4b079'},children:[
+      {name:'诸子/文社'},
+      {name:'文学流派'},
+      {name:'文体/体裁'},
+      {name:'意象/典故/题材/技法'}
+    ]},
+    {name:'文本载体 (L4)',itemStyle:{color:'#d4b079'},children:[
+      {name:'九类典籍 ('+PART.length+'类)',children:PART.map(function(p){return {name:p.name+' '+p.count+'部'};})},
+      {name:'卷·篇·章·回·则'}
+    ]},
+    {name:'人物传承 (L5)',itemStyle:{color:'#d4b079'},children:[
+      {name:'宗师/大家/名家 ('+nPersons+'位)'},
+      {name:'评点家/注家/选家'},
+      {name:'交游/师承/姻亲/同社'}
+    ]},
+    {name:'文化外延 (L6)',itemStyle:{color:'#d4b079'},children:[
+      {name:'俗文学·说唱·戏曲'},
+      {name:'民俗意象·典故'},
+      {name:'刻本/出版/域外流传'}
+    ]}
+  ]
+};
+echarts.init(document.getElementById('classChart')).setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'item',triggerOn:'mousemove'},
+  series:[{
+    type:'tree',data:[classTree],top:'2%',left:'14%',bottom:'2%',right:'20%',
+    symbolSize:9,orient:'LR',expandAndCollapse:true,
+    label:{position:'left',verticalAlign:'middle',align:'right',fontSize:13,color:'#d4d0c8'},
+    leaves:{label:{position:'right',verticalAlign:'middle',align:'left',color:'#a8a098'}},
+    lineStyle:{color:'rgba(212,176,121,.4)',width:1,curveness:0.5},
+    itemStyle:{color:'#d94a4a',borderColor:'#d4b079'},
+    emphasis:{focus:'descendant'},
+    expandAndCollapse:false,
+    initialTreeDepth:4
+  }]
+});
+
+// ===== 关系 =====
+var RELS = [
+  {name:'著述',en:'authored',desc:'Person → Work，人物创作/编纂某部作品。'},
+  {name:'收于',en:'partOf',desc:'卷/篇 → Work，作品内部结构聚合。'},
+  {name:'属于流派',en:'schoolOf',desc:'Person/Work → School，归属某文学流派。'},
+  {name:'承继',en:'influences',desc:'Person → Person，作家/文论家之间的师承影响链。'},
+  {name:'使用意象',en:'usesImagery',desc:'Work → Imagery，作品运用某文学意象。'},
+  {name:'主情',en:'expresses',desc:'Work → Emotion，作品主要抒发某类情志。'},
+  {name:'作于',en:'datedTo',desc:'Work/Person → Dynasty，所属时代。'},
+  {name:'交游',en:'acquaintedWith',desc:'Person ↔ Person，唱和/同社/同年/姻亲/同僚关系。'},
+  {name:'论及',en:'discusses',desc:'WenLun → Term，文论概念所论及的范畴。'}
+];
+document.getElementById('relList').innerHTML = RELS.map(function(r){
+  return '<div class="rel-item">'+
+    '<span class="rel-name">'+r.name+'</span>'+
+    '<span class="rel-en">'+r.en+'</span>'+
+    '<span class="rel-desc">'+r.desc+'</span>'+
+    '</div>';
+}).join('');
+
+// ===== 九类分区热力图（类×轴层）=====
+var ORTHO = TBOX.partitionOrtho || {};
+var catKeys = ['bieji','zongji','wenping','xiaoshuo','yanyi','huaben','baojuan','xiaohua','miyu'];
+var catNames = {'bieji':'别集','zongji':'总集','wenping':'文评','xiaoshuo':'小说','yanyi':'演义','huaben':'话本','baojuan':'宝卷','xiaohua':'笑话','miyu':'谜语'};
+var heatData = [];var heatMax=1;
+catKeys.forEach(function(ck,ci){
+  axisIds.forEach(function(a,ai){
+    layerIds.forEach(function(l,li){
+      var v = (ORTHO[ck]&&ORTHO[ck][a]&&ORTHO[ck][a][['','','','','','',''].indexOf('')+li])?1:((ORTHO[ck]&&ORTHO[ck][a])?(ORTHO[ck][a][li]||0):0);
+      heatData.push([li,ci,v]);
+    });
+  });
+});
+var pchart = echarts.init(document.getElementById('partChart'));
+pchart.setOption({
+  backgroundColor:'transparent',
+  tooltip:{position:'top',formatter:function(p){return catNames[catKeys[p.data[1]]]+' · '+axisIds[p.data[0]%4]+' · '+layerIds[Math.floor(p.data[0]/4)]+'<br/>覆盖度：'+p.data[2];}},
+  grid:{left:100,right:40,top:40,bottom:60},
+  xAxis:{type:'category',data:layerIds,axisLabel:{color:'#d4d0c8'},splitArea:{show:true}},
+  yAxis:{type:'category',data:catKeys.map(function(k){return catNames[k];}),axisLabel:{color:'#d4d0c8'},splitArea:{show:true}},
+  visualMap:{min:0,max:1,calculable:true,orient:'horizontal',left:'center',bottom:0,
+    inRange:{color:['rgba(212,176,121,.05)','rgba(217,74,74,.55)']},textStyle:{color:'#a8a098'}},
+  series:[{name:'覆盖',type:'heatmap',data:heatData,label:{show:false},
+    itemStyle:{borderColor:'rgba(10,22,40,.3)',borderWidth:1}}]
+});
+
+window.addEventListener('resize',function(){
+  pchart.resize();
+  echarts.getInstanceByDom(document.getElementById('classChart')).resize();
+});
 </script>
 </body>
 </html>
